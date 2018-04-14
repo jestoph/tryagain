@@ -49,7 +49,8 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity single_cycle_core is
     port ( reset  : in  std_logic;
-           clk    : in  std_logic );
+           clk    : in  std_logic;
+           clk_pc  : in std_logic           );
 end single_cycle_core;
 
 architecture structural of single_cycle_core is
@@ -104,8 +105,12 @@ component control_unit is
            reg_dst    : out std_logic;
            reg_write  : out std_logic;
            alu_src    : out std_logic;
-			  alu_op		 : out std_logic_vector(2 downto 0);
+           alu_op	  : out std_logic_vector(2 downto 0);
            mem_write  : out std_logic;
+           do_jmp     : out std_logic;
+           do_slt     : out std_logic;
+           byte_addr  : out  std_logic;
+           mem_read   : out std_logic;
            mem_to_reg : out std_logic );
 end component;
 
@@ -131,8 +136,9 @@ end component;
 component alu_16b is
     port ( src_a     : in  std_logic_vector(15 downto 0);
            src_b     : in  std_logic_vector(15 downto 0);
-           sum       : out std_logic_vector(15 downto 0);
-			  alu_op		: in 	std_logic_vector(2 downto 0);
+           alu_out   : out std_logic_vector(15 downto 0);
+           alu_op	 : in  std_logic_vector(2 downto 0);
+           do_slt    : in  std_logic;
            carry_out : out std_logic );
 end component;
 
@@ -140,7 +146,9 @@ component data_memory is
     port ( reset        : in  std_logic;
            clk          : in  std_logic;
            write_enable : in  std_logic;
+           read_enable  : in  std_logic;
            write_data   : in  std_logic_vector(15 downto 0);
+           byte_addr	: in  std_logic;
            addr_in      : in  std_logic_vector(11 downto 0);
            data_out     : out std_logic_vector(15 downto 0) );
 end component;
@@ -172,29 +180,36 @@ signal sig_alu_src_b            : std_logic_vector(15 downto 0);
 signal sig_alu_result           : std_logic_vector(15 downto 0); 
 signal sig_alu_carry_out        : std_logic;
 signal sig_data_mem_out         : std_logic_vector(15 downto 0);
-signal sig_alu_op				: std_logic_vector(2 downto 0);
 
 -- The following are added to allow for modifications to the pc
 -- ie for branching and jumping.
--- When jumping (signaled by do_jump=1) we read the address from
+-- When jumping (signaled by sig_do_jmp=1) we read the address from
 -- the immediate that is within the instruction itself
 -- When branching we still read the address from the instruction 
 -- immediate, but in this case it is a 4-bit value so must be sign extended 
 -- NOTE! The instruction memory is limited to 2^12 addresses for 
 -- convenience.
+
+signal sig_do_branch            : std_logic; -- TODO: ADD TO CONTROL UNIT THESE ARENT SIGNALS!
+signal sig_do_jmp               : std_logic;
+
+signal sig_do_slt               : std_logic;
+signal sig_byte_addr            : std_logic;
+signal sig_mem_read             : std_logic;
+signal sig_alu_op			    : std_logic_vector(2 downto 0);
 signal sig_curr_pc_or_branch    : std_logic_vector(11 downto 0);
 signal sig_branch_offset        : std_logic_vector(11 downto 0);
-signal do_jump                  : std_logic; -- TODO: ADD TO CONTROL UNIT THESE ARENT SIGNALS!
-signal do_branch                : std_logic; -- TODO: ADD TO CONTROL UNIT THESE ARENT SIGNALS!
+
+
+
 
 begin
 
     sig_one_4b <= "0001";
 	sig_one_12b <= "000000000001";
     
-    -- TODO THESE SHOULD COME FROM CONTROL UNIT!
-    do_jump <= '0';
-    do_branch <= '0';
+    -- TODO THIS SHOULD COME FROM CONTROL UNIT!
+    sig_do_branch <= '0';
 
     pc : program_counter
     port map ( reset    => reset,
@@ -210,7 +225,7 @@ begin
     -- Choose whether our branch offset is from a register (bne/beq)
     -- or from an immediate (j)
     pc_mux : mux_2to1_12b 
-    port map ( mux_select => do_jump,
+    port map ( mux_select => sig_do_jmp,
                data_a     => sig_insn(11 downto 0), -- Jump has address encoded in instruction
                data_b     => sig_branch_offset, -- Branch has address encoded in last nibble
                data_out   => sig_jump_or_branch_addr);
@@ -218,7 +233,7 @@ begin
 
     -- Choose whether we go to PC+1 or PC+1+offset where the offset could be a branch or jump
     pc_mux : mux_2to1_12b 
-    port map ( mux_select => do_jump or do_branch,
+    port map ( mux_select => sig_do_jmp or sig_do_branch,
                data_a     => sig_curr_pc, -- Default to passing on current pc
                data_b     => sig_jump_or_branch_addr,
                data_out   => sig_curr_pc_or_branch);
@@ -245,8 +260,12 @@ begin
                reg_write  => sig_reg_write,
                alu_src    => sig_alu_src,
                mem_write  => sig_mem_write,
+               mem_read   => sig_mem_read,
                mem_to_reg => sig_mem_to_reg,
-					alu_op	  => sig_alu_op);
+               do_jmp     => sig_do_jmp,
+               do_slt     => sig_do_slt,
+               byte_addr  => sig_byte_addr,
+			   alu_op	  => sig_alu_op);
 
     mux_reg_dst : mux_2to1_4b 
     port map ( mux_select => sig_reg_dst,
@@ -274,15 +293,18 @@ begin
     alu : alu_16b 
     port map ( src_a     => sig_read_data_a,
                src_b     => sig_alu_src_b,
-               sum       => sig_alu_result,
-					alu_op 	 => sig_alu_op,
+               alu_out   => sig_alu_result,
+			   alu_op 	 => sig_alu_op,
+               do_slt    => sig_do_slt,
                carry_out => sig_alu_carry_out );
 
     data_mem : data_memory 
     port map ( reset        => reset,
                clk          => clk,
                write_enable => sig_mem_write,
+               read_enable  => sig_mem_read,
                write_data   => sig_read_data_b,
+               byte_addr	=> sig_byte_addr,
                addr_in      => sig_alu_result(11 downto 0),
                data_out     => sig_data_mem_out );
                

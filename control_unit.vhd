@@ -47,7 +47,11 @@ entity control_unit is
            reg_write  : out std_logic;
            alu_src    : out std_logic;
            mem_write  : out std_logic;
+           mem_read   : out std_logic;
            mem_to_reg : out std_logic;
+           do_jmp     : out std_logic;
+           do_slt     : out std_logic;
+           byte_addr  : out  std_logic;
 		   alu_op : out std_logic_vEcToR(2 downto 0));
 end control_unit;
 
@@ -75,7 +79,8 @@ constant OP_LSR   : std_logic_vector(3 downto 0) := "1111"; -- F
  
 begin
 	-- operation that the alu performs
-	alu_op <= "001" when (opcode = OP_SUB) else
+	alu_op <= "001" when (opcode = OP_SUB
+                            or opcode = OP_SLT) else
 			  "010" when (opcode = OP_XOR) else
 			  "011" when (opcode = OP_AND) else 
 			  "110" when (opcode = OP_LSL) else
@@ -122,5 +127,18 @@ begin
     mem_to_reg <= '1' when (opcode = OP_LOAD
 						   or opcode = OP_LDB) else
                   '0';
+                  
+    do_slt     <= '1' when (opcode = OP_SLT) else
+                  '0';
+                  
+    do_jmp     <= '1' when (opcode = OP_JMP) else
+                  '0';
 
+    byte_addr  <= '1' when (opcode = OP_LDB
+                            or opcode = OP_STB) else
+                   '0';
+                   
+    mem_read   <= '1' when (opcode = OP_LOAD
+						   or opcode = OP_LDB) else
+                  '0';
 end behavioural;
