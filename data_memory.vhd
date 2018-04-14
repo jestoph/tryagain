@@ -27,6 +27,7 @@ entity data_memory is
     port ( reset        : in  std_logic;
            clk          : in  std_logic;
            write_enable : in  std_logic;
+           read_enable  : in  std_logic;
 		   byte_addr	: in  std_logic;
            write_data   : in  std_logic_vector(15 downto 0);
            addr_in      : in  std_logic_vector(11 downto 0);
@@ -39,7 +40,7 @@ type mem_array is array(0 to 15) of std_logic_vector(15 downto 0);
 signal sig_data_mem : mem_array;
 --signal sig_data_mem_tmp : mem_array;
 --signal sig_var_addr_b : std_logic_vector (11 downto 0);
-signal sig_dm_out : std_logic_vector (15 downto 0);
+
 signal sig_dm_chosen : std_logic_vector (15 downto 0);
 --signal sig_addr : std_logic_vector(11 downto 0);
 
@@ -48,10 +49,12 @@ begin
                            write_enable,
                            write_data,
                            addr_in,
+                           read_enable,
 						   byte_addr) is
   
     variable var_data_mem : mem_array;
     variable var_addr     : integer;
+    variable var_dm_out : std_logic_vector (15 downto 0);
     
 	begin
         --var_addr := conv_integer(addr_in);
@@ -100,20 +103,24 @@ begin
         -- continuous read of the memory location given by var_addr 
         --data_out <= var_data_mem(var_addr);
 		
-		-- Byte Addressible Mode	
-		if(byte_addr = '1') then
-			-- Take the relevant byte and zero extend
-			if(addr_in(0) = '1') then
-				sig_dm_out <= X"00" & var_data_mem(var_addr)(15 downto 8);
-			else
-				sig_dm_out <= X"00" & var_data_mem(var_addr)(7 downto 0);			
-			end if;
-		else 				
-		    -- WORD Addressible
-			sig_dm_out <= var_data_mem(var_addr);
-		end if;
+        if(read_enable = '1') then
+            -- Byte Addressible Mode	
+            if(byte_addr = '1') then
+                -- Take the relevant byte and zero extend
+                if(addr_in(0) = '1') then
+                    var_dm_out := X"00" & var_data_mem(var_addr)(15 downto 8);
+                else
+                    var_dm_out := X"00" & var_data_mem(var_addr)(7 downto 0);			
+                end if;
+            else 				
+                -- WORD Addressible
+                var_dm_out := var_data_mem(var_addr);
+            end if;
+        else
+            var_dm_out := "0000000000000000";
+        end if;
 		
-		data_out <= sig_dm_out;
+		data_out <= var_dm_out;
 		
 		
         -- the following are probe signals (for simulation purpose) 
