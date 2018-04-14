@@ -1,0 +1,8 @@
+# Ignore everything by default
+*
+
+
+# But allow these files
+!*.vhd
+!*.vhdl
+!.gitignore
