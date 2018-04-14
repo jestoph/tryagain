@@ -29,7 +29,7 @@ entity mux_2to1_12b is
            data_out   : out std_logic_vector(11 downto 0) );
 end mux_2to1_12b;
 
-architecture structural of mux_2to1_16b is
+architecture structural of mux_2to1_12b is
 
 component mux_2to1_1b is
     port ( mux_select : in  std_logic;
@@ -41,7 +41,7 @@ end component;
 begin
 
     -- this for-generate-loop replicates 12 single-bit 2-to-1 mux
-    muxes : for i in 12 downto 0 generate
+    muxes : for i in 11 downto 0 generate
         bit_mux : mux_2to1_1b 
         port map ( mux_select => mux_select,
                    data_a     => data_a(i),

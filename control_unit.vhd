@@ -53,7 +53,9 @@ entity control_unit is
            do_slt     : out std_logic;
            b_type     : out std_logic;
            b_insn     : out std_logic;
+           do_branch  : in  std_logic;
            byte_addr  : out  std_logic;
+           do_pc_offset : out std_logic;
 		   alu_op : out std_logic_vEcToR(2 downto 0));
 end control_unit;
 
@@ -78,6 +80,8 @@ constant OP_JMP   : std_logic_vector(3 downto 0) := "0010"; -- 2
 
 constant OP_LSL   : std_logic_vector(3 downto 0) := "1110"; -- E
 constant OP_LSR   : std_logic_vector(3 downto 0) := "1111"; -- F
+
+signal   sig_do_jmp : std_logic;
  
 begin
 	-- operation that the alu performs
@@ -133,7 +137,7 @@ begin
     do_slt     <= '1' when (opcode = OP_SLT) else
                   '0';
                   
-    do_jmp     <= '1' when (opcode = OP_JMP) else
+    sig_do_jmp     <= '1' when (opcode = OP_JMP) else
                   '0';
 
     byte_addr  <= '1' when (opcode = OP_LDB
@@ -145,11 +149,12 @@ begin
                   '0';
                   
     b_type     <= '1' when (opcode = OP_BEQ
-                           or opcode = BNE) else
+                           or opcode = OP_BNE) else
                   '0';
     
     b_insn     <= '1' when (opcode = OP_BEQ) else
                   '0';
-
     
+    do_jmp     <= sig_do_jmp;
+    do_pc_offset <= do_branch or sig_do_jmp;
 end behavioural;

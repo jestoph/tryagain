@@ -88,9 +88,9 @@ end component;
 
 component mux_2to1_12b is
     port ( mux_select : in  std_logic;
-           data_a     : in  std_logic_vector(15 downto 0);
-           data_b     : in  std_logic_vector(15 downto 0);
-           data_out   : out std_logic_vector(15 downto 0) );
+           data_a     : in  std_logic_vector(11 downto 0);
+           data_b     : in  std_logic_vector(11 downto 0);
+           data_out   : out std_logic_vector(11 downto 0) );
 end component;
 
 component mux_2to1_16b is
@@ -113,6 +113,8 @@ component control_unit is
            b_type     : out std_logic;
            b_insn     : out std_logic;
            mem_read   : out std_logic;
+           do_branch  : in  std_logic;
+           do_pc_offset : out std_logic;
            mem_to_reg : out std_logic );
 end component;
 
@@ -167,6 +169,7 @@ component adder_12b is
     port ( src_a     : in  std_logic_vector(11 downto 0);
            src_b     : in  std_logic_vector(11 downto 0);
            sum       : out std_logic_vector(11 downto 0);
+           carry_in  : in  std_logic;
            carry_out : out std_logic );
 end component;
 
@@ -211,11 +214,16 @@ signal sig_do_branch            : std_logic;
 signal sig_do_jmp               : std_logic;
 signal sig_curr_pc_or_branch    : std_logic_vector(11 downto 0);
 signal sig_branch_offset        : std_logic_vector(11 downto 0);
+signal sig_z_12b                : std_logic_vector(11 downto 0);
+signal sig_jump_or_branch_addr  : std_logic_vector(11 downto 0);
+signal sig_do_pc_offset         : std_logic;
 
 begin
 
     sig_one_4b <= "0001";
 	sig_one_12b <= "000000000001";
+    sig_z_12b <= "000000000000";
+    
     
     -- TODO THIS SHOULD COME FROM CONTROL UNIT!
     sig_do_branch <= '0';
@@ -233,7 +241,7 @@ begin
 
     -- Choose whether our branch offset is from a register (bne/beq)
     -- or from an immediate (j)
-    pc_mux : mux_2to1_12b 
+    pc_mux_bjmp : mux_2to1_12b 
     port map ( mux_select => sig_do_jmp,
                data_a     => sig_insn(11 downto 0), -- Jump has address encoded in instruction
                data_b     => sig_branch_offset, -- Branch has address encoded in last nibble
@@ -241,16 +249,17 @@ begin
     
 
     -- Choose whether we go to PC+1 or PC+1+offset where the offset could be a branch or jump
-    pc_mux : mux_2to1_12b 
-    port map ( mux_select => sig_do_jmp or sig_do_branch,
-               data_a     => sig_curr_pc, -- Default to passing on current pc
+    pc_mux_offset : mux_2to1_12b 
+    port map ( mux_select => sig_do_pc_offset,
+               data_a     => sig_z_12b, 
                data_b     => sig_jump_or_branch_addr,
                data_out   => sig_curr_pc_or_branch);
 
     next_pc : adder_12b 
     port map ( src_a     => sig_curr_pc_or_branch, 
-               src_b     => sig_one_12b,
+               src_b     => sig_curr_pc,
                sum       => sig_next_pc,   
+               carry_in  => '1',
                carry_out => sig_pc_carry_out );
     
     insn_mem : instruction_memory 
@@ -276,6 +285,8 @@ begin
                byte_addr  => sig_byte_addr,
                b_type     => sig_b_type,
                b_insn     => sig_b_type,
+               do_branch  => sig_do_branch,
+               do_pc_offset => sig_do_pc_offset,
 			   alu_op	  => sig_alu_op);
 
     mux_reg_dst : mux_2to1_4b 

@@ -42,7 +42,9 @@ begin
                   '0';
                   
     
-    do_branch   <= b_insn = '1' xor (sig_cmp_eq XOR b_type);
+    do_branch   <= '1' when (b_insn = '1' and ((sig_cmp_eq = '1' and b_type = '1')
+                                                or (sig_cmp_eq = '0' and b_type = '0'))) else
+                  '0';
                   
 
 
