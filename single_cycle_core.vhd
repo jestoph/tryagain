@@ -73,11 +73,23 @@ component sign_extend_4to16 is
            data_out : out std_logic_vector(15 downto 0) );
 end component;
 
+component sign_extend_4to12 is
+    port ( data_in  : in  std_logic_vector(3 downto 0);
+           data_out : out std_logic_vector(11 downto 0) );
+end component;
+
 component mux_2to1_4b is
     port ( mux_select : in  std_logic;
            data_a     : in  std_logic_vector(3 downto 0);
            data_b     : in  std_logic_vector(3 downto 0);
            data_out   : out std_logic_vector(3 downto 0) );
+end component;
+
+component mux_2to1_12b is
+    port ( mux_select : in  std_logic;
+           data_a     : in  std_logic_vector(15 downto 0);
+           data_b     : in  std_logic_vector(15 downto 0);
+           data_out   : out std_logic_vector(15 downto 0) );
 end component;
 
 component mux_2to1_16b is
@@ -143,7 +155,7 @@ end component;
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
 signal sig_one_4b               : std_logic_vector(3 downto 0);
-signal sig_one_12b               : std_logic_vector(11 downto 0);
+signal sig_one_12b              : std_logic_vector(11 downto 0);
 signal sig_pc_carry_out         : std_logic;
 signal sig_insn                 : std_logic_vector(15 downto 0);
 signal sig_sign_extended_offset : std_logic_vector(15 downto 0);
@@ -160,12 +172,29 @@ signal sig_alu_src_b            : std_logic_vector(15 downto 0);
 signal sig_alu_result           : std_logic_vector(15 downto 0); 
 signal sig_alu_carry_out        : std_logic;
 signal sig_data_mem_out         : std_logic_vector(15 downto 0);
-signal sig_alu_op					  : std_logic_vector(2 downto 0);
+signal sig_alu_op				: std_logic_vector(2 downto 0);
+
+-- The following are added to allow for modifications to the pc
+-- ie for branching and jumping.
+-- When jumping (signaled by do_jump=1) we read the address from
+-- the immediate that is within the instruction itself
+-- When branching we still read the address from the instruction 
+-- immediate, but in this case it is a 4-bit value so must be sign extended 
+-- NOTE! The instruction memory is limited to 2^12 addresses for 
+-- convenience.
+signal sig_curr_pc_or_branch    : std_logic_vector(11 downto 0);
+signal sig_branch_offset        : std_logic_vector(11 downto 0);
+signal do_jump                  : std_logic; -- TODO: ADD TO CONTROL UNIT THESE ARENT SIGNALS!
+signal do_branch                : std_logic; -- TODO: ADD TO CONTROL UNIT THESE ARENT SIGNALS!
 
 begin
 
     sig_one_4b <= "0001";
-	 sig_one_12b <= "000000000001";
+	sig_one_12b <= "000000000001";
+    
+    -- TODO THESE SHOULD COME FROM CONTROL UNIT!
+    do_jump <= '0';
+    do_branch <= '0';
 
     pc : program_counter
     port map ( reset    => reset,
@@ -173,8 +202,29 @@ begin
                addr_in  => sig_next_pc,
                addr_out => sig_curr_pc ); 
 
+    -- We need to sign extend because a branch encodes the address in an immediate
+    branch_extend : sign_extend_4to12 
+    port map ( data_in  => sig_insn(3 downto 0),
+               data_out => sig_branch_offset );
+
+    -- Choose whether our branch offset is from a register (bne/beq)
+    -- or from an immediate (j)
+    pc_mux : mux_2to1_12b 
+    port map ( mux_select => do_jump,
+               data_a     => sig_insn(11 downto 0), -- Jump has address encoded in instruction
+               data_b     => sig_branch_offset, -- Branch has address encoded in last nibble
+               data_out   => sig_jump_or_branch_addr);
+    
+
+    -- Choose whether we go to PC+1 or PC+1+offset where the offset could be a branch or jump
+    pc_mux : mux_2to1_12b 
+    port map ( mux_select => do_jump or do_branch,
+               data_a     => sig_curr_pc, -- Default to passing on current pc
+               data_b     => sig_jump_or_branch_addr,
+               data_out   => sig_curr_pc_or_branch);
+
     next_pc : adder_12b 
-    port map ( src_a     => sig_curr_pc, 
+    port map ( src_a     => sig_curr_pc_or_branch, 
                src_b     => sig_one_12b,
                sum       => sig_next_pc,   
                carry_out => sig_pc_carry_out );
