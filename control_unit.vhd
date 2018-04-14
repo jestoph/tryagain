@@ -51,6 +51,8 @@ entity control_unit is
            mem_to_reg : out std_logic;
            do_jmp     : out std_logic;
            do_slt     : out std_logic;
+           b_type     : out std_logic;
+           b_insn     : out std_logic;
            byte_addr  : out  std_logic;
 		   alu_op : out std_logic_vEcToR(2 downto 0));
 end control_unit;
@@ -141,4 +143,13 @@ begin
     mem_read   <= '1' when (opcode = OP_LOAD
 						   or opcode = OP_LDB) else
                   '0';
+                  
+    b_type     <= '1' when (opcode = OP_BEQ
+                           or opcode = BNE) else
+                  '0';
+    
+    b_insn     <= '1' when (opcode = OP_BEQ) else
+                  '0';
+
+    
 end behavioural;

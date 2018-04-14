@@ -109,7 +109,9 @@ component control_unit is
            mem_write  : out std_logic;
            do_jmp     : out std_logic;
            do_slt     : out std_logic;
-           byte_addr  : out  std_logic;
+           byte_addr  : out std_logic;
+           b_type     : out std_logic;
+           b_insn     : out std_logic;
            mem_read   : out std_logic;
            mem_to_reg : out std_logic );
 end component;
@@ -153,6 +155,14 @@ component data_memory is
            data_out     : out std_logic_vector(15 downto 0) );
 end component;
 
+component branch_cmp is
+    port ( b_type       : in  std_logic; -- 1 for beq
+           b_insn       : in  std_logic; -- 1 for b instruction
+           src_a        : in  std_logic_vector(15 downto 0);
+           src_b        : in  std_logic_vector(15 downto 0);
+           do_branch    : out std_logic); -- 1 if doing branch
+end component;
+
 component adder_12b is
     port ( src_a     : in  std_logic_vector(11 downto 0);
            src_b     : in  std_logic_vector(11 downto 0);
@@ -180,6 +190,12 @@ signal sig_alu_src_b            : std_logic_vector(15 downto 0);
 signal sig_alu_result           : std_logic_vector(15 downto 0); 
 signal sig_alu_carry_out        : std_logic;
 signal sig_data_mem_out         : std_logic_vector(15 downto 0);
+signal sig_alu_op			    : std_logic_vector(2 downto 0);
+signal sig_do_slt               : std_logic;
+signal sig_byte_addr            : std_logic;
+signal sig_mem_read             : std_logic;
+signal sig_b_type               : std_logic;
+signal sig_b_insn               : std_logic;
 
 -- The following are added to allow for modifications to the pc
 -- ie for branching and jumping.
@@ -190,18 +206,11 @@ signal sig_data_mem_out         : std_logic_vector(15 downto 0);
 -- NOTE! The instruction memory is limited to 2^12 addresses for 
 -- convenience.
 
-signal sig_do_branch            : std_logic; -- TODO: ADD TO CONTROL UNIT THESE ARENT SIGNALS!
-signal sig_do_jmp               : std_logic;
 
-signal sig_do_slt               : std_logic;
-signal sig_byte_addr            : std_logic;
-signal sig_mem_read             : std_logic;
-signal sig_alu_op			    : std_logic_vector(2 downto 0);
+signal sig_do_branch            : std_logic;
+signal sig_do_jmp               : std_logic;
 signal sig_curr_pc_or_branch    : std_logic_vector(11 downto 0);
 signal sig_branch_offset        : std_logic_vector(11 downto 0);
-
-
-
 
 begin
 
@@ -265,6 +274,8 @@ begin
                do_jmp     => sig_do_jmp,
                do_slt     => sig_do_slt,
                byte_addr  => sig_byte_addr,
+               b_type     => sig_b_type,
+               b_insn     => sig_b_type,
 			   alu_op	  => sig_alu_op);
 
     mux_reg_dst : mux_2to1_4b 
@@ -283,6 +294,13 @@ begin
                write_data      => sig_write_data,
                read_data_a     => sig_read_data_a,
                read_data_b     => sig_read_data_b );
+               
+    reg_cmp   : branch_cmp
+    port map ( b_type     => sig_b_type,
+               b_insn     => sig_b_insn,
+               src_a      => sig_read_data_a,
+               src_b      => sig_read_data_b,
+               do_branch  => sig_do_branch);
     
     mux_alu_src : mux_2to1_16b 
     port map ( mux_select => sig_alu_src,
@@ -291,12 +309,12 @@ begin
                data_out   => sig_alu_src_b );
 
     alu : alu_16b 
-    port map ( src_a     => sig_read_data_a,
-               src_b     => sig_alu_src_b,
-               alu_out   => sig_alu_result,
-			   alu_op 	 => sig_alu_op,
-               do_slt    => sig_do_slt,
-               carry_out => sig_alu_carry_out );
+    port map ( src_a      => sig_read_data_a,
+               src_b      => sig_alu_src_b,
+               alu_out    => sig_alu_result,
+			   alu_op 	  => sig_alu_op,
+               do_slt     => sig_do_slt,
+               carry_out  => sig_alu_carry_out );
 
     data_mem : data_memory 
     port map ( reset        => reset,

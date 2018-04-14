@@ -119,7 +119,7 @@ begin
         else
             var_dm_out := "0000000000000000";
         end if;
-		 
+		
 		data_out <= var_dm_out;
 		
 		
