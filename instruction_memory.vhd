@@ -99,7 +99,7 @@ begin
             var_insn_mem(25) := X"6002"; --beq to +2
             var_insn_mem(26) := X"0000";
             var_insn_mem(27) := X"0000"; 
-            var_insn_mem(28) := X"600E";--beq to -3
+            var_insn_mem(28) := X"600C";--beq to -4
             var_insn_mem(29) := X"0000";
             var_insn_mem(30) := X"0000";
             var_insn_mem(31) := X"0000";
