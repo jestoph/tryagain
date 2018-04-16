@@ -75,17 +75,17 @@ begin
             var_insn_mem(1)  := X"8111"; -- add  $1,$1,$1  $1=$1+$1  $1 30   /1E
             var_insn_mem(2)  := X"9026"; -- addi $2,$0,6   $2=15     $2 15   /F
             var_insn_mem(3)  := X"C123"; -- and  $3,$2,$1  $3=$1&$2  $3 13   /E
-            var_insn_mem(4)  := X"3043"; -- addi $4,$0,3   $4=3      $4 3    /3
+            var_insn_mem(4)  := X"9043"; -- addi $4,$0,3   $4=3      $4 3    /3
             var_insn_mem(5)  := X"E431"; -- sll  $3,$4,1   $4=$4<<1  $4 6    /6  
             var_insn_mem(6)  := X"E442"; -- sll  $4,$4,2   $4=$4<<2  $4 24   /18
-            var_insn_mem(7)  := X"E452"; -- sll  $5,$4,2   $4=$4<<10 $4 24576/6000
-            var_insn_mem(8)  := X"E462"; -- sll  $6,$4,11  $7=$1+$1  $4 65535/8000
-            var_insn_mem(9)  := X"0000"; 
-            var_insn_mem(10) := X"0000"; 
-            var_insn_mem(11) := X"0000"; 
-            var_insn_mem(12) := X"0000"; 
-            var_insn_mem(13) := X"0000";
-            var_insn_mem(14) := X"0000";
+            var_insn_mem(7)  := X"f452"; -- srl  $5,$4,2   
+            var_insn_mem(8)  := X"f462"; -- srl  $6,$4,2   
+            var_insn_mem(9)  := X"d437"; -- xor  $7,$4,$3
+            var_insn_mem(10) := X"b438"; -- sub  $8,$4,$3
+            var_insn_mem(11) := X"b348"; -- sub  $8,$3,$4
+            var_insn_mem(12) := X"a009"; 
+            var_insn_mem(13) := X"a21a";
+            var_insn_mem(14) := X"a12b";
             var_insn_mem(15) := X"0000";
         
         elsif (rising_edge(clk)) then

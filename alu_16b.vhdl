@@ -61,7 +61,7 @@ begin
             var_carry_out  := var_result(16);
             if (do_slt = '1') then
                 var_sum(15 downto 1)    := "000000000000000";
-                var_sum(1)              := var_result(15);
+                var_sum(0)              := var_result(16);
             else
                 var_sum        := var_result(15 downto 0);
             end if;
