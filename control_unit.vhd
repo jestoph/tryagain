@@ -40,7 +40,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
-
+ 
 entity control_unit is
     port ( opcode     : in  std_logic_vector(3 downto 0);
            reg_dst    : out std_logic;

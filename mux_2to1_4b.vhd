@@ -21,7 +21,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
-
+ 
 entity mux_2to1_4b is
     port ( mux_select : in  std_logic;
            data_a     : in  std_logic_vector(3 downto 0);

@@ -53,20 +53,37 @@ begin
             --  insn_4 : store $3, $0, 2   - store data $3 into 1($0)
             --  insn_5 : store $4, $0, 3   - store data $4 into 3($0)
             --  insn_6 - insn_15 : noop    - end of program
+  
+--            var_insn_mem(0)  := X"1010";
+--            var_insn_mem(1)  := X"1022";
+--            var_insn_mem(2)  := X"8013";
+--            var_insn_mem(3)  := X"8124";
+--            var_insn_mem(4)  := X"3031";
+--            var_insn_mem(5)  := X"3043";
+--            var_insn_mem(6)  := X"e123";
+--            var_insn_mem(7)  := X"0000";
+--            var_insn_mem(8)  := X"0000";
+--            var_insn_mem(9)  := X"0000";
+--            var_insn_mem(10) := X"0000";
+--            var_insn_mem(11) := X"0000";
+--            var_insn_mem(12) := X"0000";
+--            var_insn_mem(13) := X"0000";
+--            var_insn_mem(14) := X"0000";
+--            var_insn_mem(15) := X"0000";
 
-            var_insn_mem(0)  := X"1010";
-            var_insn_mem(1)  := X"1022";
-            var_insn_mem(2)  := X"8013";
-            var_insn_mem(3)  := X"8124";
-            var_insn_mem(4)  := X"3031";
-            var_insn_mem(5)  := X"3043";
-            var_insn_mem(6)  := X"e123";
-            var_insn_mem(7)  := X"0000";
-            var_insn_mem(8)  := X"0000";
-            var_insn_mem(9)  := X"0000";
-            var_insn_mem(10) := X"0000";
-            var_insn_mem(11) := X"0000";
-            var_insn_mem(12) := X"0000";
+            var_insn_mem(0)  := X"901F"; -- addi $1,$0,15  $1=15     $1 15   /F
+            var_insn_mem(1)  := X"8111"; -- add  $1,$1,$1  $1=$1+$1  $1 30   /1E
+            var_insn_mem(2)  := X"9026"; -- addi $2,$0,6   $2=15     $2 15   /F
+            var_insn_mem(3)  := X"C321"; -- and  $3,$2,$1  $3=$1&$2  $3 13   /E
+            var_insn_mem(4)  := X"3032"; -- addi $4,$0,3   $4=3      $4 3    /3
+            var_insn_mem(5)  := X"E441"; -- sll  $4,$4,1   $4=$4<<1  $4 6    /6  
+            var_insn_mem(6)  := X"E442"; -- sll  $4,$4,2   $4=$4<<2  $4 24   /18
+            var_insn_mem(7)  := X"E442"; -- sll  $4,$4,2   $4=$4<<10 $4 24576/6000
+            var_insn_mem(8)  := X"E442"; -- sll  $4,$4,11  $7=$1+$1  $4 65535/8000
+            var_insn_mem(9)  := X"0000"; 
+            var_insn_mem(10) := X"0000"; 
+            var_insn_mem(11) := X"0000"; 
+            var_insn_mem(12) := X"0000"; 
             var_insn_mem(13) := X"0000";
             var_insn_mem(14) := X"0000";
             var_insn_mem(15) := X"0000";

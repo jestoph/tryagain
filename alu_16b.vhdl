@@ -32,7 +32,7 @@ entity alu_16b is
            carry_out : out std_logic);
 		   
 end alu_16b;
-
+  
 architecture behavioural of alu_16b is
 
 signal sig_alu_src_a    : std_logic_vector(15 downto 0);

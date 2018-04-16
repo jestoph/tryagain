@@ -24,7 +24,7 @@ architecture behavioral of branch_cmp is
 signal sig_cmp_eq       : std_logic;
 
 begin
-
+ 
 --    branch_cmp_process : process (  src_a,
 --                                    src_b,
 --                                    b_type ) is
