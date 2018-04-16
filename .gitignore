@@ -6,3 +6,5 @@
 !*.vhd
 !*.vhdl
 !.gitignore
+!*.vhw
+!*.do
