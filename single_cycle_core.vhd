@@ -229,9 +229,6 @@ begin
 	sig_one_12b <= "000000000001";
     sig_z_12b <= "000000000000";
     
-    
-    -- TODO THIS SHOULD COME FROM CONTROL UNIT!
-    sig_do_branch <= '0';
 
     pc : program_counter
     port map ( reset    => reset,

@@ -86,9 +86,9 @@ begin
             var_insn_mem(12) := X"a009"; 
             var_insn_mem(13) := X"a21a";
             var_insn_mem(14) := X"a12b";
-            var_insn_mem(15) := X"2014"; -- jmp to 20
-            var_insn_mem(16) := X"0000";
-            var_insn_mem(17) := X"0000";
+            var_insn_mem(15) := X"0000"; -- jmp to 20
+            var_insn_mem(16) := X"901F";
+            var_insn_mem(17) := X"2014";
             var_insn_mem(18) := X"0000";
             var_insn_mem(19) := X"0000";
             var_insn_mem(20) := X"6012"; --beq to +2
@@ -98,8 +98,8 @@ begin
             var_insn_mem(24) := X"4002"; --bne to +2
             var_insn_mem(25) := X"6002"; --beq to +2
             var_insn_mem(26) := X"0000";
-            var_insn_mem(27) := X"0000";
-            var_insn_mem(28) := X"600E";
+            var_insn_mem(27) := X"0000"; 
+            var_insn_mem(28) := X"600E";--beq to -3
             var_insn_mem(29) := X"0000";
             var_insn_mem(30) := X"0000";
             var_insn_mem(31) := X"0000";
