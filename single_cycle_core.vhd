@@ -262,7 +262,7 @@ begin
     port map ( src_a     => sig_pc_or_jmp, 
                src_b     => sig_one_or_branch,
                sum       => sig_next_pc,   
-               carry_in  => do_branch,
+               carry_in  => sig_do_branch,
                carry_out => sig_pc_carry_out );
     
     insn_mem : instruction_memory 

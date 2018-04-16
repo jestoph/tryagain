@@ -86,7 +86,7 @@ begin
             var_insn_mem(12) := X"a009"; 
             var_insn_mem(13) := X"a21a";
             var_insn_mem(14) := X"a12b";
-            var_insn_mem(15) := X"0000";
+            var_insn_mem(15) := X"200a";
         
         elsif (rising_edge(clk)) then
             -- read instructions on the rising clock edge
