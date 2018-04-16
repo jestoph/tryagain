@@ -217,6 +217,9 @@ signal sig_branch_offset        : std_logic_vector(11 downto 0);
 signal sig_z_12b                : std_logic_vector(11 downto 0);
 signal sig_jump_or_branch_addr  : std_logic_vector(11 downto 0);
 signal sig_do_pc_offset         : std_logic;
+signal sig_pc_or_jmp            : std_logic_vector(11 downto 0);
+signal sig_z_or_branch          : std_logic_vector(11 downto 0);
+signal sig_one_or_branch        : std_logic_vector(11 downto 0);
 
 begin
 
@@ -239,27 +242,27 @@ begin
     port map ( data_in  => sig_insn(3 downto 0),
                data_out => sig_branch_offset );
 
-    -- Choose whether our branch offset is from a register (bne/beq)
+    -- Choose whether we're branching or not
     -- or from an immediate (j)
     pc_mux_bjmp : mux_2to1_12b 
     port map ( mux_select => sig_do_jmp,
-               data_a     => sig_insn(11 downto 0), -- Jump has address encoded in instruction
+               data_a     => sig_one_12b, -- or we don't branch
                data_b     => sig_branch_offset, -- Branch has address encoded in last nibble
-               data_out   => sig_jump_or_branch_addr);
+               data_out   => sig_one_or_branch);
     
 
-    -- Choose whether we go to PC+1 or PC+1+offset where the offset could be a branch or jump
+    -- Choose whether we go to an absolute jump or not 
     pc_mux_offset : mux_2to1_12b 
     port map ( mux_select => sig_do_pc_offset,
-               data_a     => sig_z_12b, 
-               data_b     => sig_jump_or_branch_addr,
-               data_out   => sig_curr_pc_or_branch);
+               data_a     => sig_curr_pc, --or not jump
+               data_b     => sig_insn(11 downto 0), --we can jump
+               data_out   => sig_pc_or_jmp);
 
     next_pc : adder_12b 
-    port map ( src_a     => sig_curr_pc_or_branch, 
-               src_b     => sig_curr_pc,
+    port map ( src_a     => sig_pc_or_jmp, 
+               src_b     => sig_one_or_branch,
                sum       => sig_next_pc,   
-               carry_in  => '1',
+               carry_in  => do_branch,
                carry_out => sig_pc_carry_out );
     
     insn_mem : instruction_memory 
@@ -284,7 +287,7 @@ begin
                do_slt     => sig_do_slt,
                byte_addr  => sig_byte_addr,
                b_type     => sig_b_type,
-               b_insn     => sig_b_type,
+               b_insn     => sig_b_insn,
                do_branch  => sig_do_branch,
                do_pc_offset => sig_do_pc_offset,
 			   alu_op	  => sig_alu_op);

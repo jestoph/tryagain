@@ -146,11 +146,11 @@ begin
 						   or opcode = OP_LDB) else
                   '0';
                   
-    b_type     <= '1' when (opcode = OP_BEQ
+    b_insn     <= '1' when (opcode = OP_BEQ
                            or opcode = OP_BNE) else
                   '0';
     
-    b_insn     <= '1' when (opcode = OP_BEQ) else
+    b_type     <= '1' when (opcode = OP_BEQ) else
                   '0';
     
     do_jmp     <= sig_do_jmp;
