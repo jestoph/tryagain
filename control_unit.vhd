@@ -98,9 +98,7 @@ begin
 							or opcode = OP_AND
 							or opcode = OP_XOR
 							or opcode = OP_SLT
-							or opcode = OP_SUB
-							or opcode = OP_LSL
-							or opcode = OP_LSR) else
+							or opcode = OP_SUB) else
                   '0';
 
 	-- '1' When we're writing back to a register (as opposed to memory)
