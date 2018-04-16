@@ -270,7 +270,7 @@ begin
     insn_mem : instruction_memory 
     port map ( reset    => reset,
                clk      => clk,
-               addr_in  => sig_curr_pc,
+               addr_in  => sig_next_pc,
                insn_out => sig_insn );
 
     sign_extend : sign_extend_4to16 
