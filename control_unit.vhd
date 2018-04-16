@@ -50,6 +50,7 @@ entity control_unit is
            mem_read   : out std_logic;
            mem_to_reg : out std_logic;
            do_jmp     : out std_logic;
+           do_not_jmp : out std_logic;
            do_slt     : out std_logic;
            b_type     : out std_logic;
            b_insn     : out std_logic;
@@ -154,5 +155,6 @@ begin
                   '0';
     
     do_jmp     <= sig_do_jmp;
+    do_not_jmp <= not sig_do_jmp;
     do_pc_offset <= do_branch or sig_do_jmp;
 end behavioural;

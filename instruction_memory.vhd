@@ -33,7 +33,7 @@ end instruction_memory;
 
 architecture behavioral of instruction_memory is
 
-type mem_array is array(0 to 15) of std_logic_vector(15 downto 0);
+type mem_array is array(0 to 63) of std_logic_vector(15 downto 0);
 signal sig_insn_mem : mem_array;
 
 begin
@@ -87,7 +87,24 @@ begin
             var_insn_mem(13) := X"a21a";
             var_insn_mem(14) := X"a12b";
             var_insn_mem(15) := X"200a";
-        
+            var_insn_mem(16) := X"0000";
+            var_insn_mem(17) := X"0000";
+            var_insn_mem(18) := X"0000";
+            var_insn_mem(19) := X"0000";
+            var_insn_mem(20) := X"0000";
+            var_insn_mem(21) := X"0000";
+            var_insn_mem(22) := X"0000";
+            var_insn_mem(23) := X"0000";
+            var_insn_mem(24) := X"0000";
+            var_insn_mem(25) := X"0000";
+            var_insn_mem(26) := X"0000";
+            var_insn_mem(27) := X"0000";
+            var_insn_mem(28) := X"0000";
+            var_insn_mem(29) := X"0000";
+            var_insn_mem(30) := X"0000";
+            var_insn_mem(31) := X"0000";
+            var_insn_mem(32) := X"0000";
+            
         elsif (rising_edge(clk)) then
             -- read instructions on the rising clock edge
             var_addr := conv_integer(addr_in);

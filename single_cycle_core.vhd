@@ -108,6 +108,7 @@ component control_unit is
            alu_op	  : out std_logic_vector(2 downto 0);
            mem_write  : out std_logic;
            do_jmp     : out std_logic;
+           do_not_jmp : out std_logic;
            do_slt     : out std_logic;
            byte_addr  : out std_logic;
            b_type     : out std_logic;
@@ -220,6 +221,7 @@ signal sig_do_pc_offset         : std_logic;
 signal sig_pc_or_jmp            : std_logic_vector(11 downto 0);
 signal sig_z_or_branch          : std_logic_vector(11 downto 0);
 signal sig_one_or_branch        : std_logic_vector(11 downto 0);
+signal sig_do_not_jmp           : std_logic;
 
 begin
 
@@ -245,15 +247,15 @@ begin
     -- Choose whether we're branching or not
     -- or from an immediate (j)
     pc_mux_bjmp : mux_2to1_12b 
-    port map ( mux_select => sig_do_jmp,
-               data_a     => sig_one_12b, -- or we don't branch
+    port map ( mux_select => sig_do_branch,
+               data_a     => sig_z_12b, -- or we don't branch
                data_b     => sig_branch_offset, -- Branch has address encoded in last nibble
                data_out   => sig_one_or_branch);
     
 
     -- Choose whether we go to an absolute jump or not 
     pc_mux_offset : mux_2to1_12b 
-    port map ( mux_select => sig_do_pc_offset,
+    port map ( mux_select => sig_do_jmp,
                data_a     => sig_curr_pc, --or not jump
                data_b     => sig_insn(11 downto 0), --we can jump
                data_out   => sig_pc_or_jmp);
@@ -262,7 +264,7 @@ begin
     port map ( src_a     => sig_pc_or_jmp, 
                src_b     => sig_one_or_branch,
                sum       => sig_next_pc,   
-               carry_in  => sig_do_branch,
+               carry_in  => sig_do_not_jmp,
                carry_out => sig_pc_carry_out );
     
     insn_mem : instruction_memory 
@@ -284,6 +286,7 @@ begin
                mem_read   => sig_mem_read,
                mem_to_reg => sig_mem_to_reg,
                do_jmp     => sig_do_jmp,
+               do_not_jmp => sig_do_not_jmp,
                do_slt     => sig_do_slt,
                byte_addr  => sig_byte_addr,
                b_type     => sig_b_type,
