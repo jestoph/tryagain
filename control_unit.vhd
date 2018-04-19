@@ -42,22 +42,23 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
  
 entity control_unit is
-    port ( opcode     : in  std_logic_vector(3 downto 0);
-           reg_dst    : out std_logic;
-           reg_write  : out std_logic;
-           alu_src    : out std_logic;
-           mem_write  : out std_logic;
-           mem_read   : out std_logic;
-           mem_to_reg : out std_logic;
-           do_jmp     : out std_logic;
-           do_not_jmp : out std_logic;
-           do_slt     : out std_logic;
-           b_type     : out std_logic;
-           b_insn     : out std_logic;
-           do_branch  : in  std_logic;
-           byte_addr  : out  std_logic;
+    port ( opcode       : in  std_logic_vector(3 downto 0);
+           reg_dst      : out std_logic;
+           reg_write    : out std_logic;
+           alu_src      : out std_logic;
+           mem_write    : out std_logic;
+           mem_read     : out std_logic;
+           mem_to_reg   : out std_logic;
+           do_jmp       : out std_logic;
+           do_not_jmp   : out std_logic;
+           do_slt       : out std_logic;
+           b_type       : out std_logic;
+           b_insn       : out std_logic;
+           do_branch    : in  std_logic;
+           byte_addr    : out  std_logic;
            do_pc_offset : out std_logic;
-		   alu_op : out std_logic_vEcToR(2 downto 0));
+           sign_sel     : out std_logic;
+		       alu_op       : out std_logic_vEcToR(2 downto 0));
 end control_unit;
 
 architecture behavioural of control_unit is
@@ -136,7 +137,7 @@ begin
     do_slt     <= '1' when (opcode = OP_SLT) else
                   '0';
                   
-    sig_do_jmp     <= '1' when (opcode = OP_JMP) else
+    sig_do_jmp <= '1' when (opcode = OP_JMP) else
                   '0';
 
     byte_addr  <= '1' when (opcode = OP_LDB
@@ -157,4 +158,7 @@ begin
     do_jmp     <= sig_do_jmp;
     do_not_jmp <= not sig_do_jmp;
     do_pc_offset <= do_branch or sig_do_jmp;
+
+    sign_sel   <= '1' when (opcode = OP_ADDI) else
+                  '0';
 end behavioural;

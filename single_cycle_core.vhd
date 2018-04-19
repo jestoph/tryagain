@@ -74,6 +74,12 @@ component sign_extend_4to16 is
            data_out : out std_logic_vector(15 downto 0) );
 end component;
 
+component non_sign_extend_4to16 is
+    port ( data_in  : in  std_logic_vector(3 downto 0);
+           sign_sel : in std_logic;
+           data_out : out std_logic_vector(15 downto 0) );
+end component;
+
 component sign_extend_4to12 is
     port ( data_in  : in  std_logic_vector(3 downto 0);
            data_out : out std_logic_vector(11 downto 0) );
@@ -116,6 +122,7 @@ component control_unit is
            mem_read   : out std_logic;
            do_branch  : in  std_logic;
            do_pc_offset : out std_logic;
+           sign_sel     : out std_logic;
            mem_to_reg : out std_logic );
 end component;
 
@@ -221,6 +228,7 @@ signal sig_do_pc_offset         : std_logic;
 signal sig_pc_or_jmp            : std_logic_vector(11 downto 0);
 signal sig_z_or_branch          : std_logic_vector(11 downto 0);
 signal sig_one_or_branch        : std_logic_vector(11 downto 0);
+signal sig_sign_sel             : std_logic;
 signal sig_do_not_jmp           : std_logic;
 
 begin
@@ -270,8 +278,9 @@ begin
                addr_in  => sig_next_pc,
                insn_out => sig_insn );
 
-    sign_extend : sign_extend_4to16 
+    sign_extend : non_sign_extend_4to16 
     port map ( data_in  => sig_insn(3 downto 0),
+               sign_sel => sig_sign_sel,
                data_out => sig_sign_extended_offset );
 
     ctrl_unit : control_unit 
@@ -290,7 +299,8 @@ begin
                b_insn     => sig_b_insn,
                do_branch  => sig_do_branch,
                do_pc_offset => sig_do_pc_offset,
-			   alu_op	  => sig_alu_op);
+               sign_sel   => sig_sign_sel,
+			         alu_op	    => sig_alu_op);
 
     mux_reg_dst : mux_2to1_4b 
     port map ( mux_select => sig_reg_dst,
@@ -326,7 +336,7 @@ begin
     port map ( src_a      => sig_read_data_a,
                src_b      => sig_alu_src_b,
                alu_out    => sig_alu_result,
-			   alu_op 	  => sig_alu_op,
+			         alu_op 	  => sig_alu_op,
                do_slt     => sig_do_slt,
                carry_out  => sig_alu_carry_out );
 
