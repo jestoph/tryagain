@@ -71,22 +71,22 @@ begin
 --            var_insn_mem(14) := X"0000";
 --            var_insn_mem(15) := X"0000";
             
-            var_insn_mem(0)  := X"0000";
-            var_insn_mem(1)  := X"901F"; -- addi $1,$0,15  $1=15     $1 15   /F
-            var_insn_mem(2)  := X"8111"; -- add  $1,$1,$1  $1=$1+$1  $1 30   /1E
-            var_insn_mem(3)  := X"902F"; -- addi $2,$0,F   $2=15     $2 15   /F
-            var_insn_mem(4)  := X"C123"; -- and  $3,$2,$1  $3=$1&$2  $3 14   /E
-            var_insn_mem(5)  := X"9043"; -- addi $4,$0,3   $4=3      $4 3    /3
-            var_insn_mem(6)  := X"E441"; -- sll  $4,$4,1   $4=$4<<1  $4 6    /6  
-            var_insn_mem(7)  := X"E442"; -- sll  $4,$4,2   $4=$4<<2  $4 24   /18
-            var_insn_mem(8)  := X"f452"; -- srl  $5,$4,2   $5=$5>>2  $5 6   
-            var_insn_mem(9)  := X"f562"; -- srl  $6,$5,2   $6=$5>>2  $6 1
-            var_insn_mem(10) := X"d437"; -- xor  $7,$4,$3  $7=$4^$3  $7 22
-            var_insn_mem(11) := X"b438"; -- sub  $8,$4,$3  $8=$4-$3  $8 10
-            var_insn_mem(12) := X"b348"; -- sub  $8,$3,$4  $8=$3-$4  $8 65525
-            var_insn_mem(13) := X"a009"; 
-            var_insn_mem(14) := X"a21a";
-            var_insn_mem(15) := X"a12b";
+            var_insn_mem(0)  := X"0000"; -- nop
+            var_insn_mem(1)  := X"901F"; -- addi $1,$0,15    $1=15     $1  15   /F
+            var_insn_mem(2)  := X"8111"; -- add  $1,$1,$1    $1=$1+$1  $1  30   /1E
+            var_insn_mem(3)  := X"902F"; -- addi $2,$0,F     $2=15     $2  15   /F
+            var_insn_mem(4)  := X"C123"; -- and  $3,$2,$1    $3=$1&$2  $3  14   /E
+            var_insn_mem(5)  := X"9043"; -- addi $4,$0,3     $4=3      $4  3    /3
+            var_insn_mem(6)  := X"E441"; -- sll  $4,$4,1     $4=$4<<1  $4  6    /6  
+            var_insn_mem(7)  := X"E442"; -- sll  $4,$4,2     $4=$4<<2  $4  24   /18
+            var_insn_mem(8)  := X"f452"; -- srl  $5,$4,2     $5=$5>>2  $5  6   
+            var_insn_mem(9)  := X"f562"; -- srl  $6,$5,2     $6=$5>>2  $6  1
+            var_insn_mem(10) := X"d437"; -- xor  $7,$4,$3    $7=$4^$3  $7  22
+            var_insn_mem(11) := X"b438"; -- sub  $8,$4,$3    $8=$4-$3  $8  10
+            var_insn_mem(12) := X"b348"; -- sub  $8,$3,$4    $8=$3-$4  $8  65525
+            var_insn_mem(13) := X"a009"; -- slt  $9,$0,$0    $9=0      $9  0
+            var_insn_mem(14) := X"a21a"; -- slt  $10,$2,$1  $10=$2,$1  $10 1 
+            var_insn_mem(15) := X"a12b"; -- slt  
             var_insn_mem(16) := X"0000"; -- jmp to 20
             var_insn_mem(17) := X"901F";
             var_insn_mem(18) := X"2014";
