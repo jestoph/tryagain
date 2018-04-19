@@ -38,7 +38,7 @@ begin
         -- the extended bits take on the value of the most significant
         -- bit (MSB) of data_in
         for i in 15 downto 4 loop
-            data_out(i) <= data_in(3);
+            data_out(i) <= '0';
         end loop;
 
     end process;
