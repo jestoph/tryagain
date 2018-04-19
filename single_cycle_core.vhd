@@ -153,7 +153,7 @@ component data_memory is
            write_enable : in  std_logic;
            read_enable  : in  std_logic;
            write_data   : in  std_logic_vector(15 downto 0);
-           byte_addr	: in  std_logic;
+           byte_addr	   : in  std_logic;
            addr_in      : in  std_logic_vector(11 downto 0);
            data_out     : out std_logic_vector(15 downto 0) );
 end component;
@@ -173,6 +173,19 @@ component adder_12b is
            carry_in  : in  std_logic;
            carry_out : out std_logic );
 end component;
+
+--------------------------------------------------------------
+-- pipeline registers
+--
+--------------------------------------------------------------
+
+component reg_if_id is
+    port ( reset        : in  std_logic;
+           clk          : in  std_logic;
+           id_out			: out std_logic_vector(15 downto 0);
+           if_in     	: in  std_logic_vector(15 downto 0));
+end component;
+
 
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
@@ -194,7 +207,7 @@ signal sig_alu_src_b            : std_logic_vector(15 downto 0);
 signal sig_alu_result           : std_logic_vector(15 downto 0); 
 signal sig_alu_carry_out        : std_logic;
 signal sig_data_mem_out         : std_logic_vector(15 downto 0);
-signal sig_alu_op			    : std_logic_vector(2 downto 0);
+signal sig_alu_op			        : std_logic_vector(2 downto 0);
 signal sig_do_slt               : std_logic;
 signal sig_byte_addr            : std_logic;
 signal sig_mem_read             : std_logic;
@@ -223,10 +236,18 @@ signal sig_z_or_branch          : std_logic_vector(11 downto 0);
 signal sig_one_or_branch        : std_logic_vector(11 downto 0);
 signal sig_do_not_jmp           : std_logic;
 
+-------------------------------------------
+-- Pipeline signals
+-- 
+-------------------------------------------
+signal sig_next_pc_if           : std_logic_vector(11 downto 0);
+signal sig_next_pc_id           : std_logic_vector(11 downto 0);
+signal sig_insn_if              : std_logic_vector(15 downto 0);
+
 begin
 
     sig_one_4b <= "0001";
-	sig_one_12b <= "000000000001";
+	 sig_one_12b <= "000000000001";
     sig_z_12b <= "000000000000";
     
 
@@ -268,7 +289,7 @@ begin
     port map ( reset    => reset,
                clk      => clk,
                addr_in  => sig_next_pc,
-               insn_out => sig_insn );
+               insn_out => sig_insn_if );
 
     sign_extend : sign_extend_4to16 
     port map ( data_in  => sig_insn(3 downto 0),
@@ -345,5 +366,16 @@ begin
                data_a     => sig_alu_result,
                data_b     => sig_data_mem_out,
                data_out   => sig_write_data );
+
+----------------------------------------------------
+-- Pipeline registers
+--
+----------------------------------------------------
+
+   register_if_id   : reg_if_id
+    port map(  reset       => reset,
+               clk         => clk,
+               id_out	   => sig_insn,
+               if_in     	=> sig_insn_if);
 
 end structural;

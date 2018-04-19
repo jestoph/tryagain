@@ -41,7 +41,7 @@ begin
        if (reset = '1') then
            addr_out <= (others => '0'); 
        elsif (rising_edge(clk)) then
-           addr_out <= addr_in; 
+           addr_out <= addr_in after 0.5ns; 
        end if;
     end process;
 end behavioral;
