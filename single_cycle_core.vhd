@@ -193,24 +193,36 @@ signal sig_one_4b               : std_logic_vector(3 downto 0);
 signal sig_one_12b              : std_logic_vector(11 downto 0);
 signal sig_pc_carry_out         : std_logic;
 signal sig_insn                 : std_logic_vector(15 downto 0);
-signal sig_sign_extended_offset : std_logic_vector(15 downto 0);
-signal sig_reg_dst              : std_logic;
-signal sig_reg_write            : std_logic;
-signal sig_alu_src              : std_logic;
-signal sig_mem_write            : std_logic;
-signal sig_mem_to_reg           : std_logic;
-signal sig_write_register       : std_logic_vector(3 downto 0);
+signal sig_sign_extended_offset_id : std_logic_vector(15 downto 0);
+signal sig_sign_extended_offset_ex : std_logic_vector(15 downto 0);
+signal sig_reg_dst               : std_logic;
+signal sig_reg_write_id         : std_logic;
+signal sig_reg_write_ex         : std_logic;
+signal sig_alu_src_id           : std_logic;
+signal sig_alu_src_ex           : std_logic;
+signal sig_mem_write_id         : std_logic;
+signal sig_mem_write_ex         : std_logic;
+signal sig_mem_to_reg_id        : std_logic;
+signal sig_mem_to_reg_ex        : std_logic;
+signal sig_write_register_id    : std_logic_vector(3 downto 0);
+signal sig_write_register_ex    : std_logic_vector(3 downto 0);
 signal sig_write_data           : std_logic_vector(15 downto 0);
-signal sig_read_data_a          : std_logic_vector(15 downto 0);
-signal sig_read_data_b          : std_logic_vector(15 downto 0);
+signal sig_read_data_a_id       : std_logic_vector(15 downto 0);
+signal sig_read_data_a_ex       : std_logic_vector(15 downto 0);
+signal sig_read_data_b_id       : std_logic_vector(15 downto 0);
+signal sig_read_data_b_ex       : std_logic_vector(15 downto 0);
 signal sig_alu_src_b            : std_logic_vector(15 downto 0);
 signal sig_alu_result           : std_logic_vector(15 downto 0); 
 signal sig_alu_carry_out        : std_logic;
 signal sig_data_mem_out         : std_logic_vector(15 downto 0);
-signal sig_alu_op			        : std_logic_vector(2 downto 0);
-signal sig_do_slt               : std_logic;
-signal sig_byte_addr            : std_logic;
-signal sig_mem_read             : std_logic;
+signal sig_alu_op_id        : std_logic_vector(2 downto 0);
+signal sig_alu_op_ex        : std_logic_vector(2 downto 0);
+signal sig_do_slt_id            : std_logic;
+signal sig_do_slt_ex            : std_logic;
+signal sig_byte_addr_id         : std_logic;
+signal sig_byte_addr_ex         : std_logic;
+signal sig_mem_read_id           : std_logic;
+signal sig_mem_read_ex          : std_logic;
 signal sig_b_type               : std_logic;
 signal sig_b_insn               : std_logic;
 
@@ -230,7 +242,8 @@ signal sig_curr_pc_or_branch    : std_logic_vector(11 downto 0);
 signal sig_branch_offset        : std_logic_vector(11 downto 0);
 signal sig_z_12b                : std_logic_vector(11 downto 0);
 signal sig_jump_or_branch_addr  : std_logic_vector(11 downto 0);
-signal sig_do_pc_offset         : std_logic;
+signal sig_do_pc_offset_id      : std_logic;
+signal sig_do_pc_offset_ex      : std_logic;
 signal sig_pc_or_jmp            : std_logic_vector(11 downto 0);
 signal sig_z_or_branch          : std_logic_vector(11 downto 0);
 signal sig_one_or_branch        : std_logic_vector(11 downto 0);
@@ -296,76 +309,76 @@ begin
 
     sign_extend : sign_extend_4to16 
     port map ( data_in  => sig_insn_id(3 downto 0),
-               data_out => sig_sign_extended_offset );
+               data_out => sig_sign_extended_offset_id );
 
     ctrl_unit : control_unit 
     port map ( opcode     => sig_insn_id(15 downto 12),
                reg_dst    => sig_reg_dst,
-               reg_write  => sig_reg_write,
-               alu_src    => sig_alu_src,
-               mem_write  => sig_mem_write,
-               mem_read   => sig_mem_read,
-               mem_to_reg => sig_mem_to_reg,
+               reg_write  => sig_reg_write_id,
+               alu_src    => sig_alu_src_id,
+               mem_write  => sig_mem_write_id,
+               mem_read   => sig_mem_read_id,
+               mem_to_reg => sig_mem_to_reg_id,
                do_jmp     => sig_do_jmp,
                do_not_jmp => sig_do_not_jmp,
-               do_slt     => sig_do_slt,
-               byte_addr  => sig_byte_addr,
+               do_slt     => sig_do_slt_id,
+               byte_addr  => sig_byte_addr_id,
                b_type     => sig_b_type,
                b_insn     => sig_b_insn,
                do_branch  => sig_do_branch,
-               do_pc_offset => sig_do_pc_offset,
-			   alu_op	  => sig_alu_op);
+               do_pc_offset => sig_do_pc_offset_id,
+					alu_op	  => sig_alu_op_id);
 
     mux_reg_dst : mux_2to1_4b 
     port map ( mux_select => sig_reg_dst,
                data_a     => sig_insn_id(7 downto 4),
                data_b     => sig_insn_id(3 downto 0),
-               data_out   => sig_write_register );
+               data_out   => sig_write_register_id );
 
     reg_file : register_file 
     port map ( reset           => reset, 
                clk             => clk,
                read_register_a => sig_insn_id(11 downto 8),
                read_register_b => sig_insn_id(7 downto 4),
-               write_enable    => sig_reg_write,
-               write_register  => sig_write_register,
+               write_enable    => sig_reg_write_ex,
+               write_register  => sig_write_register_ex,
                write_data      => sig_write_data,
-               read_data_a     => sig_read_data_a,
-               read_data_b     => sig_read_data_b );
+               read_data_a     => sig_read_data_a_id,
+               read_data_b     => sig_read_data_b_id );
                
     reg_cmp   : branch_cmp
     port map ( b_type     => sig_b_type,
                b_insn     => sig_b_insn,
-               src_a      => sig_read_data_a,
-               src_b      => sig_read_data_b,
+               src_a      => sig_read_data_a_id,
+               src_b      => sig_read_data_b_id,
                do_branch  => sig_do_branch);
     
     mux_alu_src : mux_2to1_16b 
-    port map ( mux_select => sig_alu_src,
-               data_a     => sig_read_data_b,
-               data_b     => sig_sign_extended_offset,
+    port map ( mux_select => sig_alu_src_ex,
+               data_a     => sig_read_data_b_ex,
+               data_b     => sig_sign_extended_offset_ex,
                data_out   => sig_alu_src_b );
 
     alu : alu_16b 
-    port map ( src_a      => sig_read_data_a,
+    port map ( src_a      => sig_read_data_a_ex,
                src_b      => sig_alu_src_b,
                alu_out    => sig_alu_result,
-			   alu_op 	  => sig_alu_op,
-               do_slt     => sig_do_slt,
+					alu_op 	  => sig_alu_op_ex,
+               do_slt     => sig_do_slt_ex,
                carry_out  => sig_alu_carry_out );
 
     data_mem : data_memory 
     port map ( reset        => reset,
                clk          => clk,
-               write_enable => sig_mem_write,
-               read_enable  => sig_mem_read,
-               write_data   => sig_read_data_b,
-               byte_addr	=> sig_byte_addr,
+               write_enable => sig_mem_write_ex,
+               read_enable  => sig_mem_read_ex,
+               write_data   => sig_read_data_b_id,
+               byte_addr	=> sig_byte_addr_ex,
                addr_in      => sig_alu_result(11 downto 0),
                data_out     => sig_data_mem_out );
                
     mux_mem_to_reg : mux_2to1_16b 
-    port map ( mux_select => sig_mem_to_reg,
+    port map ( mux_select => sig_mem_to_reg_ex,
                data_a     => sig_alu_result,
                data_b     => sig_data_mem_out,
                data_out   => sig_write_data );
@@ -381,5 +394,49 @@ begin
               clk         => clk,
               data_out	  => sig_insn_id,
               data_in     => sig_insn_if);
+
+   register_id_ex   : generic_register
+   generic map( LEN => 63 )						-- Guess 48 for the moment, probably going to be more like 53
+   port map(  	reset       => reset,
+					clk         => clk,
+				  
+					-- This register stores:
+					--   Reg A and Reg B from the register file
+					--   Output from the sign extender
+					--   All the control unit outputs except branch and jump signals
+
+					-- Inputs (Control signals)
+					data_in(62 downto 59)	=> sig_write_register_id,
+					data_in(58) 				=> sig_reg_write_id,
+					data_in(57) 				=> sig_alu_src_id,
+					data_in(56 downto 54) 	=> sig_alu_op_id,
+					data_in(53) 				=> sig_mem_write_id,
+					data_in(52) 				=> sig_do_slt_id,
+					data_in(51) 				=> sig_byte_addr_id,
+					data_in(50) 				=> sig_mem_read_id,
+					data_in(49) 				=> sig_do_pc_offset_id,
+					data_in(48) 				=> sig_mem_to_reg_id,
+					
+					-- Inputs (others)
+					data_in(47 downto 32)  	=> sig_read_data_a_id,   -- TODO: find other connections here
+					data_in(31 downto 16)   => sig_read_data_b_id,  -- TODO: find other connections here
+					data_in(15 downto 0)   	=> sig_sign_extended_offset_id,  -- TODO: find other connections here
+
+					-- Outputs (Control Signals)
+					data_out(62 downto 59)	=> sig_write_register_ex,
+					data_out(58) 				=> sig_reg_write_ex,
+					data_out(57) 				=> sig_alu_src_ex,
+					data_out(56 downto 54) 	=> sig_alu_op_ex,
+					data_out(53) 				=> sig_mem_write_ex,
+					data_out(52) 				=> sig_do_slt_ex,
+					data_out(51) 				=> sig_byte_addr_ex,
+					data_out(50) 				=> sig_mem_read_ex,
+					data_out(49) 				=> sig_do_pc_offset_ex,
+					data_out(48) 				=> sig_mem_to_reg_ex,
+					
+					-- Outputs (others)
+					data_out(47 downto 32)	=> sig_read_data_a_ex,
+					data_out(31 downto 16)	=> sig_read_data_b_ex,
+					data_out(15 downto 0)	=> sig_sign_extended_offset_ex);
 
 end structural;
