@@ -28,8 +28,8 @@ entity generic_register is
 
     port ( reset        : in  std_logic;
            clk          : in  std_logic;
-           id_out			: out  std_logic_vector(LEN-1 downto 0);
-           if_in     	: in std_logic_vector(LEN-1 downto 0) );
+           data_out		: out  std_logic_vector(LEN-1 downto 0);
+           data_in     	: in std_logic_vector(LEN-1 downto 0) );
 	end generic_register;
 
 architecture behavioral of generic_register is
@@ -41,7 +41,7 @@ signal sig_val         : std_logic_vector(LEN-1 downto 0);
 begin
 	reg_process: process(reset,
                         clk, 
-								if_in) is
+						data_in) is
    
    variable var_val    : std_logic_vector(LEN-1 downto 0);
    variable var_val_in : std_logic_vector(LEN-1 downto 0);
@@ -49,7 +49,7 @@ begin
                   
    begin
    
-   sig_val_in <= if_in;
+   sig_val_in <= data_in;
    
    if(rising_edge(clk)) then
       if(reset = '1') then
@@ -58,6 +58,7 @@ begin
          var_val_out  := X"0000";
          sig_val_out  <= X"0000";
       else
+         --var_val_in  := sig_val_in;
          --var_val_in  := sig_val_in;
          --var_val_out := var_val;
          
@@ -69,7 +70,7 @@ begin
    end if;
    
    sig_val <= var_val;
-   id_out <= sig_val_out;-- after 1ns;
+   data_out <= sig_val_out;-- after 1ns;
    
    end process;
 end behavioral;
