@@ -39,9 +39,8 @@ signal sig_val_out     : std_logic_vector(LEN-1 downto 0);
 signal sig_val         : std_logic_vector(LEN-1 downto 0);
 
 begin
-	reg_process: process(reset,
-                        clk, 
-						data_in) is
+reg_process: process(reset,
+                        clk) is
    
    variable var_val    : std_logic_vector(LEN-1 downto 0);
    variable var_val_in : std_logic_vector(LEN-1 downto 0);
@@ -51,26 +50,31 @@ begin
    
    sig_val_in <= data_in;
    
-   if(rising_edge(clk)) then
-      if(reset = '1') then
-         var_val_in   := (others => '0');
-         var_val      := (others => '0');
-         var_val_out  := (others => '0');
-         sig_val_out  <= (others => '0');
-      else
-         --var_val_in  := sig_val_in;
-         --var_val_in  := sig_val_in;
-         --var_val_out := var_val;
-         
-         var_val_in  := sig_val_in;         
-         var_val_out := var_val_in;
-         sig_val_out <= var_val_out;
-      end if;
-      
+--   if(reset = '1') then
+--      var_val_in   := (others => '0');
+--      var_val      := (others => '0');
+--      var_val_out  := (others => '0');
+--      sig_val_out  <= (others => '0');
+--   else if (rising_edge(clk)) then
+--      --var_val_in  := sig_val_in;
+--      --var_val_in  := sig_val_in;
+--      --var_val_out := var_val;
+--         
+--      var_val_in  := sig_val_in;         
+--      var_val_out := var_val_in;
+--      sig_val_out <= var_val_out;
+--      
+--   end if;
+   
+   if (reset = '1') then
+      data_out <= (others => '0'); 
+   elsif (rising_edge(clk)) then
+      data_out <= data_in after 10ns; 
    end if;
    
-   sig_val <= var_val;
-   data_out <= sig_val_out;-- after 1ns;
+   
+--   sig_val <= var_val;
+--   data_out <= sig_val_out after 20 ns;
    
    end process;
 end behavioral;

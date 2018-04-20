@@ -343,11 +343,7 @@ begin
     port map ( opcode     => sig_insn_id(15 downto 12),
                reg_dst    => sig_reg_dst,
                reg_write  => sig_reg_write_id,
-<<<<<<< HEAD
-               alu_src    => sig_alu_src,
-=======
                alu_src    => sig_alu_src_id,
->>>>>>> e0d0f729804e209ed6982932a3c9139a8a62d1d1
                mem_write  => sig_mem_write_id,
                mem_read   => sig_mem_read_id,
                mem_to_reg => sig_mem_to_reg_id,
@@ -394,8 +390,8 @@ begin
     alu : alu_16b 
     port map ( src_a      => sig_read_data_a_ex,
                src_b      => sig_alu_src_b,
-               alu_out    => sig_alu_result,
-					alu_op 	  => sig_alu_op_ex,
+               alu_out    => sig_alu_result_ex,
+                alu_op 	  => sig_alu_op_ex,
                do_slt     => sig_do_slt_ex,
                carry_out  => sig_alu_carry_out );
 
