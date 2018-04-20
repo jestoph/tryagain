@@ -250,7 +250,7 @@ signal sig_write_register_id    : std_logic_vector(3 downto 0);
 signal sig_alu_result_ex        : std_logic_vector(15 downto 0);  
 signal sig_read_data_b_ex       : std_logic_vector(15 downto 0);
 signal sig_byte_addr_ex         : std_logic;
-signal sig_reg_dst_ex           : std_logic;
+--signal sig_reg_dst_ex           : std_logic;
 signal sig_reg_write_ex         : std_logic;
 signal sig_mem_write_ex         : std_logic;
 signal sig_mem_read_ex          : std_logic;
@@ -260,7 +260,7 @@ signal sig_write_register_ex    : std_logic_vector(3 downto 0);
 signal sig_alu_result_dm        : std_logic_vector(15 downto 0);  
 signal sig_read_data_b_dm       : std_logic_vector(15 downto 0);
 signal sig_byte_addr_dm         : std_logic;
-signal sig_reg_dst_dm           : std_logic;
+--signal sig_reg_dst_dm           : std_logic;
 signal sig_reg_write_dm         : std_logic;
 signal sig_mem_write_dm         : std_logic;
 signal sig_mem_read_dm          : std_logic;
@@ -278,7 +278,7 @@ begin
     sig_alu_result          <= sig_alu_result;
     sig_read_data_b         <= sig_read_data_b;
     sig_byte_addr           <= sig_byte_addr_ex;
-    sig_reg_dst             <= sig_reg_dst_ex;
+--    sig_reg_dst             <= sig_reg_dst_ex;
     sig_reg_write           <= sig_reg_write_ex;
     sig_mem_write           <= sig_mem_write_ex; 
     sig_mem_read            <= sig_mem_read_ex;
@@ -331,7 +331,7 @@ begin
 
     ctrl_unit : control_unit 
     port map ( opcode     => sig_insn_id(15 downto 12),
-               reg_dst    => sig_reg_dst_ex,
+               reg_dst    => sig_reg_dst,
                reg_write  => sig_reg_write_ex,
                alu_src    => sig_alu_src,
                mem_write  => sig_mem_write_ex,
@@ -348,7 +348,7 @@ begin
 			   alu_op	  => sig_alu_op);
 
     mux_reg_dst : mux_2to1_4b 
-    port map ( mux_select => sig_reg_dst_dm,
+    port map ( mux_select => sig_reg_dst,
                data_a     => sig_insn_id(7 downto 4),
                data_b     => sig_insn_id(3 downto 0),
                data_out   => sig_write_register_id );
@@ -422,29 +422,33 @@ begin
               data_in(15 downto 0)      => sig_alu_result_ex,
               data_in(31 downto 16)     => sig_read_data_b_ex,
               data_in(32)               => sig_byte_addr_ex,
-              data_in(33)               => sig_reg_dst_ex,
-              data_in(34)               => sig_reg_write_ex,
-              data_in(35)               => sig_mem_write_ex, 
-              data_in(36)               => sig_mem_read_ex, 
-              data_in(37)               => sig_mem_to_reg_ex,
+              data_in(33)               => sig_reg_write_ex,
+              data_in(34)               => sig_mem_write_ex, 
+              data_in(35)               => sig_mem_read_ex, 
+              data_in(36)               => sig_mem_to_reg_ex,
+              data_in(40 downto 37)     => sig_write_register_ex,
               
               data_out(15 downto 0)	    => sig_alu_result_dm,
               data_out(31 downto 16)    => sig_read_data_b_dm,
               data_out(32)              => sig_byte_addr_dm,
-              data_out(33)              => sig_reg_dst_dm,
-              data_out(34)              => sig_reg_write_dm,
-              data_out(35)              => sig_mem_write_dm, 
-              data_out(36)              => sig_mem_read_dm, 
-              data_out(37)              => sig_mem_to_reg_dm);
+              data_out(33)              => sig_reg_write_dm,
+              data_out(34)              => sig_mem_write_dm, 
+              data_out(35)              => sig_mem_read_dm, 
+              data_out(36)              => sig_mem_to_reg_dm,
+              data_out(40 downto 37)    => sig_write_register_ex);
    
    register_dm_wb   : generic_register   
    generic map( LEN => 16 )
    port map(  reset       => reset,
               clk         => clk,
               
-              data_out	  => sig_insn_id,
+              data_in	  => sig_write_register_dm,
+              data_in     => sig_mem_to_reg_dm,
+              data_in(33)              => sig_reg_write_dm,
               
-              data_in     => sig_insn_if);
+              data_out    => sig_write_register_wb,
+              data_out     => sig_mem_to_reg_wb,
+              data_out(33)              => sig_reg_write_wb);
 
 
 end structural;
