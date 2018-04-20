@@ -343,7 +343,11 @@ begin
     port map ( opcode     => sig_insn_id(15 downto 12),
                reg_dst    => sig_reg_dst,
                reg_write  => sig_reg_write_id,
+<<<<<<< HEAD
+               alu_src    => sig_alu_src,
+=======
                alu_src    => sig_alu_src_id,
+>>>>>>> e0d0f729804e209ed6982932a3c9139a8a62d1d1
                mem_write  => sig_mem_write_id,
                mem_read   => sig_mem_read_id,
                mem_to_reg => sig_mem_to_reg_id,
