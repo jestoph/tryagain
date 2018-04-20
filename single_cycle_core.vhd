@@ -241,9 +241,11 @@ signal sig_do_not_jmp           : std_logic;
 -- 
 -------------------------------------------
 signal sig_next_pc_if           : std_logic_vector(11 downto 0);
-signal sig_next_pc_id           : std_logic_vector(11 downto 0);
 signal sig_insn_if              : std_logic_vector(15 downto 0);
+
+signal sig_next_pc_id           : std_logic_vector(11 downto 0);
 signal sig_insn_id              : std_logic_vector(15 downto 0); 
+signal sig_write_register_id    : std_logic_vector(3 downto 0);
 
 signal sig_alu_result_ex        : std_logic_vector(15 downto 0);  
 signal sig_read_data_b_ex       : std_logic_vector(15 downto 0);
@@ -253,6 +255,7 @@ signal sig_reg_write_ex         : std_logic;
 signal sig_mem_write_ex         : std_logic;
 signal sig_mem_read_ex          : std_logic;
 signal sig_mem_to_reg_ex        : std_logic;
+signal sig_write_register_ex    : std_logic_vector(3 downto 0);
 
 signal sig_alu_result_dm        : std_logic_vector(15 downto 0);  
 signal sig_read_data_b_dm       : std_logic_vector(15 downto 0);
@@ -262,6 +265,7 @@ signal sig_reg_write_dm         : std_logic;
 signal sig_mem_write_dm         : std_logic;
 signal sig_mem_read_dm          : std_logic;
 signal sig_mem_to_reg_dm        : std_logic;
+signal sig_write_register_dm    : std_logic_vector(3 downto 0);
 
 
 
@@ -347,7 +351,7 @@ begin
     port map ( mux_select => sig_reg_dst_dm,
                data_a     => sig_insn_id(7 downto 4),
                data_b     => sig_insn_id(3 downto 0),
-               data_out   => sig_write_register );
+               data_out   => sig_write_register_id );
 
     reg_file : register_file 
     port map ( reset           => reset, 
@@ -355,7 +359,7 @@ begin
                read_register_a => sig_insn_id(11 downto 8),
                read_register_b => sig_insn_id(7 downto 4),
                write_enable    => sig_reg_write_dm,
-               write_register  => sig_write_register,
+               write_register  => sig_write_register_wb,
                write_data      => sig_write_data,
                read_data_a     => sig_read_data_a,
                read_data_b     => sig_read_data_b );
@@ -406,6 +410,7 @@ begin
    generic map( LEN => 16 )
    port map(  reset       => reset,
               clk         => clk,
+              
               data_out	  => sig_insn_id,
               data_in     => sig_insn_if);
               
@@ -413,6 +418,7 @@ begin
    generic map( LEN => 38 )
    port map(  reset       => reset,
               clk         => clk,
+              
               data_in(15 downto 0)      => sig_alu_result_ex,
               data_in(31 downto 16)     => sig_read_data_b_ex,
               data_in(32)               => sig_byte_addr_ex,
@@ -430,12 +436,15 @@ begin
               data_out(35)              => sig_mem_write_dm, 
               data_out(36)              => sig_mem_read_dm, 
               data_out(37)              => sig_mem_to_reg_dm);
+   
+   register_dm_wb   : generic_register   
+   generic map( LEN => 16 )
+   port map(  reset       => reset,
+              clk         => clk,
               
---signal sig_byte_addr_dm         : std_logic;
---signal sig_reg_dst_dm           : std_logic;
---signal sig_reg_write_dm         : std_logic;
---signal sig_mem_write_dm         : std_logic;
---signal sig_mem_read_dm          : std_logic;
---signal sig_mem_to_reg_dm        : std_logic;
+              data_out	  => sig_insn_id,
+              
+              data_in     => sig_insn_if);
+
 
 end structural;
