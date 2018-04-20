@@ -180,12 +180,12 @@ end component;
 --------------------------------------------------------------
 
 component generic_register is
+	generic ( LEN			: integer );
     port ( reset        : in  std_logic;
            clk          : in  std_logic;
-           data_out		: out std_logic_vector(15 downto 0);
-           data_in     	: in  std_logic_vector(15 downto 0));
+           data_out		: out std_logic_vector(LEN-1 downto 0);
+           data_in     	: in  std_logic_vector(LEN-1 downto 0));
 end component;
-
 
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
@@ -243,12 +243,15 @@ signal sig_do_not_jmp           : std_logic;
 signal sig_next_pc_if           : std_logic_vector(11 downto 0);
 signal sig_next_pc_id           : std_logic_vector(11 downto 0);
 signal sig_insn_if              : std_logic_vector(15 downto 0);
+signal sig_insn_id              : std_logic_vector(15 downto 0); 
+
 
 begin
 
     sig_one_4b <= "0001";
-	 sig_one_12b <= "000000000001";
+	sig_one_12b <= "000000000001";
     sig_z_12b <= "000000000000";
+    sig_insn <= sig_insn_id;
     
 
     pc : program_counter
@@ -259,7 +262,7 @@ begin
 
     -- We need to sign extend because a branch encodes the address in an immediate
     branch_extend : sign_extend_4to12 
-    port map ( data_in  => sig_insn(3 downto 0),
+    port map ( data_in  => sig_insn_id(3 downto 0),
                data_out => sig_branch_offset );
 
     -- Choose whether we're branching or not
@@ -275,7 +278,7 @@ begin
     pc_mux_offset : mux_2to1_12b 
     port map ( mux_select => sig_do_jmp,
                data_a     => sig_curr_pc, --or not jump
-               data_b     => sig_insn(11 downto 0), --we can jump
+               data_b     => sig_insn_id(11 downto 0), --we can jump
                data_out   => sig_pc_or_jmp);
 
     next_pc : adder_12b 
@@ -292,11 +295,11 @@ begin
                insn_out => sig_insn_if );
 
     sign_extend : sign_extend_4to16 
-    port map ( data_in  => sig_insn(3 downto 0),
+    port map ( data_in  => sig_insn_id(3 downto 0),
                data_out => sig_sign_extended_offset );
 
     ctrl_unit : control_unit 
-    port map ( opcode     => sig_insn(15 downto 12),
+    port map ( opcode     => sig_insn_id(15 downto 12),
                reg_dst    => sig_reg_dst,
                reg_write  => sig_reg_write,
                alu_src    => sig_alu_src,
@@ -315,15 +318,15 @@ begin
 
     mux_reg_dst : mux_2to1_4b 
     port map ( mux_select => sig_reg_dst,
-               data_a     => sig_insn(7 downto 4),
-               data_b     => sig_insn(3 downto 0),
+               data_a     => sig_insn_id(7 downto 4),
+               data_b     => sig_insn_id(3 downto 0),
                data_out   => sig_write_register );
 
     reg_file : register_file 
     port map ( reset           => reset, 
                clk             => clk,
-               read_register_a => sig_insn(11 downto 8),
-               read_register_b => sig_insn(7 downto 4),
+               read_register_a => sig_insn_id(11 downto 8),
+               read_register_b => sig_insn_id(7 downto 4),
                write_enable    => sig_reg_write,
                write_register  => sig_write_register,
                write_data      => sig_write_data,
@@ -373,9 +376,10 @@ begin
 ----------------------------------------------------
 
    register_if_id   : generic_register
-    port map(  reset       => reset,
-               clk         => clk,
-               data_out	   => sig_insn,
-               data_in     => sig_insn_if);
+   generic map( LEN => 16 )
+   port map(  reset       => reset,
+              clk         => clk,
+              data_out	  => sig_insn_id,
+              data_in     => sig_insn_if);
 
 end structural;
