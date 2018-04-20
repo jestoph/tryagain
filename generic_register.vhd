@@ -23,7 +23,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity generic_register is
 	generic(
-				LEN : integer := 27 -- Intentionally strange number so can tell if forget to set it
+				LEN : integer := 100 -- Intentionally strange number so can tell if forget to set it
 			);
 
     port ( reset        : in  std_logic;
