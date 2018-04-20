@@ -179,11 +179,12 @@ end component;
 --
 --------------------------------------------------------------
 
-component reg_if_id is
+component generic_register is
+	generic ( LEN			: integer );
     port ( reset        : in  std_logic;
            clk          : in  std_logic;
-           id_out			: out std_logic_vector(15 downto 0);
-           if_in     	: in  std_logic_vector(15 downto 0));
+           id_out			: out std_logic_vector(LEN-1 downto 0);
+           if_in     	: in  std_logic_vector(LEN-1 downto 0));
 end component;
 
 
@@ -372,7 +373,8 @@ begin
 --
 ----------------------------------------------------
 
-   register_if_id   : reg_if_id
+   register_if_id   : generic_register
+	generic map( LEN			=> 16 )
     port map(  reset       => reset,
                clk         => clk,
                id_out	   => sig_insn,
