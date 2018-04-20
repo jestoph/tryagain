@@ -235,7 +235,6 @@ signal sig_pc_or_jmp            : std_logic_vector(11 downto 0);
 signal sig_z_or_branch          : std_logic_vector(11 downto 0);
 signal sig_one_or_branch        : std_logic_vector(11 downto 0);
 signal sig_do_not_jmp           : std_logic;
-signal sig_read_data_b_dm       : std_logic_vector(15 downto 0);
 
 -------------------------------------------
 -- Pipeline signals
@@ -245,14 +244,41 @@ signal sig_next_pc_if           : std_logic_vector(11 downto 0);
 signal sig_next_pc_id           : std_logic_vector(11 downto 0);
 signal sig_insn_if              : std_logic_vector(15 downto 0);
 signal sig_insn_id              : std_logic_vector(15 downto 0); 
+
+signal sig_alu_result_ex        : std_logic_vector(15 downto 0);  
+signal sig_read_data_b_ex       : std_logic_vector(15 downto 0);
+signal sig_byte_addr_ex         : std_logic;
+signal sig_reg_dst_ex           : std_logic;
+signal sig_reg_write_ex         : std_logic;
+signal sig_mem_write_ex         : std_logic;
+signal sig_mem_read_ex          : std_logic;
+signal sig_mem_to_reg_ex        : std_logic;
+
 signal sig_alu_result_dm        : std_logic_vector(15 downto 0);  
+signal sig_read_data_b_dm       : std_logic_vector(15 downto 0);
+signal sig_byte_addr_dm         : std_logic;
+signal sig_reg_dst_dm           : std_logic;
+signal sig_reg_write_dm         : std_logic;
+signal sig_mem_write_dm         : std_logic;
+signal sig_mem_read_dm          : std_logic;
+signal sig_mem_to_reg_dm        : std_logic;
+
+
 
 begin
 
-    sig_one_4b <= "0001";
-	sig_one_12b <= "000000000001";
-    sig_z_12b <= "000000000000";
-    sig_insn <= sig_insn_id;
+    sig_one_4b              <= "0001";
+	sig_one_12b             <= "000000000001";
+    sig_z_12b               <= "000000000000";
+    sig_insn                <= sig_insn_id;
+    sig_alu_result          <= sig_alu_result;
+    sig_read_data_b         <= sig_read_data_b;
+    sig_byte_addr           <= sig_byte_addr_ex;
+    sig_reg_dst             <= sig_reg_dst_ex;
+    sig_reg_write           <= sig_reg_write_ex;
+    sig_mem_write           <= sig_mem_write_ex; 
+    sig_mem_read            <= sig_mem_read_ex;
+    sig_mem_to_reg          <= sig_mem_to_reg_ex;
     
 
     pc : program_counter
@@ -301,16 +327,16 @@ begin
 
     ctrl_unit : control_unit 
     port map ( opcode     => sig_insn_id(15 downto 12),
-               reg_dst    => sig_reg_dst,
-               reg_write  => sig_reg_write,
+               reg_dst    => sig_reg_dst_ex,
+               reg_write  => sig_reg_write_ex,
                alu_src    => sig_alu_src,
-               mem_write  => sig_mem_write,
-               mem_read   => sig_mem_read,
-               mem_to_reg => sig_mem_to_reg,
+               mem_write  => sig_mem_write_ex,
+               mem_read   => sig_mem_read_ex,
+               mem_to_reg => sig_mem_to_reg_ex,
                do_jmp     => sig_do_jmp,
                do_not_jmp => sig_do_not_jmp,
                do_slt     => sig_do_slt,
-               byte_addr  => sig_byte_addr,
+               byte_addr  => sig_byte_addr_ex,
                b_type     => sig_b_type,
                b_insn     => sig_b_insn,
                do_branch  => sig_do_branch,
@@ -318,7 +344,7 @@ begin
 			   alu_op	  => sig_alu_op);
 
     mux_reg_dst : mux_2to1_4b 
-    port map ( mux_select => sig_reg_dst,
+    port map ( mux_select => sig_reg_dst_dm,
                data_a     => sig_insn_id(7 downto 4),
                data_b     => sig_insn_id(3 downto 0),
                data_out   => sig_write_register );
@@ -328,7 +354,7 @@ begin
                clk             => clk,
                read_register_a => sig_insn_id(11 downto 8),
                read_register_b => sig_insn_id(7 downto 4),
-               write_enable    => sig_reg_write,
+               write_enable    => sig_reg_write_dm,
                write_register  => sig_write_register,
                write_data      => sig_write_data,
                read_data_a     => sig_read_data_a,
@@ -358,15 +384,15 @@ begin
     data_mem : data_memory 
     port map ( reset        => reset,
                clk          => clk,
-               write_enable => sig_mem_write,
-               read_enable  => sig_mem_read,
+               write_enable => sig_mem_write_dm,
+               read_enable  => sig_mem_read_dm,
                write_data   => sig_read_data_b_dm,
-               byte_addr	=> sig_byte_addr,
+               byte_addr	=> sig_byte_addr_dm,
                addr_in      => sig_alu_result_dm(11 downto 0),
                data_out     => sig_data_mem_out );
                
     mux_mem_to_reg : mux_2to1_16b 
-    port map ( mux_select => sig_mem_to_reg,
+    port map ( mux_select => sig_mem_to_reg_dm,
                data_a     => sig_alu_result_dm,
                data_b     => sig_data_mem_out,
                data_out   => sig_write_data );
@@ -384,14 +410,32 @@ begin
               data_in     => sig_insn_if);
               
    register_ex_dm   : generic_register
-   generic map( LEN => 16 )
+   generic map( LEN => 38 )
    port map(  reset       => reset,
               clk         => clk,
               data_in(15 downto 0)      => sig_alu_result_ex,
               data_in(31 downto 16)     => sig_read_data_b_ex,
-              
+              data_in(32)               => sig_byte_addr_ex,
+              data_in(33)               => sig_reg_dst_ex,
+              data_in(34)               => sig_reg_write_ex,
+              data_in(35)               => sig_mem_write_ex, 
+              data_in(36)               => sig_mem_read_ex, 
+              data_in(37)               => sig_mem_to_reg_ex,
               
               data_out(15 downto 0)	    => sig_alu_result_dm,
-              data_out(31 downto 16)    => sig_read_data_b_dm);
+              data_out(31 downto 16)    => sig_read_data_b_dm,
+              data_out(32)              => sig_byte_addr_dm,
+              data_out(33)              => sig_reg_dst_dm,
+              data_out(34)              => sig_reg_write_dm,
+              data_out(35)              => sig_mem_write_dm, 
+              data_out(36)              => sig_mem_read_dm, 
+              data_out(37)              => sig_mem_to_reg_dm);
+              
+--signal sig_byte_addr_dm         : std_logic;
+--signal sig_reg_dst_dm           : std_logic;
+--signal sig_reg_write_dm         : std_logic;
+--signal sig_mem_write_dm         : std_logic;
+--signal sig_mem_read_dm          : std_logic;
+--signal sig_mem_to_reg_dm        : std_logic;
 
 end structural;

@@ -23,7 +23,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity generic_register is
 	generic(
-				LEN : integer := 27 -- Intentionally strange number so can tell if forget to set it
+				LEN : integer := 100 -- Intentionally strange number so can tell if forget to set it
 			);
 
     port ( reset        : in  std_logic;
@@ -53,10 +53,10 @@ begin
    
    if(rising_edge(clk)) then
       if(reset = '1') then
-         var_val_in   := X"0000";
-         var_val      := X"0000";
-         var_val_out  := X"0000";
-         sig_val_out  <= X"0000";
+         var_val_in   := (others => '0');
+         var_val      := (others => '0');
+         var_val_out  := (others => '0');
+         sig_val_out  <= (others => '0');
       else
          --var_val_in  := sig_val_in;
          --var_val_in  := sig_val_in;
