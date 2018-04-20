@@ -266,8 +266,13 @@ signal sig_mem_write_dm         : std_logic;
 signal sig_mem_read_dm          : std_logic;
 signal sig_mem_to_reg_dm        : std_logic;
 signal sig_write_register_dm    : std_logic_vector(3 downto 0);
+signal sig_data_mem_out_dm      : std_logic_vector(15 downto 0);
 
-
+signal sig_alu_result_wb        : std_logic_vector(15 downto 0);
+signal sig_data_mem_out_wb      : std_logic_vector(15 downto 0);
+signal sig_write_register_wb    : std_logic_vector(3 downto 0);
+signal sig_mem_to_reg_wb        : std_logic;
+signal sig_reg_write_wb         : std_logic;
 
 begin
 
@@ -393,12 +398,12 @@ begin
                write_data   => sig_read_data_b_dm,
                byte_addr	=> sig_byte_addr_dm,
                addr_in      => sig_alu_result_dm(11 downto 0),
-               data_out     => sig_data_mem_out );
+               data_out     => sig_data_mem_out_dm );
                
     mux_mem_to_reg : mux_2to1_16b 
-    port map ( mux_select => sig_mem_to_reg_dm,
-               data_a     => sig_alu_result_dm,
-               data_b     => sig_data_mem_out,
+    port map ( mux_select => sig_mem_to_reg_wb,
+               data_a     => sig_alu_result_wb,
+               data_b     => sig_data_mem_out_wb,
                data_out   => sig_write_data );
 
 ----------------------------------------------------
@@ -415,7 +420,7 @@ begin
               data_in     => sig_insn_if);
               
    register_ex_dm   : generic_register
-   generic map( LEN => 38 )
+   generic map( LEN => 41 )
    port map(  reset       => reset,
               clk         => clk,
               
@@ -435,20 +440,24 @@ begin
               data_out(34)              => sig_mem_write_dm, 
               data_out(35)              => sig_mem_read_dm, 
               data_out(36)              => sig_mem_to_reg_dm,
-              data_out(40 downto 37)    => sig_write_register_ex);
+              data_out(40 downto 37)    => sig_write_register_dm);
    
    register_dm_wb   : generic_register   
-   generic map( LEN => 16 )
+   generic map( LEN => 38 )
    port map(  reset       => reset,
               clk         => clk,
               
-              data_in	  => sig_write_register_dm,
-              data_in     => sig_mem_to_reg_dm,
-              data_in(33)              => sig_reg_write_dm,
+              data_in(15 downto 0)      => sig_alu_result_dm,
+              data_in(31 downto 16)     => sig_data_mem_out_dm,
+              data_in(35 downto 32)	    => sig_write_register_dm,
+              data_in(36)               => sig_mem_to_reg_dm,
+              data_in(37)               => sig_reg_write_dm,
               
-              data_out    => sig_write_register_wb,
-              data_out     => sig_mem_to_reg_wb,
-              data_out(33)              => sig_reg_write_wb);
+              data_out(15 downto 0)     => sig_alu_result_wb,
+              data_out(31 downto 16)    => sig_data_mem_out_wb,
+              data_out(35 downto 32)    => sig_write_register_wb,
+              data_out(36)              => sig_mem_to_reg_wb,
+              data_out(37)              => sig_reg_write_wb);
 
 
 end structural;
