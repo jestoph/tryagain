@@ -207,7 +207,7 @@ signal sig_alu_src_b            : std_logic_vector(15 downto 0);
 signal sig_alu_result           : std_logic_vector(15 downto 0); 
 signal sig_alu_carry_out        : std_logic;
 signal sig_data_mem_out         : std_logic_vector(15 downto 0);
-signal sig_alu_op			        : std_logic_vector(2 downto 0);
+signal sig_alu_op			    : std_logic_vector(2 downto 0);
 signal sig_do_slt               : std_logic;
 signal sig_byte_addr            : std_logic;
 signal sig_mem_read             : std_logic;
@@ -235,6 +235,7 @@ signal sig_pc_or_jmp            : std_logic_vector(11 downto 0);
 signal sig_z_or_branch          : std_logic_vector(11 downto 0);
 signal sig_one_or_branch        : std_logic_vector(11 downto 0);
 signal sig_do_not_jmp           : std_logic;
+signal sig_read_data_b_dm       : std_logic_vector(15 downto 0);
 
 -------------------------------------------
 -- Pipeline signals
@@ -244,7 +245,7 @@ signal sig_next_pc_if           : std_logic_vector(11 downto 0);
 signal sig_next_pc_id           : std_logic_vector(11 downto 0);
 signal sig_insn_if              : std_logic_vector(15 downto 0);
 signal sig_insn_id              : std_logic_vector(15 downto 0); 
-
+signal sig_alu_result_dm        : std_logic_vector(15 downto 0);  
 
 begin
 
@@ -349,7 +350,7 @@ begin
     alu : alu_16b 
     port map ( src_a      => sig_read_data_a,
                src_b      => sig_alu_src_b,
-               alu_out    => sig_alu_result,
+               alu_out    => sig_alu_result_ex,
 			   alu_op 	  => sig_alu_op,
                do_slt     => sig_do_slt,
                carry_out  => sig_alu_carry_out );
@@ -359,14 +360,14 @@ begin
                clk          => clk,
                write_enable => sig_mem_write,
                read_enable  => sig_mem_read,
-               write_data   => sig_read_data_b,
+               write_data   => sig_read_data_b_dm,
                byte_addr	=> sig_byte_addr,
-               addr_in      => sig_alu_result(11 downto 0),
+               addr_in      => sig_alu_result_dm(11 downto 0),
                data_out     => sig_data_mem_out );
                
     mux_mem_to_reg : mux_2to1_16b 
     port map ( mux_select => sig_mem_to_reg,
-               data_a     => sig_alu_result,
+               data_a     => sig_alu_result_dm,
                data_b     => sig_data_mem_out,
                data_out   => sig_write_data );
 
@@ -381,5 +382,16 @@ begin
               clk         => clk,
               data_out	  => sig_insn_id,
               data_in     => sig_insn_if);
+              
+   register_ex_dm   : generic_register
+   generic map( LEN => 16 )
+   port map(  reset       => reset,
+              clk         => clk,
+              data_in(15 downto 0)      => sig_alu_result_ex,
+              data_in(31 downto 16)     => sig_read_data_b_ex,
+              
+              
+              data_out(15 downto 0)	    => sig_alu_result_dm,
+              data_out(31 downto 16)    => sig_read_data_b_dm);
 
 end structural;
