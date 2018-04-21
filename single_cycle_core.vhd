@@ -285,8 +285,13 @@ signal sig_reg_write_wb         : std_logic;
 -------------------------------------------
 signal sig_alu_haz_res_src_a    : std_logic_vector(15 downto 0);
 signal sig_alu_haz_res_src_b    : std_logic_vector(15 downto 0);
-signal sig_alu_haz_ctr_a        : std_logic;
-signal sig_alu_haz_ctr_b        : std_logic;
+signal sig_alu_fwd_ctr_a        : std_logic;
+signal sig_alu_fwd_ctr_b        : std_logic;
+signal sig_alu_fwd_src_a        : std_logic_vector(15 downto 0);
+signal sig_alu_fwd_src_b        : std_logic_vector(15 downto 0);
+signal sig_alu_src_a_ctrl       : std_logic;
+signal sig_alu_src_b_ctrl       : std_logic;
+
 
 begin
 
@@ -400,7 +405,7 @@ begin
     port map ( src_a      => sig_alu_haz_res_src_a,
                src_b      => sig_alu_haz_res_src_b,
                alu_out    => sig_alu_result_ex,
-                alu_op 	  => sig_alu_op_ex,
+               alu_op 	  => sig_alu_op_ex,
                do_slt     => sig_do_slt_ex,
                carry_out  => sig_alu_carry_out );
 
@@ -523,17 +528,29 @@ begin
 --
 -------------------------------------------------------------
 
-    mux_alu_srca : mux_2to1_16b 
-    port map ( mux_select => sig_alu_haz_ctr_a,
+    mux_alu_src_a : mux_2to1_16b 
+    port map ( mux_select => sig_alu_src_a_ctrl,
                data_a     => sig_read_data_a_ex,
-               data_b     => ,
+               data_b     => sig_alu_fwd_src_a,
                data_out   => sig_alu_haz_res_src_a );
                
-    mux_alu_srcb : mux_2to1_16b 
-    port map ( mux_select => sig_alu_haz_ctr_b,
+    mux_alu_src_b : mux_2to1_16b 
+    port map ( mux_select => sig_alu_src_b_ctrl,
                data_a     => sig_alu_src_b,
-               data_b     => ,
+               data_b     => sig_alu_fwd_src_b,
                data_out   => sig_alu_haz_res_src_b );
+               
+    mux_alu_fwd_a : mux_2to1_16b 
+    port map ( mux_select => sig_alu_fwd_ctr_a,
+               data_a     => sig_alu_result_dm,
+               data_b     => sig_write_data,
+               data_out   => sig_alu_fwd_src_a );
+               
+    mux_alu_fwd_b : mux_2to1_16b 
+    port map ( mux_select => sig_alu_fwd_ctr_b,
+               data_a     => sig_alu_result_dm,
+               data_b     => sig_write_data,
+               data_out   => sig_alu_fwd_src_b );
                
 
 end structural;
