@@ -187,6 +187,26 @@ component generic_register is
            data_in     	: in  std_logic_vector(LEN-1 downto 0));
 end component;
 
+--------------------------------------------------------------
+-- forwarding unit
+--
+--------------------------------------------------------------
+
+component fwd_unit is
+    port (  src_reg_a       : in std_logic_vector(3 downto 0);
+            src_reg_b       : in std_logic_vector(3 downto 0);
+            reg_write_dm    : in std_logic;
+            reg_write_wb    : in std_logic;   
+            alu_src         : in std_logic;
+            write_reg_dm    : in std_logic_vector(3 downto 0);
+            write_reg_wb    : in std_logic_vector(3 downto 0);
+            alu_fwd_dm_or_w_a   : out std_logic;
+            alu_fwd_dm_or_w_b   : out std_logic;
+            alu_src_a_ctrl  : out std_logic;
+            alu_src_b_ctrl  : out std_logic
+            );
+end component;
+
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
 signal sig_one_4b               : std_logic_vector(3 downto 0);
@@ -285,18 +305,22 @@ signal sig_reg_write_wb         : std_logic;
 -------------------------------------------
 signal sig_alu_haz_res_src_a    : std_logic_vector(15 downto 0);
 signal sig_alu_haz_res_src_b    : std_logic_vector(15 downto 0);
-signal sig_alu_fwd_ctr_a        : std_logic;
-signal sig_alu_fwd_ctr_b        : std_logic;
+signal sig_alu_fwd_dm_or_w_a    : std_logic;
+signal sig_alu_fwd_dm_or_w_b    : std_logic;
 signal sig_alu_fwd_src_a        : std_logic_vector(15 downto 0);
 signal sig_alu_fwd_src_b        : std_logic_vector(15 downto 0);
 signal sig_alu_src_a_ctrl       : std_logic;
 signal sig_alu_src_b_ctrl       : std_logic;
+signal sig_reg_read_a_id        : std_logic_vector(3 downto 0);
+signal sig_reg_read_b_id        : std_logic_vector(3 downto 0);
+signal sig_reg_read_a_ex        : std_logic_vector(3 downto 0);
+signal sig_reg_read_b_ex        : std_logic_vector(3 downto 0);
 
 
 begin
 
     sig_one_4b              <= "0001";
-	 sig_one_12b             <= "000000000001";
+	sig_one_12b             <= "000000000001";
     sig_z_12b               <= "000000000000";
     sig_insn                <= sig_insn_id;
     sig_alu_result          <= sig_alu_result;
@@ -307,6 +331,8 @@ begin
 --    sig_mem_write           <= sig_mem_write_ex; 
 --    sig_mem_read            <= sig_mem_read_ex;
 --    sig_mem_to_reg          <= sig_mem_to_reg_ex;
+    sig_reg_read_a_id       <= sig_insn_id(11 downto 8);
+    sig_reg_read_b_id       <= sig_insn_id(7 downto 4);
     
 
     pc : program_counter
@@ -380,9 +406,9 @@ begin
     reg_file : register_file 
     port map ( reset           => reset, 
                clk             => clk,
-               read_register_a => sig_insn_id(11 downto 8),
-               read_register_b => sig_insn_id(7 downto 4),
-               write_enable    => sig_reg_write_dm,
+               read_register_a => sig_reg_read_a_id,
+               read_register_b => sig_reg_read_b_id,
+               write_enable    => sig_reg_write_wb,
                write_register  => sig_write_register_wb,
                write_data      => sig_write_data,
                read_data_a     => sig_read_data_a_id,
@@ -480,8 +506,8 @@ begin
 
 
    register_id_ex   : generic_register
-   generic map( LEN => 63 )						-- Guess 48 for the moment, probably going to be more like 53
-   port map(  	reset       => reset,
+   generic map( LEN => 71 )						-- Guess 48 for the moment, probably going to be more like 53
+   port map(  	    reset       => reset,
 					clk         => clk,
 				  
 					-- This register stores:
@@ -490,10 +516,12 @@ begin
 					--   All the control unit outputs except branch and jump signals
 
 					-- Inputs (Control signals)
-					data_in(62 downto 59)	=> sig_write_register_id,
+                    data_in(70 downto 67)       => sig_reg_read_a_id,
+                    data_in(66 downto 63)       => sig_reg_read_b_id,
+					data_in(62 downto 59)	    => sig_write_register_id,
 					data_in(58) 				=> sig_reg_write_id,
 					data_in(57) 				=> sig_alu_src_id,
-					data_in(56 downto 54) 	=> sig_alu_op_id,
+					data_in(56 downto 54) 	    => sig_alu_op_id,
 					data_in(53) 				=> sig_mem_write_id,
 					data_in(52) 				=> sig_do_slt_id,
 					data_in(51) 				=> sig_byte_addr_id,
@@ -507,10 +535,12 @@ begin
 					data_in(15 downto 0)   	=> sig_sign_extended_offset_id,  -- TODO: find other connections here
 
 					-- Outputs (Control Signals)
-					data_out(62 downto 59)	=> sig_write_register_ex,
+                    data_out(70 downto 67)      => sig_reg_read_a_ex,
+                    data_out(66 downto 63)      => sig_reg_read_b_ex,
+					data_out(62 downto 59)	    => sig_write_register_ex,
 					data_out(58) 				=> sig_reg_write_ex,
 					data_out(57) 				=> sig_alu_src_ex,
-					data_out(56 downto 54) 	=> sig_alu_op_ex,
+					data_out(56 downto 54) 	    => sig_alu_op_ex,
 					data_out(53) 				=> sig_mem_write_ex,
 					data_out(52) 				=> sig_do_slt_ex,
 					data_out(51) 				=> sig_byte_addr_ex,
@@ -524,10 +554,10 @@ begin
 					data_out(15 downto 0)	=> sig_sign_extended_offset_ex);
                     
 -------------------------------------------------------------
--- Hazard control
+-- Forwarding unit
 --
 -------------------------------------------------------------
-
+    --mux to choose between forawrd and original src
     mux_alu_src_a : mux_2to1_16b 
     port map ( mux_select => sig_alu_src_a_ctrl,
                data_a     => sig_read_data_a_ex,
@@ -540,17 +570,31 @@ begin
                data_b     => sig_alu_fwd_src_b,
                data_out   => sig_alu_haz_res_src_b );
                
+    --mux to choose between dm and wb forwards
     mux_alu_fwd_a : mux_2to1_16b 
-    port map ( mux_select => sig_alu_fwd_ctr_a,
+    port map ( mux_select => sig_alu_fwd_dm_or_w_a,
                data_a     => sig_alu_result_dm,
                data_b     => sig_write_data,
                data_out   => sig_alu_fwd_src_a );
                
     mux_alu_fwd_b : mux_2to1_16b 
-    port map ( mux_select => sig_alu_fwd_ctr_b,
+    port map ( mux_select => sig_alu_fwd_dm_or_w_b,
                data_a     => sig_alu_result_dm,
                data_b     => sig_write_data,
                data_out   => sig_alu_fwd_src_b );
                
+    forwarding_unit : fwd_unit 
+    port map ( src_reg_a            => sig_reg_read_a_ex,
+               src_reg_b            => sig_reg_read_b_ex,
+               reg_write_dm         => sig_reg_write_ex,
+               reg_write_wb         => sig_reg_write_wb,
+               alu_src              => sig_alu_src_ex,
+               write_reg_dm         => sig_write_register_dm,
+               write_reg_wb         => sig_write_register_wb,
+               alu_fwd_dm_or_w_a    => sig_alu_fwd_dm_or_w_a,
+               alu_fwd_dm_or_w_b    => sig_alu_fwd_dm_or_w_b,
+               alu_src_a_ctrl       => sig_alu_src_a_ctrl,
+               alu_src_b_ctrl       => sig_alu_src_b_ctrl
+               );
 
 end structural;
