@@ -279,6 +279,15 @@ signal sig_write_register_wb    : std_logic_vector(3 downto 0);
 signal sig_mem_to_reg_wb        : std_logic;
 signal sig_reg_write_wb         : std_logic;
 
+-------------------------------------------
+-- Hazard detection signals
+-- 
+-------------------------------------------
+signal sig_alu_haz_res_src_a    : std_logic_vector(15 downto 0);
+signal sig_alu_haz_res_src_b    : std_logic_vector(15 downto 0);
+signal sig_alu_haz_ctr_a        : std_logic;
+signal sig_alu_haz_ctr_b        : std_logic;
+
 begin
 
     sig_one_4b              <= "0001";
@@ -388,8 +397,8 @@ begin
                data_out   => sig_alu_src_b );
 
     alu : alu_16b 
-    port map ( src_a      => sig_read_data_a_ex,
-               src_b      => sig_alu_src_b,
+    port map ( src_a      => sig_alu_haz_res_src_a,
+               src_b      => sig_alu_haz_res_src_b,
                alu_out    => sig_alu_result_ex,
                 alu_op 	  => sig_alu_op_ex,
                do_slt     => sig_do_slt_ex,
@@ -508,5 +517,23 @@ begin
 					data_out(47 downto 32)	=> sig_read_data_a_ex,
 					data_out(31 downto 16)	=> sig_read_data_b_ex,
 					data_out(15 downto 0)	=> sig_sign_extended_offset_ex);
+                    
+-------------------------------------------------------------
+-- Hazard control
+--
+-------------------------------------------------------------
+
+    mux_alu_srca : mux_2to1_16b 
+    port map ( mux_select => sig_alu_haz_ctr_a,
+               data_a     => sig_read_data_a_ex,
+               data_b     => ,
+               data_out   => sig_alu_haz_res_src_a );
+               
+    mux_alu_srcb : mux_2to1_16b 
+    port map ( mux_select => sig_alu_haz_ctr_b,
+               data_a     => sig_alu_src_b,
+               data_b     => ,
+               data_out   => sig_alu_haz_res_src_b );
+               
 
 end structural;
