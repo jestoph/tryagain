@@ -22,6 +22,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use STD.textio.all;
+use ieee.std_logic_textio.all;
  
 entity data_memory is
     port ( reset        : in  std_logic;
@@ -43,6 +45,11 @@ signal sig_data_mem : mem_array;
 
 signal sig_dm_chosen : std_logic_vector (15 downto 0);
 --signal sig_addr : std_logic_vector(11 downto 0);
+file file_INPUT : text;
+signal readIn : std_logic_vector(7 downto 0);
+signal ReadFile : std_logic;
+--file file_OUTPUT : text
+
 
 begin
     mem_process: process ( clk,
@@ -54,8 +61,8 @@ begin
   
     variable var_data_mem : mem_array;
     variable var_addr     : integer;
-    variable var_dm_out : std_logic_vector (15 downto 0);
-    
+    variable var_dm_out   : std_logic_vector (15 downto 0);
+    --variable v_OLINE     : line;
 	begin
         --var_addr := conv_integer(addr_in);
 		
@@ -67,7 +74,7 @@ begin
             -- initial values of the data memory : reset to zero 
             var_data_mem(0)  := X"0005";
             var_data_mem(1)  := X"0008";
-            var_data_mem(2)  := X"0000";
+            var_data_mem(2)  := X"FFFF";
             var_data_mem(3)  := X"0000";
             var_data_mem(4)  := X"0000";
             var_data_mem(5)  := X"0000";
@@ -114,7 +121,19 @@ begin
                 end if;
             else 				
                 -- WORD Addressible
-                var_dm_out := var_data_mem(var_addr);
+                if (var_addr = 0) then
+                    ReadFile <= '1';
+                    --while ReadFile /= '0' loop
+                        
+                    --end loop;
+
+
+                    --wait on ReadFile until ReadFile = '0';
+                    var_dm_out := X"00" & readIn;
+                    
+                else
+                    var_dm_out := var_data_mem(var_addr);
+                end if;
             end if;
         else
             var_dm_out := "0000000000000000";
@@ -125,6 +144,33 @@ begin
 		
         -- the following are probe signals (for simulation purpose) 
         sig_data_mem <= var_data_mem;
+
+    end process;
+
+    process
+
+    variable v_ILINE      : line;
+    variable get_char     : std_logic_vector(0 to 7);
+
+    begin
+        file_open(file_INPUT, "input_chars.txt",  read_mode);
+        while not endfile(file_INPUT) loop
+          while ReadFile /= '1' loop end loop;
+          --wait on ReadFile until ReadFile = '1';
+          readline (file_INPUT, v_ILINE );
+          read (v_ILINE , get_char);
+          -- Pass the variable to a signal to allow the ripple-carry to use it
+          readIn <= get_char;
+          ReadFile <= '0';
+     
+          --wait for 10 ns;
+        end loop;
+
+        while(1= 1) loop
+            wait on ReadFile until ReadFile = '1';
+            readIn <= X"00";
+            ReadFile <= '0';
+        end loop;
 
     end process;
   
