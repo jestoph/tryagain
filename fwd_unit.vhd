@@ -49,14 +49,14 @@ begin
         begin
         
         -- determine if we need to forward to src b
-        if ( alu_src = '1' and ((reg_write_dm = '1' and src_reg_a = write_reg_dm ) or (reg_write_wb = '1' and src_reg_a = write_reg_wb)) ) then
+        if ( alu_src = '0' and ((reg_write_dm = '1' and src_reg_b = write_reg_dm ) or (reg_write_wb = '1' and src_reg_b = write_reg_wb)) ) then
             alu_src_b_ctrl <= '1';
         else
             alu_src_b_ctrl <= '0';
         end if;
         
         -- determine if we need to forward to src a
-        if ( (reg_write_dm = '1' and src_reg_b = write_reg_dm ) or (reg_write_wb = '1' and src_reg_b = write_reg_wb) ) then
+        if ( (reg_write_dm = '1' and src_reg_a = write_reg_dm ) or (reg_write_wb = '1' and src_reg_a = write_reg_wb) ) then
             alu_src_a_ctrl <= '1';
         else
             alu_src_a_ctrl <= '0';

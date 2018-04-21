@@ -586,7 +586,7 @@ begin
     forwarding_unit : fwd_unit 
     port map ( src_reg_a            => sig_reg_read_a_ex,
                src_reg_b            => sig_reg_read_b_ex,
-               reg_write_dm         => sig_reg_write_ex,
+               reg_write_dm         => sig_reg_write_dm,
                reg_write_wb         => sig_reg_write_wb,
                alu_src              => sig_alu_src_ex,
                write_reg_dm         => sig_write_register_dm,
