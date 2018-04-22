@@ -352,6 +352,17 @@ signal sig_b_adder_carry_out    : std_logic;
 signal sig_jmp_flag             : std_logic;
 signal sig_pc_p1_or_jmp         : std_logic_vector(11 downto 0);
 
+-------------------------------------------
+-- PC as it moves through the pipe
+-- 
+-------------------------------------------
+signal sig_pc_stage_if          : std_logic_vector(11 downto 0);
+signal sig_pc_stage_id          : std_logic_vector(11 downto 0);
+signal sig_pc_stage_ex          : std_logic_vector(11 downto 0);
+signal sig_pc_stage_dm          : std_logic_vector(11 downto 0);
+signal sig_pc_stage_wb          : std_logic_vector(11 downto 0);
+signal sig_insn_pc              : std_logic_vector(11 downto 0);
+
 begin
 
     sig_one_4b              <= "0001";
@@ -369,7 +380,7 @@ begin
     sig_reg_read_a_id       <= sig_insn_id(11 downto 8);
     sig_reg_read_b_id       <= sig_insn_id(7 downto 4);
     sig_curr_pc             <= sig_curr_pc_if;
-    
+    sig_pc_stage_if         <= sig_next_pc;
 
     pc : program_counter
     port map ( reset    => reset,
@@ -698,5 +709,74 @@ begin
 --    port map (  src_a  => sig_pc_src,
 --                src_b  => reset,
 --                d_out  => sig_reg_if_id_bubble);
+
+
+-------------------------------------------------------------
+-- PC tracking 
+-- 
+-------------------------------------------------------------
+
+   register_pc_dummy_pc_track   : generic_register   
+   generic map( LEN => 12 )
+   port map(  reset       => reset,
+              clk         => clk,
+              flush       => '0',
+              
+              data_in(11 downto 0)      => sig_next_pc,
+
+              data_out(11 downto 0)     => sig_insn_pc);
+              
+              
+   register_insn_dummy_pc_track   : generic_register   
+   generic map( LEN => 12 )
+   port map(  reset       => reset,
+              clk         => clk,
+              flush       => '0',
+              
+              data_in(11 downto 0)      => sig_insn_pc,
+
+              data_out(11 downto 0)     => sig_pc_stage_if);
+              
+    
+
+   register_if_id_pc_track   : generic_register   
+   generic map( LEN => 12 )
+   port map(  reset       => reset,
+              clk         => clk,
+              flush       => '0',
+              
+              data_in(11 downto 0)      => sig_pc_stage_if,
+
+              data_out(11 downto 0)     => sig_pc_stage_id);
+              
+   register_id_ex_pc_track   : generic_register   
+   generic map( LEN => 12 )
+   port map(  reset       => reset,
+              clk         => clk,
+              flush       => '0',
+              
+              data_in(11 downto 0)      => sig_pc_stage_id,
+
+              data_out(11 downto 0)     => sig_pc_stage_ex);
+              
+   register_if_ex_dm_track   : generic_register   
+   generic map( LEN => 12 )
+   port map(  reset       => reset,
+              clk         => clk,
+              flush       => '0',
+              
+              data_in(11 downto 0)      => sig_pc_stage_ex,
+
+              data_out(11 downto 0)     => sig_pc_stage_dm);
+              
+   register_dm_wb_pc_track   : generic_register   
+   generic map( LEN => 12 )
+   port map(  reset       => reset,
+              clk         => clk,
+              flush       => '0',
+              
+              data_in(11 downto 0)      => sig_pc_stage_dm,
+
+              data_out(11 downto 0)     => sig_pc_stage_wb);
 
 end structural;
