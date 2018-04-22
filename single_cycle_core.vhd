@@ -415,7 +415,7 @@ begin
     port map ( src_a     => sig_curr_pc_id, 
                src_b     => sig_branch_offset,
                sum       => sig_pc_b_addr,   
-               carry_in  => '1',
+               carry_in  => '0',
                carry_out => sig_b_adder_carry_out);
     
         -- Choose whether we go to a branch or not 
