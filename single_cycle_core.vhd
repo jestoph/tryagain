@@ -182,6 +182,7 @@ end component;
 component generic_register is
 	generic ( LEN			: integer );
     port ( reset        : in  std_logic;
+           flush        : in  std_logic;
            clk          : in  std_logic;
            data_out		: out std_logic_vector(LEN-1 downto 0);
            data_in     	: in  std_logic_vector(LEN-1 downto 0));
@@ -214,7 +215,15 @@ component pc_ctrl_if is
            b_type     : out std_logic;
            b_insn     : out std_logic;
            do_branch  : in  std_logic;
-           do_pc_offset : out std_logic);
+           do_pc_offset : out std_logic;
+           b_or_jmp     : out std_logic;
+           pc_src       : out std_logic);
+end component;
+
+component or_gate is 
+    port(src_a  : in  std_logic;
+         src_b  : in  std_logic;
+         d_out  : out std_logic);
 end component;
 
 signal sig_next_pc              : std_logic_vector(11 downto 0);
@@ -332,6 +341,9 @@ signal sig_ctrl_out             : std_logic_vector(15 downto 0);
 signal sig_curr_pc_p1           : std_logic_vector(11 downto 0);
 signal sig_curr_pc_fly          : std_logic_vector(11 downto 0);
 signal sig_pc_src               : std_logic;
+signal sig_b_or_jmp             : std_logic;
+signal sig_pc_b_addr            : std_logic_vector(11 downto 0);
+signal sig_b_adder_carry_out    : std_logic;
 
 begin
 
@@ -350,7 +362,7 @@ begin
     sig_reg_read_a_id       <= sig_insn_id(11 downto 8);
     sig_reg_read_b_id       <= sig_insn_id(7 downto 4);
     sig_curr_pc             <= sig_curr_pc_if;
-    sig_pc_src              <= '0';
+    
 
     pc : program_counter
     port map ( reset    => reset,
@@ -386,18 +398,31 @@ begin
 --               carry_in  => sig_do_not_jmp,
 --               carry_out => sig_pc_carry_out );
     
+    pc_b_or_jmp : mux_2to1_12b 
+    port map ( mux_select => sig_b_or_jmp,
+               data_a     => sig_pc_b_addr, --branch
+               data_b     => sig_insn_id(11 downto 0), --or we can jump
+               data_out   => sig_curr_pc_fly);
+    
+    pc_b_addr : adder_12b
+    port map ( src_a     => sig_curr_pc_id, 
+               src_b     => sig_branch_offset,
+               sum       => sig_pc_b_addr,   
+               carry_in  => '1',
+               carry_out => sig_b_adder_carry_out);
+    
         -- Choose whether we go to a jump/branch or not 
     pc_mux_offset : mux_2to1_12b 
     port map ( mux_select => sig_pc_src,
-               data_a     => sig_curr_pc_p1, --or not jump
-               data_b     => sig_curr_pc_fly, --we can jump
+               data_a     => sig_curr_pc_p1, --execute sequentially
+               data_b     => sig_curr_pc_fly, --or jump/branch
                data_out   => sig_next_pc);
     
     next_pc : adder_12b 
     port map ( src_a     => sig_curr_pc_if, 
-               src_b     => x"000",
+               src_b     => x"001",
                sum       => sig_curr_pc_p1,   
-               carry_in  => '1',
+               carry_in  => '0',
                carry_out => sig_pc_carry_out );
     
     insn_mem : instruction_memory 
@@ -489,8 +514,9 @@ begin
 
    register_if_id   : generic_register
    generic map( LEN => 16 )
-   port map(  reset       => sig_reg_if_id_bubble,
+   port map(  reset       => reset,
               clk         => clk,
+              flush       => sig_pc_src,
               
               data_out	  => sig_insn_id,
               data_in     => sig_insn_if);
@@ -499,6 +525,7 @@ begin
    generic map( LEN => 41 )
    port map(  reset       => reset,
               clk         => clk,
+              flush       => '0',
               
               data_in(15 downto 0)      => sig_alu_result_ex,
               data_in(31 downto 16)     => sig_read_data_b_ex,
@@ -522,6 +549,7 @@ begin
    generic map( LEN => 38 )
    port map(  reset       => reset,
               clk         => clk,
+              flush       => '0',
               
               data_in(15 downto 0)      => sig_alu_result_dm,
               data_in(31 downto 16)     => sig_data_mem_out_dm,
@@ -540,6 +568,7 @@ begin
    generic map( LEN => 71 )						-- Guess 48 for the moment, probably going to be more like 53
    port map(  	    reset       => reset,
 					clk         => clk,
+                    flush       => '0',
 				  
 					-- This register stores:
 					--   Reg A and Reg B from the register file
@@ -637,6 +666,7 @@ begin
    generic map( LEN => 12 )
    port map(  reset       => reset,
               clk         => clk,
+              flush       => '0',
 
               data_in(11 downto 0) => sig_curr_pc_if,
               
@@ -649,8 +679,13 @@ begin
             b_type      => sig_b_type,
             b_insn      => sig_b_insn,
             do_branch   => sig_do_branch,
-            do_pc_offset => sig_do_pc_offset_id);
+            do_pc_offset => sig_do_pc_offset_id,
+            b_or_jmp    => sig_b_or_jmp,
+            pc_src      => sig_pc_src );
             
-
+--    bubble_sel          : or_gate 
+--    port map (  src_a  => sig_pc_src,
+--                src_b  => reset,
+--                d_out  => sig_reg_if_id_bubble);
 
 end structural;

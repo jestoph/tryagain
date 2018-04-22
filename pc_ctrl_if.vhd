@@ -28,7 +28,9 @@ entity pc_ctrl_if is
            b_type     : out std_logic;
            b_insn     : out std_logic;
            do_branch  : in  std_logic;
-           do_pc_offset : out std_logic);
+           do_pc_offset : out std_logic;
+           b_or_jmp     : out std_logic;
+           pc_src       : out std_logic);
 end pc_ctrl_if;
 
 architecture behavioural of pc_ctrl_if is
@@ -70,5 +72,8 @@ begin
     do_jmp     <= sig_do_jmp;
     do_not_jmp <= not sig_do_jmp;
     do_pc_offset <= do_branch or sig_do_jmp;
+    
+    b_or_jmp    <= sig_do_jmp after 1ns;
+    pc_src      <= sig_do_jmp or do_branch after 1ns;
 
 end behavioural;

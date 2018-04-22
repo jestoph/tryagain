@@ -27,6 +27,7 @@ entity generic_register is
 			);
 
     port ( reset        : in  std_logic;
+           flush        : in  std_logic;
            clk          : in  std_logic;
            data_out		: out  std_logic_vector(LEN-1 downto 0);
            data_in     	: in std_logic_vector(LEN-1 downto 0) );
@@ -69,7 +70,11 @@ reg_process: process(reset,
    if (reset = '1') then
       data_out <= (others => '0'); 
    elsif (rising_edge(clk)) then
-      data_out <= data_in after 10ns; 
+      if(flush = '1') then
+         data_out <= (others => '0'); 
+      else
+         data_out <= data_in after 10ns; 
+      end if;
    end if;
    
    

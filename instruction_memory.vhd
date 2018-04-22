@@ -121,9 +121,9 @@ begin
             var_insn_mem(15) := X"a12b";
             var_insn_mem(16) := X"0000"; 
             var_insn_mem(17) := X"901F";
-            var_insn_mem(18) := X"2014";-- jmp to 20
-            var_insn_mem(19) := X"0000";
-            var_insn_mem(20) := X"0000";
+            var_insn_mem(18) := X"201F";-- jmp to 20
+            var_insn_mem(19) := X"1111";
+            var_insn_mem(20) := X"9999";
             var_insn_mem(21) := X"6012"; --beq to +2
             var_insn_mem(22) := X"4012"; --bne to +2
             var_insn_mem(23) := X"0000";
@@ -133,9 +133,9 @@ begin
             var_insn_mem(27) := X"0000";
             var_insn_mem(28) := X"0000"; 
             var_insn_mem(29) := X"600C";--beq to -4
-            var_insn_mem(30) := X"0000";
-            var_insn_mem(31) := X"0000";
-            var_insn_mem(32) := X"0000";
+            var_insn_mem(30) := X"5555";
+            var_insn_mem(31) := X"6666";
+            var_insn_mem(32) := X"7777";
             
         elsif (rising_edge(clk)) then
             -- read instructions on the rising clock edge
