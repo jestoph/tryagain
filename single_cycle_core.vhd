@@ -329,6 +329,9 @@ signal sig_reg_read_a_ex        : std_logic_vector(3 downto 0);
 signal sig_reg_read_b_ex        : std_logic_vector(3 downto 0);
 signal sig_reg_if_id_bubble     : std_logic;
 signal sig_ctrl_out             : std_logic_vector(15 downto 0);
+signal sig_curr_pc_p1           : std_logic_vector(11 downto 0);
+signal sig_curr_pc_fly          : std_logic_vector(11 downto 0);
+signal sig_pc_src               : std_logic;
 
 begin
 
@@ -346,12 +349,13 @@ begin
 --    sig_mem_to_reg          <= sig_mem_to_reg_ex;
     sig_reg_read_a_id       <= sig_insn_id(11 downto 8);
     sig_reg_read_b_id       <= sig_insn_id(7 downto 4);
-    
+    sig_curr_pc             <= sig_curr_pc_if;
+    sig_pc_src              <= '0';
 
     pc : program_counter
     port map ( reset    => reset,
                clk      => clk,
-               addr_in  => sig_next_pc_if,
+               addr_in  => sig_next_pc,
                addr_out => sig_curr_pc_if ); 
 
     -- We need to sign extend because a branch encodes the address in an immediate
@@ -361,25 +365,39 @@ begin
 
     -- Choose whether we're branching or not
     -- or from an immediate (j)
-    pc_mux_bjmp : mux_2to1_12b 
-    port map ( mux_select => sig_do_branch,
-               data_a     => sig_z_12b, -- or we don't branch
-               data_b     => sig_branch_offset, -- Branch has address encoded in last nibble
-               data_out   => sig_one_or_branch);
+--    pc_mux_bjmp : mux_2to1_12b 
+--    port map ( mux_select => sig_do_branch,
+--               data_a     => sig_z_12b, -- or we don't branch
+--               data_b     => sig_branch_offset, -- Branch has address encoded in last nibble
+--               data_out   => sig_one_or_branch);
+--    
+--
+--    -- Choose whether we go to an absolute jump or not 
+--    pc_mux_offset : mux_2to1_12b 
+--    port map ( mux_select => sig_do_jmp,
+--               data_a     => sig_curr_pc_id, --or not jump
+--               data_b     => sig_insn_id(11 downto 0), --we can jump
+--               data_out   => sig_pc_or_jmp);
+--
+--    next_pc : adder_12b 
+--    port map ( src_a     => sig_pc_or_jmp, 
+--               src_b     => sig_one_or_branch,
+--               sum       => sig_next_pc,   
+--               carry_in  => sig_do_not_jmp,
+--               carry_out => sig_pc_carry_out );
     
-
-    -- Choose whether we go to an absolute jump or not 
+        -- Choose whether we go to a jump/branch or not 
     pc_mux_offset : mux_2to1_12b 
-    port map ( mux_select => sig_do_jmp,
-               data_a     => sig_curr_pc_id, --or not jump
-               data_b     => sig_insn_id(11 downto 0), --we can jump
-               data_out   => sig_pc_or_jmp);
-
+    port map ( mux_select => sig_pc_src,
+               data_a     => sig_curr_pc_p1, --or not jump
+               data_b     => sig_curr_pc_fly, --we can jump
+               data_out   => sig_next_pc);
+    
     next_pc : adder_12b 
-    port map ( src_a     => sig_pc_or_jmp, 
-               src_b     => sig_one_or_branch,
-               sum       => sig_next_pc_if,   
-               carry_in  => sig_do_not_jmp,
+    port map ( src_a     => sig_curr_pc_if, 
+               src_b     => x"000",
+               sum       => sig_curr_pc_p1,   
+               carry_in  => '1',
                carry_out => sig_pc_carry_out );
     
     insn_mem : instruction_memory 
@@ -616,16 +634,14 @@ begin
 -------------------------------------------------------------
 
    register_pc_if_id   : generic_register
-   generic map( LEN => 24 )
+   generic map( LEN => 12 )
    port map(  reset       => reset,
               clk         => clk,
+
+              data_in(11 downto 0) => sig_curr_pc_if,
               
-              data_out(11 downto 0)  => sig_next_pc_if,
-              data_out(23 downto 12) => sig_curr_pc_if,
-              
-              data_in(11 downto 0)  => sig_next_pc_id,
-              data_in(23 downto 12) => sig_curr_pc_id);
-              
+              data_out(11 downto 0) => sig_curr_pc_id);
+                            
    if_pc_ctrl           : pc_ctrl_if
    port map ( opcode    => sig_insn_id(15 downto 12),
             do_jmp      => sig_do_jmp,
