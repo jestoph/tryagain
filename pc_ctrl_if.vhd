@@ -74,6 +74,6 @@ begin
     do_pc_offset <= do_branch or sig_do_jmp;
     
     b_or_jmp    <= sig_do_jmp after 1ns;
-    pc_src      <= sig_do_jmp or do_branch after 1ns;
+    pc_src      <= do_branch after 1ns;
 
 end behavioural;

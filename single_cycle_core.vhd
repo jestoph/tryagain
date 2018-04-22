@@ -226,6 +226,11 @@ component or_gate is
          d_out  : out std_logic);
 end component;
 
+component jmp_ctrl is 
+    port(OPCODE  : in  std_logic_vector (3 downto 0);
+         jmp_flag: out std_logic);
+end component;
+
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
 signal sig_one_4b               : std_logic_vector(3 downto 0);
@@ -344,6 +349,8 @@ signal sig_pc_src               : std_logic;
 signal sig_b_or_jmp             : std_logic;
 signal sig_pc_b_addr            : std_logic_vector(11 downto 0);
 signal sig_b_adder_carry_out    : std_logic;
+signal sig_jmp_flag             : std_logic;
+signal sig_pc_p1_or_jmp         : std_logic_vector(11 downto 0);
 
 begin
 
@@ -398,11 +405,11 @@ begin
 --               carry_in  => sig_do_not_jmp,
 --               carry_out => sig_pc_carry_out );
     
-    pc_b_or_jmp : mux_2to1_12b 
-    port map ( mux_select => sig_b_or_jmp,
-               data_a     => sig_pc_b_addr, --branch
-               data_b     => sig_insn_id(11 downto 0), --or we can jump
-               data_out   => sig_curr_pc_fly);
+    pc_inc_or_jmp : mux_2to1_12b 
+    port map ( mux_select => sig_jmp_flag,
+               data_a     => sig_curr_pc_p1, --increment
+               data_b     => sig_insn_if(11 downto 0), --or we can jump
+               data_out   => sig_pc_p1_or_jmp);
     
     pc_b_addr : adder_12b
     port map ( src_a     => sig_curr_pc_id, 
@@ -411,11 +418,11 @@ begin
                carry_in  => '1',
                carry_out => sig_b_adder_carry_out);
     
-        -- Choose whether we go to a jump/branch or not 
-    pc_mux_offset : mux_2to1_12b 
+        -- Choose whether we go to a branch or not 
+    pc_src_select : mux_2to1_12b 
     port map ( mux_select => sig_pc_src,
-               data_a     => sig_curr_pc_p1, --execute sequentially
-               data_b     => sig_curr_pc_fly, --or jump/branch
+               data_a     => sig_pc_p1_or_jmp, --execute sequentially
+               data_b     => sig_pc_b_addr, --or jump/branch
                data_out   => sig_next_pc);
     
     next_pc : adder_12b 
@@ -683,6 +690,10 @@ begin
             b_or_jmp    => sig_b_or_jmp,
             pc_src      => sig_pc_src );
             
+    jump_control        :jmp_ctrl 
+    port map(OPCODE => sig_insn_if(15 downto 12),
+             jmp_flag => sig_jmp_flag);
+    
 --    bubble_sel          : or_gate 
 --    port map (  src_a  => sig_pc_src,
 --                src_b  => reset,
