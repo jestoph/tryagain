@@ -4,6 +4,8 @@ add wave -noupdate -format Logic -radix hexadecimal /single_cycle_core_testbench
 add wave -noupdate -format Logic -radix hexadecimal /single_cycle_core_testbench/clk
 add wave -noupdate -format Literal -radix unsigned /single_cycle_core_testbench/uut/sig_insn
 add wave -noupdate -format Literal -radix unsigned /single_cycle_core_testbench/uut/sig_insn_if
+add wave -noupdate -format Literal -radix unsigned /single_cycle_core_testbench/uut/sig_do_branch
+add wave -noupdate -format Literal -radix unsigned /single_cycle_core_testbench/uut/sig_reset_IF_ID
 
 
 TreeUpdate [SetDefaultTree]

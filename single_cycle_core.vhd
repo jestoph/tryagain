@@ -55,11 +55,26 @@ end single_cycle_core;
 
 architecture structural of single_cycle_core is
 
+  component mux_2to1_1b is 
+    port ( mux_select : in  std_logic;
+           data_a     : in  std_logic;
+           data_b     : in  std_logic;
+           data_out   : out std_logic );
+end component;
+
 component program_counter is
     port ( reset    : in  std_logic;
            clk      : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
            addr_out : out std_logic_vector(11 downto 0) );
+end component;
+
+component jmp_premp is
+    port (  instr_in        : in std_logic_vector(15 downto 0);
+            do_jmp          : out std_logic;
+            do_not_jmp      : out std_logic;
+            jmp_addr        : out std_logic_vector(15 downto 0)   
+            );
 end component;
 
 component instruction_memory is
@@ -260,6 +275,7 @@ signal sig_pc_or_jmp            : std_logic_vector(11 downto 0);
 signal sig_z_or_branch          : std_logic_vector(11 downto 0);
 signal sig_one_or_branch        : std_logic_vector(11 downto 0);
 signal sig_do_not_jmp           : std_logic;
+signal sig_jmp_addr             : std_logic_vector(15 downto 0);
 
 -------------------------------------------
 -- Pipeline signals
@@ -299,6 +315,7 @@ signal sig_write_register_wb    : std_logic_vector(3 downto 0);
 signal sig_mem_to_reg_wb        : std_logic;
 signal sig_reg_write_wb         : std_logic;
 
+
 -------------------------------------------
 -- Hazard detection signals
 -- 
@@ -315,6 +332,7 @@ signal sig_reg_read_a_id        : std_logic_vector(3 downto 0);
 signal sig_reg_read_b_id        : std_logic_vector(3 downto 0);
 signal sig_reg_read_a_ex        : std_logic_vector(3 downto 0);
 signal sig_reg_read_b_ex        : std_logic_vector(3 downto 0);
+signal sig_reset_IF_ID          : std_logic;
 
 
 begin
@@ -333,6 +351,20 @@ begin
 --    sig_mem_to_reg          <= sig_mem_to_reg_ex;
     sig_reg_read_a_id       <= sig_insn_id(11 downto 8);
     sig_reg_read_b_id       <= sig_insn_id(7 downto 4);
+
+    jump_pemp : jmp_premp
+      port map (  instr_in   => sig_insn_if,
+                  --do_jmp     => sig_do_jmp,
+                  --do_not_jmp => sig_do_not_jmp,
+                  jmp_addr   => sig_jmp_addr
+
+        );
+
+    IF_ID_reset_mux : mux_2to1_1b
+      port map ( mux_select => sig_do_branch,
+           data_a     => reset,
+           data_b     => sig_do_branch,
+           data_out   => sig_reset_IF_ID);
     
 
     pc : program_counter
@@ -359,7 +391,8 @@ begin
     pc_mux_offset : mux_2to1_12b 
     port map ( mux_select => sig_do_jmp,
                data_a     => sig_curr_pc, --or not jump
-               data_b     => sig_insn_id(11 downto 0), --we can jump
+               --data_b     => sig_jmp_addr(11 downto 0), --we can jump
+               data_b     => sig_insn_id(11 downto 0),
                data_out   => sig_pc_or_jmp);
 
     next_pc : adder_12b 
@@ -451,6 +484,8 @@ begin
                data_b     => sig_data_mem_out_wb,
                data_out   => sig_write_data );
 
+
+
 ----------------------------------------------------
 -- Pipeline registers
 --
@@ -458,7 +493,7 @@ begin
 
    register_if_id   : generic_register
    generic map( LEN => 16 )
-   port map(  reset       => reset,
+   port map(  reset       => sig_reset_IF_ID,
               clk         => clk,
               
               data_out	  => sig_insn_id,
