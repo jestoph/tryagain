@@ -28,6 +28,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity program_counter is
     port ( reset    : in  std_logic;
            clk      : in  std_logic;
+           refresh  : in  std_logic;
            stall    : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
            addr_out : out std_logic_vector(11 downto 0) );
@@ -36,11 +37,14 @@ end program_counter;
 architecture behavioral of program_counter is
 begin
 
-    update_process: process ( reset, 
+    update_process: process ( reset,
+                              refresh,
                               clk ) is
     begin
        if (reset = '1') then
            addr_out <= (others => '0'); 
+       elsif (refresh = '1') then
+           addr_out <= addr_in after 0.5ns; 
        elsif (rising_edge(clk) and stall = '0') then
            addr_out <= addr_in after 0.5ns; 
        end if;

@@ -58,6 +58,7 @@ architecture structural of single_cycle_core is
 component program_counter is
     port ( reset    : in  std_logic;
            clk      : in  std_logic;
+           refresh  : in  std_logic;
            stall    : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
            addr_out : out std_logic_vector(11 downto 0) );
@@ -380,6 +381,7 @@ signal sig_pc_b_addr            : std_logic_vector(11 downto 0);
 signal sig_b_adder_carry_out    : std_logic;
 signal sig_jmp_flag             : std_logic;
 signal sig_pc_p1_or_jmp         : std_logic_vector(11 downto 0);
+signal sig_refresh              : std_logic;
 
 -------------------------------------------
 -- PC as it moves through the pipe
@@ -415,6 +417,7 @@ begin
     pc : program_counter
     port map ( reset    => reset,
                clk      => clk,
+               refresh  => sig_refresh,
                stall    => sig_stall,
                addr_in  => sig_next_pc,
                addr_out => sig_curr_pc_if ); 
@@ -423,42 +426,19 @@ begin
     branch_extend : sign_extend_4to12 
     port map ( data_in  => sig_insn_id(3 downto 0),
                data_out => sig_branch_offset );
-
-    -- Choose whether we're branching or not
-    -- or from an immediate (j)
---    pc_mux_bjmp : mux_2to1_12b 
---    port map ( mux_select => sig_do_branch,
---               data_a     => sig_z_12b, -- or we don't branch
---               data_b     => sig_branch_offset, -- Branch has address encoded in last nibble
---               data_out   => sig_one_or_branch);
---    
---
---    -- Choose whether we go to an absolute jump or not 
---    pc_mux_offset : mux_2to1_12b 
---    port map ( mux_select => sig_do_jmp,
---               data_a     => sig_curr_pc_id, --or not jump
---               data_b     => sig_insn_id(11 downto 0), --we can jump
---               data_out   => sig_pc_or_jmp);
---
---    next_pc : adder_12b 
---    port map ( src_a     => sig_pc_or_jmp, 
---               src_b     => sig_one_or_branch,
---               sum       => sig_next_pc,   
---               carry_in  => sig_do_not_jmp,
---               carry_out => sig_pc_carry_out );
     
     pc_inc_or_jmp : mux_2to1_12b 
     port map ( mux_select => sig_jmp_flag,
                data_a     => sig_curr_pc_p1, --increment
-               data_b     => sig_insn_if
-(11 downto 0), --or we can jump
+               data_b     => sig_insn_if(11 downto 0), --or we can jump
                data_out   => sig_pc_p1_or_jmp);
+               
     
     pc_b_addr : adder_12b
     port map ( src_a     => sig_curr_pc_id, 
                src_b     => sig_branch_offset,
                sum       => sig_pc_b_addr,   
-               carry_in  => '1',
+               carry_in  => '0',
                carry_out => sig_b_adder_carry_out);
     
         -- Choose whether we go to a branch or not 
@@ -827,6 +807,11 @@ begin
             insn_if     => sig_insn_if_raw,
             insn_id     => sig_insn_id,
             stall       => sig_stall            );
+            
+    refresh_select          : or_gate 
+    port map (  src_a  => sig_pc_src,
+                src_b  => sig_jmp_flag,
+                d_out  => sig_refresh);
             
               
 --    insn_mem_staller          : mux_2to1_16b 

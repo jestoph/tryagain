@@ -141,26 +141,60 @@ begin
 --            var_insn_mem(32) := X"7777";
 
 
-            var_insn_mem(1)  := X"9011"; -- addi $1,$0,1  
-            var_insn_mem(2)  := X"9022"; -- addi $2,$0,2  
-            var_insn_mem(3)  := X"9033"; -- addi $3,$0,3   
-            var_insn_mem(4)  := X"6115"; -- 
-            var_insn_mem(5)  := X"9111"; -- 
-            var_insn_mem(6)  := X"9222"; -- 
-            var_insn_mem(7)  := X"9333"; -- 
-            var_insn_mem(8)  := X"9444"; -- 
-            var_insn_mem(9)  := X"9555"; -- 
-            var_insn_mem(10) := X"9666"; -- 
-            var_insn_mem(11) := X"9777"; --  bne
-            var_insn_mem(12) := X"1080"; --
-            var_insn_mem(13) := X"8888"; 
-            var_insn_mem(14) := X"7090";  
-            var_insn_mem(15) := X"8999"; -- bne
-            var_insn_mem(16) := X"0000"; 
-            var_insn_mem(17) := X"2005";
-            var_insn_mem(18) := X"9777";-- jmp to 20
-            var_insn_mem(19) := X"9888";
-            var_insn_mem(20) := X"9999";
+--            var_insn_mem(1)  := X"9011"; -- addi $1,$0,1  
+--            var_insn_mem(2)  := X"9022"; -- addi $2,$0,2  
+--            var_insn_mem(3)  := X"9033"; -- addi $3,$0,3   
+--            var_insn_mem(4)  := X"6115"; -- 
+--            var_insn_mem(5)  := X"9111"; -- 
+--            var_insn_mem(6)  := X"9222"; -- 
+--            var_insn_mem(7)  := X"9333"; -- 
+--            var_insn_mem(8)  := X"9444"; -- 
+--            var_insn_mem(9)  := X"9555"; -- 
+--            var_insn_mem(10) := X"9666"; -- 
+--            var_insn_mem(11) := X"9777"; --  bne
+--            var_insn_mem(12) := X"1080"; --
+--            var_insn_mem(13) := X"8888"; 
+--            var_insn_mem(14) := X"7090";  
+--            var_insn_mem(15) := X"8999"; -- bne
+--            var_insn_mem(16) := X"0000"; 
+--            var_insn_mem(17) := X"2005";
+--            var_insn_mem(18) := X"9777";-- jmp to 20
+--            var_insn_mem(19) := X"9888";
+--            var_insn_mem(20) := X"9999";
+--            var_insn_mem(21) := X"6012"; --beq to +2
+--            var_insn_mem(22) := X"4012"; --bne to +2
+--            var_insn_mem(23) := X"0000";
+--            var_insn_mem(24) := X"0000";
+--            var_insn_mem(25) := X"4002"; --bne to +2
+--            var_insn_mem(26) := X"6002"; --beq to +2
+--            var_insn_mem(27) := X"0000";
+--            var_insn_mem(28) := X"0000"; 
+--            var_insn_mem(29) := X"600C";--beq to -4
+--            var_insn_mem(30) := X"5555";
+--            var_insn_mem(31) := X"6666";
+--            var_insn_mem(32) := X"7777";
+            
+            var_insn_mem(0)  := X"9011"; -- addi $1 $0 1
+            var_insn_mem(1)  := X"9022"; -- addi $2,$0,2  
+            var_insn_mem(2)  := X"9033"; -- addi $3,$0,3  
+            var_insn_mem(3)  := X"1040"; -- lw $4 <= 0(0)  
+            var_insn_mem(4)  := X"b435"; -- sub $5, $4, $3
+            var_insn_mem(5)  := X"8456"; -- add 6 4 5 
+            var_insn_mem(6)  := X"8567"; -- 7 5 6
+            var_insn_mem(7)  := X"6115"; -- branch 
+            var_insn_mem(8)  := X"1111"; -- 
+            var_insn_mem(9)  := X"2222"; -- 
+            var_insn_mem(10) := X"3333"; -- 
+            var_insn_mem(11) := X"4444"; --  
+            var_insn_mem(12) := X"5555"; --
+            var_insn_mem(13) := X"2010"; 
+            var_insn_mem(14) := X"6666";  
+            var_insn_mem(15) := X"7777"; -- 
+            var_insn_mem(16) := X"a128"; 
+            var_insn_mem(17) := X"a219";
+            var_insn_mem(18) := X"7170";-- jmp to 20
+            var_insn_mem(19) := X"0000";
+            var_insn_mem(20) := X"0000";
             var_insn_mem(21) := X"6012"; --beq to +2
             var_insn_mem(22) := X"4012"; --bne to +2
             var_insn_mem(23) := X"0000";
@@ -173,6 +207,8 @@ begin
             var_insn_mem(30) := X"5555";
             var_insn_mem(31) := X"6666";
             var_insn_mem(32) := X"7777";
+
+
 
         elsif (rising_edge(clk) and stall = '0') then
             -- read instructions on the rising clock edge
