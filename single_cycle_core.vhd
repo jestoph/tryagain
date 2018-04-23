@@ -220,6 +220,21 @@ component pc_ctrl_if is
            pc_src       : out std_logic);
 end component;
 
+component hzd_ctrl is
+    port ( opcode     : in  std_logic_vector(3 downto 0);
+           do_jmp     : out std_logic;
+           do_not_jmp : out std_logic;
+           b_type     : out std_logic;
+           b_insn     : out std_logic;
+           do_branch  : in  std_logic;
+           do_pc_offset : out std_logic;
+           b_or_jmp     : out std_logic;
+           pc_src       : out std_logic;
+           insn_if      : in  std_logic_vector(15 downto 0);
+           insn_id      : in  std_logic_vector(15 downto 0);
+           stall        : out std_logic);
+end component;
+
 component or_gate is 
     port(src_a  : in  std_logic;
          src_b  : in  std_logic;
@@ -261,6 +276,7 @@ signal sig_byte_addr_id         : std_logic;
 signal sig_mem_read_id           : std_logic;
 signal sig_b_type               : std_logic;
 signal sig_b_insn               : std_logic;
+signal sig_stall                : std_logic;
 
 -- The following are added to allow for modifications to the pc
 -- ie for branching and jumping.
@@ -379,14 +395,13 @@ begin
 --    sig_mem_to_reg          <= sig_mem_to_reg_ex;
     sig_reg_read_a_id       <= sig_insn_id(11 downto 8);
     sig_reg_read_b_id       <= sig_insn_id(7 downto 4);
-    sig_curr_pc             <= sig_curr_pc_if;
     sig_pc_stage_if         <= sig_next_pc;
 
     pc : program_counter
     port map ( reset    => reset,
                clk      => clk,
                addr_in  => sig_next_pc,
-               addr_out => sig_curr_pc_if ); 
+               addr_out => sig_curr_pc ); 
 
     -- We need to sign extend because a branch encodes the address in an immediate
     branch_extend : sign_extend_4to12 
@@ -447,7 +462,7 @@ begin
     port map ( reset    => reset,
                clk      => clk,
                addr_in  => sig_curr_pc_if,
-               insn_out => sig_insn_if );
+               insn_out => sig_insn );
 
     sign_extend : sign_extend_4to16 
     port map ( data_in  => sig_insn_id(3 downto 0),
@@ -779,4 +794,30 @@ begin
 
               data_out(11 downto 0)     => sig_pc_stage_wb);
 
+   hazard_control_unit        : hzd_ctrl
+   port map ( opcode    => sig_insn_id(15 downto 12),
+            do_jmp      => sig_do_jmp,
+            do_not_jmp  => sig_do_not_jmp,
+            b_type      => sig_b_type,
+            b_insn      => sig_b_insn,
+            do_branch   => sig_do_branch,
+            do_pc_offset => sig_do_pc_offset_id,
+            b_or_jmp    => sig_b_or_jmp,
+            pc_src      => sig_pc_src,
+            insn_if     => sig_insn_if,
+            insn_id     => sig_insn_id,
+            stall       => sig_stall            );
+            
+    insn_mem_staller          : mux_2to1_16b 
+    port map ( mux_select => sig_stall,
+               data_a     => sig_insn,
+               data_b     => X"0000",
+               data_out   => sig_insn_if );
+               
+    pc_staller                : mux_2to1_12b 
+    port map ( mux_select => sig_stall,
+               data_a     => sig_next_pc,
+               data_b     => sig_curr_pc,
+               data_out   => sig_curr_pc_if );
+               
 end structural;

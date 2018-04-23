@@ -27,6 +27,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity instruction_memory is
     port ( reset    : in  std_logic;
            clk      : in  std_logic;
+          -- stall    : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
            insn_out : out std_logic_vector(15 downto 0) );
 end instruction_memory;
@@ -136,7 +137,9 @@ begin
             var_insn_mem(30) := X"5555";
             var_insn_mem(31) := X"6666";
             var_insn_mem(32) := X"7777";
-            
+        --elsif (stall = '1') then
+        --    insn_out <= X"0000";
+        
         elsif (rising_edge(clk)) then
             -- read instructions on the rising clock edge
             var_addr := conv_integer(addr_in);

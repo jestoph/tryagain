@@ -28,6 +28,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity program_counter is
     port ( reset    : in  std_logic;
            clk      : in  std_logic;
+--           stall    : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
            addr_out : out std_logic_vector(11 downto 0) );
 end program_counter;
@@ -40,7 +41,7 @@ begin
     begin
        if (reset = '1') then
            addr_out <= (others => '0'); 
-       elsif (rising_edge(clk)) then
+       elsif (rising_edge(clk) ) then
            addr_out <= addr_in after 0.5ns; 
        end if;
     end process;
