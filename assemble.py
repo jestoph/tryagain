@@ -119,10 +119,18 @@ labels = {}
 
 def isint(a):
     try:
-        int(a)
+        if int(a):
+            return True
+        int(a,16)
         return True
     except:
         return False
+
+def getint(a):
+    try:
+        return int(a)
+    except:
+        return int(a,16)
 
 def parsefile(file):
     lines = []
@@ -194,7 +202,10 @@ def parsefile(file):
         elif isint(parts[3]):
             # Destination Register
             data['inst'] += "{:X}".format(registers[parts[1]])
-            data['inst'] += "{:X}".format(int(parts[3]) & 0xf)
+            data['inst'] += "{:X}".format(getint(parts[3]) & 0xf)
+        elif 'bne' in parts[0] or 'beq' in parts[0]:
+            data['inst'] += "{:X}".format(registers[parts[1]])
+            data['tobranch'] = parts[3]
         else:
             Exception("I don't know how to handle", parts[3], "in", parts)
 
@@ -213,14 +224,18 @@ def dumpfile(file,lines):
     index = 0
     for line in lines:
         output=""
-        if 'tojump' in line:
-            output += "var_insn_mem("+str(index)+") := X\""+line['inst']
-            output += "{:03X}".format(labels[line['tojump']])+"\"; "
-            index += 1
-        elif 'label' in line:
+        if 'label' in line:
             output += "-- " + line['label']               
         elif 'inst' in line:
-            output += "var_insn_mem("+str(index)+") := X\""+line['inst']+"\"; "
+            output += "var_insn_mem("+str(index)+") := X\""+line['inst']
+            if 'tojump' in line:
+                output += "{:03X}".format(labels[line['tojump']])
+            if 'tobranch' in line:
+                length = labels[line['tobranch']] - index
+                if abs(length) > 8:
+                    Exception("Branch instruction can only jump 8 instructions")
+                output += "{:01X}".format(length & 0xf)
+            output += "\"; "
             index += 1
 
         output += "--" + line['textinstruction']
