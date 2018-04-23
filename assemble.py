@@ -119,12 +119,17 @@ labels = {}
 
 def isint(a):
     try:
-        if int(a):
-            return True
-        int(a,16)
+        int(a)
+        print "inta:", int(a)
         return True
     except:
-        return False
+        pass
+    try:
+        int(a,16)
+        print "inta:", int(a,16)
+        return True
+    except:
+        return false
 
 def getint(a):
     try:
@@ -185,7 +190,7 @@ def parsefile(file):
 
         # If we get here then we have a four-field instruction
         if len(parts) < 4:
-            Exception("Unknown instruction ", parts)
+            raise Exception("Unknown instruction ", parts)
 
         # Substitute any aliases
         for i in range(1,4):
@@ -207,7 +212,7 @@ def parsefile(file):
             data['inst'] += "{:X}".format(registers[parts[1]])
             data['tobranch'] = parts[3]
         else:
-            Exception("I don't know how to handle", parts[3], "in", parts)
+            raise Exception("I don't know how to handle", parts[3], "in", parts)
 
         index += 1
                 
@@ -233,7 +238,7 @@ def dumpfile(file,lines):
             if 'tobranch' in line:
                 length = labels[line['tobranch']] - index
                 if abs(length) > 8:
-                    Exception("Branch instruction can only jump 8 instructions")
+                    raise Exception("Branch instruction can only jump 8 instructions")
                 output += "{:01X}".format(length & 0xf)
             output += "\"; "
             index += 1
