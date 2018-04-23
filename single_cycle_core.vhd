@@ -378,13 +378,14 @@ signal sig_pc_stage_ex          : std_logic_vector(11 downto 0);
 signal sig_pc_stage_dm          : std_logic_vector(11 downto 0);
 signal sig_pc_stage_wb          : std_logic_vector(11 downto 0);
 signal sig_insn_pc              : std_logic_vector(11 downto 0);
+signal sig_next_pc_in           : std_logic_vector(11 downto 0);
 
 begin
 
     sig_one_4b              <= "0001";
 	sig_one_12b             <= "000000000001";
     sig_z_12b               <= "000000000000";
-    sig_insn                <= sig_insn_id;
+
     sig_alu_result          <= sig_alu_result;
 --    sig_read_data_b         <= sig_read_data_b;
 --    sig_byte_addr           <= sig_byte_addr_ex;
@@ -395,13 +396,13 @@ begin
 --    sig_mem_to_reg          <= sig_mem_to_reg_ex;
     sig_reg_read_a_id       <= sig_insn_id(11 downto 8);
     sig_reg_read_b_id       <= sig_insn_id(7 downto 4);
-    sig_pc_stage_if         <= sig_next_pc;
+
 
     pc : program_counter
     port map ( reset    => reset,
                clk      => clk,
-               addr_in  => sig_next_pc,
-               addr_out => sig_curr_pc ); 
+               addr_in  => sig_next_pc_in,
+               addr_out => sig_curr_pc_if ); 
 
     -- We need to sign extend because a branch encodes the address in an immediate
     branch_extend : sign_extend_4to12 
@@ -434,7 +435,8 @@ begin
     pc_inc_or_jmp : mux_2to1_12b 
     port map ( mux_select => sig_jmp_flag,
                data_a     => sig_curr_pc_p1, --increment
-               data_b     => sig_insn_if(11 downto 0), --or we can jump
+               data_b     => sig_insn_if
+(11 downto 0), --or we can jump
                data_out   => sig_pc_p1_or_jmp);
     
     pc_b_addr : adder_12b
@@ -705,16 +707,16 @@ begin
               
               data_out(11 downto 0) => sig_curr_pc_id);
                             
-   if_pc_ctrl           : pc_ctrl_if
-   port map ( opcode    => sig_insn_id(15 downto 12),
-            do_jmp      => sig_do_jmp,
-            do_not_jmp  => sig_do_not_jmp,
-            b_type      => sig_b_type,
-            b_insn      => sig_b_insn,
-            do_branch   => sig_do_branch,
-            do_pc_offset => sig_do_pc_offset_id,
-            b_or_jmp    => sig_b_or_jmp,
-            pc_src      => sig_pc_src );
+--   if_pc_ctrl           : pc_ctrl_if
+--   port map ( opcode    => sig_insn_id(15 downto 12),
+--            do_jmp      => sig_do_jmp,
+--            do_not_jmp  => sig_do_not_jmp,
+--            b_type      => sig_b_type,
+--            b_insn      => sig_b_insn,
+--            do_branch   => sig_do_branch,
+--            do_pc_offset => sig_do_pc_offset_id,
+--            b_or_jmp    => sig_b_or_jmp,
+--            pc_src      => sig_pc_src );
             
     jump_control        :jmp_ctrl 
     port map(OPCODE => sig_insn_if(15 downto 12),
@@ -737,7 +739,7 @@ begin
               clk         => clk,
               flush       => '0',
               
-              data_in(11 downto 0)      => sig_next_pc,
+              data_in(11 downto 0)      => sig_next_pc_in,
 
               data_out(11 downto 0)     => sig_insn_pc);
               
@@ -804,7 +806,7 @@ begin
             do_pc_offset => sig_do_pc_offset_id,
             b_or_jmp    => sig_b_or_jmp,
             pc_src      => sig_pc_src,
-            insn_if     => sig_insn_if,
+            insn_if     => sig_insn,
             insn_id     => sig_insn_id,
             stall       => sig_stall            );
             
@@ -818,6 +820,6 @@ begin
     port map ( mux_select => sig_stall,
                data_a     => sig_next_pc,
                data_b     => sig_curr_pc,
-               data_out   => sig_curr_pc_if );
+               data_out   => sig_next_pc_in );
                
 end structural;
