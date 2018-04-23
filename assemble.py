@@ -1,6 +1,21 @@
 #!/usr/bin/python
 import sys
 
+# An example use of this would be to translate the following:
+#
+#  ALIAS x $3
+#  ALIAS i $7
+#  ALIAS y $2
+#  
+#  addi i $0 7      ; Do loop seven times
+#  addi x $0 1
+#  # Begin loop
+#  sub i i x
+#  slt y x i # 2 <- $7 < 1? 1 : 0
+#  beq y x -2 
+#  nop
+
+
 intro = """
 ---------------------------------------------------------------------------
 -- instruction_memory.vhd - Implementation of A Single-Port, 16 x 16-bit
@@ -91,8 +106,11 @@ instructions = {
     'lb'    : 0x5, 
     'sb'    : 0x7, 
 }
-registers = {
-}
+
+# This holds any register aliases
+aliases = {}
+
+registers = {}
 for i in range(16):
     registers["$" + str(i)] = i
 
@@ -110,6 +128,12 @@ def parsefile(file):
     lines = []
     index = 0
     for line in file:
+
+        if "ALIAS" in line:
+            vals = line.split()
+            aliases[vals[1]] = vals[2]
+            continue
+
         data= {}
         things=line.strip().split("#")
 
@@ -139,6 +163,7 @@ def parsefile(file):
             lines.append(data)
             continue
         elif parts[0] == 'j':
+            data['inst'] += "{:X}".format(instructions[parts[0]])
             data['tojump'] = parts[1]
             index += 1
             lines.append(data)
@@ -154,6 +179,10 @@ def parsefile(file):
         if len(parts) < 4:
             Exception("Unknown instruction ", parts)
 
+        # Substitute any aliases
+        for i in range(1,4):
+            if parts[i] in aliases:
+                parts[i] = aliases[parts[i]]
 
         data['inst'] += "{:X}".format(instructions[parts[0]])
         data['inst'] += "{:X}".format(registers[parts[2]])
@@ -165,10 +194,11 @@ def parsefile(file):
         elif isint(parts[3]):
             # Destination Register
             data['inst'] += "{:X}".format(registers[parts[1]])
-            data['inst'] += "{:X}".format(int(parts[3]))
+            data['inst'] += "{:X}".format(int(parts[3]) & 0xf)
         else:
             Exception("I don't know how to handle", parts[3], "in", parts)
 
+        index += 1
                 
 
         lines.append(data)
