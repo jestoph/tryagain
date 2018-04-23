@@ -58,6 +58,7 @@ architecture structural of single_cycle_core is
 component program_counter is
     port ( reset    : in  std_logic;
            clk      : in  std_logic;
+           stall    : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
            addr_out : out std_logic_vector(11 downto 0) );
 end component;
@@ -65,8 +66,10 @@ end component;
 component instruction_memory is
     port ( reset    : in  std_logic;
            clk      : in  std_logic;
+           stall    : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
-           insn_out : out std_logic_vector(15 downto 0) );
+           insn_out : out std_logic_vector(15 downto 0);
+           insn_out_raw : out std_logic_vector(15 downto 0)           );
 end component;
 
 component sign_extend_4to16 is
@@ -183,6 +186,16 @@ component generic_register is
 	generic ( LEN			: integer );
     port ( reset        : in  std_logic;
            flush        : in  std_logic;
+           clk          : in  std_logic;
+           data_out		: out std_logic_vector(LEN-1 downto 0);
+           data_in     	: in  std_logic_vector(LEN-1 downto 0));
+end component;
+
+component if_id_reg is
+	generic ( LEN			: integer );
+    port ( reset        : in  std_logic;
+           flush        : in  std_logic;
+           stall        : in  std_logic;
            clk          : in  std_logic;
            data_out		: out std_logic_vector(LEN-1 downto 0);
            data_in     	: in  std_logic_vector(LEN-1 downto 0));
@@ -379,11 +392,12 @@ signal sig_pc_stage_dm          : std_logic_vector(11 downto 0);
 signal sig_pc_stage_wb          : std_logic_vector(11 downto 0);
 signal sig_insn_pc              : std_logic_vector(11 downto 0);
 signal sig_next_pc_in           : std_logic_vector(11 downto 0);
+signal sig_insn_if_raw          : std_logic_vector(15 downto 0);
 
 begin
 
     sig_one_4b              <= "0001";
-	sig_one_12b             <= "000000000001";
+	 sig_one_12b             <= "000000000001";
     sig_z_12b               <= "000000000000";
 
     sig_alu_result          <= sig_alu_result;
@@ -401,7 +415,8 @@ begin
     pc : program_counter
     port map ( reset    => reset,
                clk      => clk,
-               addr_in  => sig_next_pc_in,
+               stall    => sig_stall,
+               addr_in  => sig_next_pc,
                addr_out => sig_curr_pc_if ); 
 
     -- We need to sign extend because a branch encodes the address in an immediate
@@ -443,7 +458,7 @@ begin
     port map ( src_a     => sig_curr_pc_id, 
                src_b     => sig_branch_offset,
                sum       => sig_pc_b_addr,   
-               carry_in  => '0',
+               carry_in  => '1',
                carry_out => sig_b_adder_carry_out);
     
         -- Choose whether we go to a branch or not 
@@ -463,8 +478,10 @@ begin
     insn_mem : instruction_memory 
     port map ( reset    => reset,
                clk      => clk,
+               stall    => sig_stall,
                addr_in  => sig_curr_pc_if,
-               insn_out => sig_insn );
+               insn_out => sig_insn_if,
+               insn_out_raw => sig_insn_if_raw);
 
     sign_extend : sign_extend_4to16 
     port map ( data_in  => sig_insn_id(3 downto 0),
@@ -547,11 +564,12 @@ begin
 --
 ----------------------------------------------------
 
-   register_if_id   : generic_register
+   register_if_id   : if_id_reg
    generic map( LEN => 16 )
    port map(  reset       => reset,
               clk         => clk,
               flush       => sig_pc_src,
+              stall       => sig_stall,
               
               data_out	  => sig_insn_id,
               data_in     => sig_insn_if);
@@ -733,15 +751,15 @@ begin
 -- 
 -------------------------------------------------------------
 
-   register_pc_dummy_pc_track   : generic_register   
-   generic map( LEN => 12 )
-   port map(  reset       => reset,
-              clk         => clk,
-              flush       => '0',
-              
-              data_in(11 downto 0)      => sig_next_pc_in,
-
-              data_out(11 downto 0)     => sig_insn_pc);
+--   register_pc_dummy_pc_track   : generic_register   
+--   generic map( LEN => 12 )
+--   port map(  reset       => reset,
+--              clk         => clk,
+--              flush       => '0',
+--              
+--              data_in(11 downto 0)      => sig_curr_pc_if,
+--
+--              data_out(11 downto 0)     => sig_insn_pc);
               
               
    register_insn_dummy_pc_track   : generic_register   
@@ -750,7 +768,7 @@ begin
               clk         => clk,
               flush       => '0',
               
-              data_in(11 downto 0)      => sig_insn_pc,
+              data_in(11 downto 0)      => sig_curr_pc_if,
 
               data_out(11 downto 0)     => sig_pc_stage_if);
               
@@ -806,20 +824,21 @@ begin
             do_pc_offset => sig_do_pc_offset_id,
             b_or_jmp    => sig_b_or_jmp,
             pc_src      => sig_pc_src,
-            insn_if     => sig_insn,
+            insn_if     => sig_insn_if_raw,
             insn_id     => sig_insn_id,
             stall       => sig_stall            );
             
-    insn_mem_staller          : mux_2to1_16b 
-    port map ( mux_select => sig_stall,
-               data_a     => sig_insn,
-               data_b     => X"0000",
-               data_out   => sig_insn_if );
-               
-    pc_staller                : mux_2to1_12b 
-    port map ( mux_select => sig_stall,
-               data_a     => sig_next_pc,
-               data_b     => sig_curr_pc,
-               data_out   => sig_next_pc_in );
+              
+--    insn_mem_staller          : mux_2to1_16b 
+--    port map ( mux_select => sig_stall,
+--               data_a     => sig_insn,
+--               data_b     => X"0000",
+--               data_out   => sig_insn_if );
+--               
+--    pc_staller                : mux_2to1_12b 
+--    port map ( mux_select => sig_stall,
+--               data_a     => sig_curr_pc,
+--               data_b     => sig_pc_stage_if,
+--               data_out   => sig_curr_pc_if );
                
 end structural;

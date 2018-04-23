@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
--- reg_generic_register.vhd - register stage between ID and EXE
+-- reg_if_id.vhd - register stage between ID and EXE
 -- 
 -- All Rights Reserved. 
 --
@@ -21,19 +21,20 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-entity generic_register is
+entity if_id_reg is
 	generic(
 				LEN : integer := 100 -- Intentionally strange number so can tell if forget to set it
 			);
 
     port ( reset        : in  std_logic;
            flush        : in  std_logic;
+           stall        : in  std_logic;
            clk          : in  std_logic;
            data_out		: out  std_logic_vector(LEN-1 downto 0);
            data_in     	: in std_logic_vector(LEN-1 downto 0) );
-	end generic_register;
+	end if_id_reg;
 
-architecture behavioral of generic_register is
+architecture behavioral of if_id_reg is
 
 signal sig_val_in      : std_logic_vector(LEN-1 downto 0);
 signal sig_val_out     : std_logic_vector(LEN-1 downto 0);
@@ -71,7 +72,9 @@ reg_process: process(reset,
       data_out <= (others => '0'); 
    elsif (rising_edge(clk)) then
       if(flush = '1') then
-         data_out <= (others => '0'); 
+         data_out <= (others => '0');
+      elsif(stall = '1') then
+         data_out <= (others => '0');
       else
          data_out <= data_in after 10ns; 
       end if;

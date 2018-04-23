@@ -27,9 +27,10 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity instruction_memory is
     port ( reset    : in  std_logic;
            clk      : in  std_logic;
-          -- stall    : in  std_logic;
+           stall    : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
-           insn_out : out std_logic_vector(15 downto 0) );
+           insn_out : out std_logic_vector(15 downto 0);
+           insn_out_raw : out std_logic_vector(15 downto 0));
 end instruction_memory;
 
 architecture behavioral of instruction_memory is
@@ -39,7 +40,8 @@ signal sig_insn_mem : mem_array;
 
 begin
     mem_process: process ( clk,
-                           addr_in ) is
+                           addr_in
+                           ) is
   
     variable var_insn_mem : mem_array;
     variable var_addr     : integer;
@@ -172,13 +174,11 @@ begin
             var_insn_mem(31) := X"6666";
             var_insn_mem(32) := X"7777";
 
-        --elsif (stall = '1') then
-        --    insn_out <= X"0000";
-        
-        elsif (rising_edge(clk)) then
+        elsif (rising_edge(clk) and stall = '0') then
             -- read instructions on the rising clock edge
             var_addr := conv_integer(addr_in);
             insn_out <= var_insn_mem(var_addr);
+            insn_out_raw <= var_insn_mem(var_addr);
         end if;
 
         -- the following are probe signals (for simulation purpose)
