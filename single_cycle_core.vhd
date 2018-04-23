@@ -417,7 +417,7 @@ begin
     pc : program_counter
     port map ( reset    => reset,
                clk      => clk,
-               refresh  => sig_refresh,
+               refresh  => '0',
                stall    => sig_stall,
                addr_in  => sig_next_pc,
                addr_out => sig_curr_pc_if ); 
@@ -438,7 +438,7 @@ begin
     port map ( src_a     => sig_curr_pc_id, 
                src_b     => sig_branch_offset,
                sum       => sig_pc_b_addr,   
-               carry_in  => '0',
+               carry_in  => '1',
                carry_out => sig_b_adder_carry_out);
     
         -- Choose whether we go to a branch or not 

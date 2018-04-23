@@ -43,8 +43,8 @@ begin
     begin
        if (reset = '1') then
            addr_out <= (others => '0'); 
-       elsif (refresh = '1') then
-           addr_out <= addr_in after 0.5ns; 
+       --elsif (refresh = '1') then
+       --    addr_out <= addr_in after 0.5ns; 
        elsif (rising_edge(clk) and stall = '0') then
            addr_out <= addr_in after 0.5ns; 
        end if;
