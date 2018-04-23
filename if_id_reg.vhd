@@ -42,7 +42,8 @@ signal sig_val         : std_logic_vector(LEN-1 downto 0);
 
 begin
 reg_process: process(reset,
-                        clk) is
+                        clk,
+                        stall) is
    
    variable var_val    : std_logic_vector(LEN-1 downto 0);
    variable var_val_in : std_logic_vector(LEN-1 downto 0);
@@ -70,11 +71,13 @@ reg_process: process(reset,
    
    if (reset = '1') then
       data_out <= (others => '0'); 
+   elsif(rising_edge(stall)) then
+      data_out <= (others => '0');
    elsif (rising_edge(clk)) then
       if(flush = '1') then
          data_out <= (others => '0');
-      elsif(stall = '1') then
-         data_out <= (others => '0');
+      --elsif(stall = '1') then
+      --   data_out <= (others => '0');
       else
          data_out <= data_in after 10ns; 
       end if;

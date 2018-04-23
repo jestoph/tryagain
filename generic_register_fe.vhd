@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
--- generic_register.vhd - register stage between ID and EXE
+-- generic_register_fe.vhd - register stage between ID and EXE
 -- 
 -- All Rights Reserved. 
 --
@@ -21,7 +21,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-entity generic_register is
+entity generic_register_fe is
 	generic(
 				LEN : integer := 100 -- Intentionally strange number so can tell if forget to set it
 			);
@@ -31,9 +31,9 @@ entity generic_register is
            clk          : in  std_logic;
            data_out		: out  std_logic_vector(LEN-1 downto 0);
            data_in     	: in std_logic_vector(LEN-1 downto 0) );
-	end generic_register;
+	end generic_register_fe;
 
-architecture behavioral of generic_register is
+architecture behavioral of generic_register_fe is
 
 signal sig_val_in      : std_logic_vector(LEN-1 downto 0);
 signal sig_val_out     : std_logic_vector(LEN-1 downto 0);
@@ -50,26 +50,10 @@ reg_process: process(reset,
    begin
    
    sig_val_in <= data_in;
-   
---   if(reset = '1') then
---      var_val_in   := (others => '0');
---      var_val      := (others => '0');
---      var_val_out  := (others => '0');
---      sig_val_out  <= (others => '0');
---   else if (rising_edge(clk)) then
---      --var_val_in  := sig_val_in;
---      --var_val_in  := sig_val_in;
---      --var_val_out := var_val;
---         
---      var_val_in  := sig_val_in;         
---      var_val_out := var_val_in;
---      sig_val_out <= var_val_out;
---      
---   end if;
-   
+
    if (reset = '1') then
       data_out <= (others => '0'); 
-   elsif (rising_edge(clk)) then
+   elsif (falling_edge(clk)) then
       if(flush = '1') then
          data_out <= (others => '0'); 
       else

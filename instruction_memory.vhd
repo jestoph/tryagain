@@ -187,7 +187,7 @@ begin
             var_insn_mem(10) := X"3333"; -- 
             var_insn_mem(11) := X"4444"; --  
             var_insn_mem(12) := X"5555"; --
-            var_insn_mem(13) := X"9999"; 
+            var_insn_mem(13) := X"9599"; 
             var_insn_mem(14) := X"9666";  
             var_insn_mem(15) := X"9777"; -- 
             var_insn_mem(16) := X"a128"; 

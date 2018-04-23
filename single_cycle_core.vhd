@@ -192,6 +192,15 @@ component generic_register is
            data_in     	: in  std_logic_vector(LEN-1 downto 0));
 end component;
 
+component generic_register_fe is
+	generic ( LEN			: integer );
+    port ( reset        : in  std_logic;
+           flush        : in  std_logic;
+           clk          : in  std_logic;
+           data_out		: out std_logic_vector(LEN-1 downto 0);
+           data_in     	: in  std_logic_vector(LEN-1 downto 0));
+end component;
+
 component if_id_reg is
 	generic ( LEN			: integer );
     port ( reset        : in  std_logic;
@@ -382,6 +391,7 @@ signal sig_b_adder_carry_out    : std_logic;
 signal sig_jmp_flag             : std_logic;
 signal sig_pc_p1_or_jmp         : std_logic_vector(11 downto 0);
 signal sig_refresh              : std_logic;
+signal sig_insn_ex              : std_logic_vector(15 downto 0);
 
 -------------------------------------------
 -- PC as it moves through the pipe
@@ -395,6 +405,8 @@ signal sig_pc_stage_wb          : std_logic_vector(11 downto 0);
 signal sig_insn_pc              : std_logic_vector(11 downto 0);
 signal sig_next_pc_in           : std_logic_vector(11 downto 0);
 signal sig_insn_if_raw          : std_logic_vector(15 downto 0);
+signal sig_insn_id_fe           : std_logic_vector(15 downto 0);
+signal sig_insn_id_storage      : std_logic_vector(15 downto 0);
 
 begin
 
@@ -598,7 +610,7 @@ begin
 
 
    register_id_ex   : generic_register
-   generic map( LEN => 71 )						-- Guess 48 for the moment, probably going to be more like 53
+   generic map( LEN => 87 )						-- Guess 48 for the moment, probably going to be more like 53
    port map(  	    reset       => reset,
 					clk         => clk,
                     flush       => '0',
@@ -609,6 +621,7 @@ begin
 					--   All the control unit outputs except branch and jump signals
 
 					-- Inputs (Control signals)
+                    data_in(86 downto 71)       => sig_insn_id,
                     data_in(70 downto 67)       => sig_reg_read_a_id,
                     data_in(66 downto 63)       => sig_reg_read_b_id,
 					data_in(62 downto 59)	    => sig_write_register_id,
@@ -628,6 +641,7 @@ begin
 					data_in(15 downto 0)   	=> sig_sign_extended_offset_id,  -- TODO: find other connections here
 
 					-- Outputs (Control Signals)
+                    data_out(86 downto 71)      => sig_insn_ex,
                     data_out(70 downto 67)      => sig_reg_read_a_ex,
                     data_out(66 downto 63)      => sig_reg_read_b_ex,
 					data_out(62 downto 59)	    => sig_write_register_ex,
@@ -804,15 +818,34 @@ begin
             do_pc_offset => sig_do_pc_offset_id,
             b_or_jmp    => sig_b_or_jmp,
             pc_src      => sig_pc_src,
-            insn_if     => sig_insn_if_raw,
-            insn_id     => sig_insn_id,
+            insn_if     => sig_insn_id_storage,
+            insn_id     => sig_insn_ex,
             stall       => sig_stall            );
             
     refresh_select          : or_gate 
     port map (  src_a  => sig_pc_src,
                 src_b  => sig_jmp_flag,
                 d_out  => sig_refresh);
-            
+    
+--    register_if_id_insn_fe   : generic_register_fe   
+--    generic map( LEN => 16 )
+--    port map(  reset       => reset,
+--              clk         => clk,
+--              flush       => sig_pc_src,
+--              
+--              data_in(15 downto 0)      => sig_insn_if,
+--
+--              data_out(15 downto 0)     => sig_insn_id_fe);
+              
+    register_if_id_track   : generic_register   
+    generic map( LEN => 16 )
+    port map(  reset       => reset,
+              clk         => clk,
+              flush       => '0',
+              
+              data_in(15 downto 0)      => sig_insn_id,
+
+              data_out(15 downto 0)     => sig_insn_id_storage);
               
 --    insn_mem_staller          : mux_2to1_16b 
 --    port map ( mux_select => sig_stall,

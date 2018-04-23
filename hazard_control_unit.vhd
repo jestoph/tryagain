@@ -95,7 +95,7 @@ begin
     
     stall      <= '1' when (  (sig_op_id = OP_LOAD or sig_op_id = OP_LDB) 
                               and (sig_src_a_if = sig_dst_id or (sig_src_b_en = '1' and
-                                    (sig_src_b_if = sig_dst_id)))) else '0' after 1ns;
+                                    (sig_src_b_if = sig_dst_id)))) else '0' after 1.5ns;
     b_or_jmp    <= sig_do_jmp after 1.5ns;
     pc_src      <= do_branch after 1.5ns;
     
