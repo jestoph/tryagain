@@ -129,7 +129,7 @@ def isint(a):
         print "inta:", int(a,16)
         return True
     except:
-        return false
+        return False
 
 def getint(a):
     try:
