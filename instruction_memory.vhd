@@ -220,24 +220,25 @@ var_insn_mem(7) := X"8677"; -- calculate output string addr | add ros ros ris
 
 var_insn_mem(8) := X"0000"; --nop
 var_insn_mem(9) := X"0000"; --nop
-var_insn_mem(10) := X"0000"; --nop
 
-var_insn_mem(11) := X"1BC0"; --lw rk1 rkp 0    ; key1 = *key + 0
-var_insn_mem(12) := X"1BD2"; --lw rk1 rkp 0    ; key2 = *key + 2
-var_insn_mem(13) := X"1BE4"; --lw rk1 rkp 0    ; key3 = *key + 4
-var_insn_mem(14) := X"1BF6"; --lw rk1 rkp 0    ; key4 = *key + 6
-var_insn_mem(15) := X"0000";  
-var_insn_mem(16) := X"9031"; --addi rkc $0 1   ; load 0x0001
-var_insn_mem(17) := X"e33F"; --srl  rkc rkc 1  ; make 0x8000
-var_insn_mem(18) := X"90AF"; --addi rm1 $0 0xf ; make 0x000f
-var_insn_mem(19) := X"EAA4"; --sll  rm1 rm1 4  ; make 0x00f0
-var_insn_mem(20) := X"9AAF"; --addi rm1 rm1 0xf ;make 0x00ff
+
+var_insn_mem(10) := X"1BC0"; --lw rk1 rkp 0    ; key1 = *key + 0
+var_insn_mem(11) := X"1BD2"; --lw rk1 rkp 0    ; key2 = *key + 2
+var_insn_mem(12) := X"1BE4"; --lw rk1 rkp 0    ; key3 = *key + 4
+var_insn_mem(13) := X"1BF6"; --lw rk1 rkp 0    ; key4 = *key + 6
+var_insn_mem(14) := X"0000";  
+var_insn_mem(15) := X"9031"; --addi rkc $0 1   ; load 0x0001
+var_insn_mem(16) := X"e33F"; --srl  rkc rkc 1  ; make 0x8000
+var_insn_mem(17) := X"90AF"; --addi rm1 $0 0xf ; make 0x000f
+var_insn_mem(18) := X"EAA4"; --sll  rm1 rm1 4  ; make 0x00f0
+var_insn_mem(19) := X"9AAF"; --addi rm1 rm1 0xf ;make 0x00ff
 -- MAIN--MAIN:          ; do {
-var_insn_mem(21) := X"5620"; --lb re ris 0      ; load byte of string into re ; tmp = string[j]
-var_insn_mem(22) := X"9661"; --addi ris ris 1    ; j++ or *string++
-var_insn_mem(23) := X"0000"; 
+var_insn_mem(20) := X"5620"; --lb re ris 0      ; load byte of string into re ; tmp = string[j]
+var_insn_mem(21) := X"9661"; --addi ris ris 1    ; j++ or *string++
+var_insn_mem(22) := X"0000"; 
+var_insn_mem(23) := X"0000"; --nop
 var_insn_mem(24) := X"4021"; --bne re $0 START  ; if(*string != EOF) continue
-var_insn_mem(25) := X"2040"; --j END
+var_insn_mem(25) := X"204D"; --j END
 -- START--START:
 --var_insn_mem(26) := X"5B80"; --lb s1 rkp 0       ;load first value of key into s1
 --var_insn_mem(27) := X"D282"; --xor re re s1 ;xor input char with first key byte
@@ -274,34 +275,31 @@ var_insn_mem(43) := X"AC31"; --slt  ri rk1 rkc  ; if rk1 < 1b80, Msb is 0 -> ri=
 var_insn_mem(44) := X"0000";
 var_insn_mem(45) := X"0000";
 var_insn_mem(46) := X"0000";
-var_insn_mem(47) := X"0000";
-var_insn_mem(48) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1), don't shift
-var_insn_mem(49) := X"E221"; --sll  re re 1     ; shift encrypted char left by 1
-var_insn_mem(50) := X"D288"; --xor s1 re s1 ; XOR the tag with the shifted character ;only the ls 8 bits needed. ;Mask the output of the tag at END
-var_insn_mem(51) := X"AF31"; --slt  ri rk4 rkc  ; if rk4 < 0x80, Msb = 0 -> ri = 1 ; rotate key2 left
-var_insn_mem(52) := X"EFF1"; --sll  rk4 rk4 1   ; shift rk4 left by 1
-var_insn_mem(53) := X"AE38"; --slt  s1 rk3 rkc  ; if rk3 < 0x80, Msb = 0 -> s1 = 1
-var_insn_mem(54) := X"EEE1"; --sll rk3 rk3 1    ; shift rk3 left by 1
-var_insn_mem(55) := X"0000";
-var_insn_mem(56) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
-var_insn_mem(57) := X"9EE1"; --addi rk3 rk3 1   ; add carry
-var_insn_mem(58) := X"AD31"; --slt  ri rk2 rkc  ; if rk2 < 0x80, Msb = 0 -> ri = 1
-var_insn_mem(59) := X"EDD1"; --sll rk2 rk2 1    ; shift rk2 left by 1
-var_insn_mem(60) := X"0000";
-var_insn_mem(61) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1) don't add carry
-var_insn_mem(62) := X"9EE1"; --addi rk3 rk3 1   ; add carry
-var_insn_mem(63) := X"AC38"; --slt  s1 rk1 rkc  ; if rk1 < 0x80, Msb = 0 -> s1 = 1
-var_insn_mem(64) := X"ECC1"; --sll rk1 rk1 1    ; shift rk1 left by 1
-var_insn_mem(65) := X"0000";
-var_insn_mem(66) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
-var_insn_mem(67) := X"9CC1"; --addi rk1 rk1 1   ; add carry
-var_insn_mem(68) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1)no Msb to rotate
-var_insn_mem(69) := X"9FF1"; --addi rk4 rk4 1   ; move Msb to lsb
+var_insn_mem(47) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1), don't shift
+var_insn_mem(48) := X"E221"; --sll  re re 1     ; shift encrypted char left by 1
+var_insn_mem(49) := X"D288"; --xor s1 re s1 ; XOR the tag with the shifted character ;only the ls 8 bits needed. ;Mask the output of the tag at END
+var_insn_mem(50) := X"AF31"; --slt  ri rk4 rkc  ; if rk4 < 0x80, Msb = 0 -> ri = 1 ; rotate key2 left
+var_insn_mem(51) := X"EFF1"; --sll  rk4 rk4 1   ; shift rk4 left by 1
+var_insn_mem(52) := X"AE38"; --slt  s1 rk3 rkc  ; if rk3 < 0x80, Msb = 0 -> s1 = 1
+var_insn_mem(53) := X"EEE1"; --sll rk3 rk3 1    ; shift rk3 left by 1
+var_insn_mem(54) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
+var_insn_mem(55) := X"9EE1"; --addi rk3 rk3 1   ; add carry
+var_insn_mem(56) := X"AD31"; --slt  ri rk2 rkc  ; if rk2 < 0x80, Msb = 0 -> ri = 1
+var_insn_mem(57) := X"EDD1"; --sll rk2 rk2 1    ; shift rk2 left by 1
+var_insn_mem(68) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1) don't add carry
+var_insn_mem(69) := X"9EE1"; --addi rk3 rk3 1   ; add carry
+var_insn_mem(70) := X"AC38"; --slt  s1 rk1 rkc  ; if rk1 < 0x80, Msb = 0 -> s1 = 1
+var_insn_mem(71) := X"ECC1"; --sll rk1 rk1 1    ; shift rk1 left by 1
+var_insn_mem(72) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
+var_insn_mem(73) := X"9CC1"; --addi rk1 rk1 1   ; add carry
+var_insn_mem(74) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1)no Msb to rotate
+var_insn_mem(75) := X"9FF1"; --addi rk4 rk4 1   ; move Msb to lsb
 -- DOTaG_ExIT--DOTaG_ExIT:     ; Modify Tag given output and key
-var_insn_mem(70) := X"2016"; --j MAIN
+var_insn_mem(76) := X"2014"; --j MAIN
 -- END--END:
-var_insn_mem(71) := X"C4A4"; --and rT rT rm1    ;mask the tag
-var_insn_mem(72) := X"0000"; --nop              ; Finished.
+var_insn_mem(77) := X"C4A4"; --and rT rT rm1    ;mask the tag
+var_insn_mem(77) := X"7744"; --sb    ;store the tag
+var_insn_mem(78) := X"0000"; --nop              ; Finished.
 
 
 
