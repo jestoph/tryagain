@@ -269,6 +269,15 @@ component jmp_ctrl is
          jmp_flag: out std_logic);
 end component;
 
+component mux_4to1_16b is
+    port ( mux_select : in  std_logic_vector(1 downto 0);
+           data_0     : in  std_logic_vector(15 downto 0);
+           data_1     : in  std_logic_vector(15 downto 0);
+           data_2     : in  std_logic_vector(15 downto 0);
+           data_3     : in  std_logic_vector(15 downto 0);
+           data_out   : out std_logic_vector(15 downto 0) );
+end component; 
+
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
 signal sig_one_4b               : std_logic_vector(3 downto 0);

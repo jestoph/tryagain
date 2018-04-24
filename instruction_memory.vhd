@@ -248,16 +248,16 @@ var_insn_mem(25) := X"2040"; --j END
 var_insn_mem(26) := X"0000";
 var_insn_mem(27) := X"0000";
 
-var_insn_mem(28) := X"9017"; --addi ri $0 7 ;for(ri = 7; ri > 0; ri--) ri = 7
-var_insn_mem(29) := X"b011"; --addi ri $0 7 ;for(ri = 7; ri > 0; ri--) ri = 7
+var_insn_mem(28) := X"9018"; --addi ri $0 8 ;for(ri = -8; ri < 0; ri--) ri = -8
+var_insn_mem(29) := X"b011"; --addi ri $0 8 ;for(ri = -8; ri < 0; ri--) ri = -8
 
 -- ENCRYPT_lOOP--ENCRYPT_lOOP:
-var_insn_mem(30) := X"5B80"; --lb  s1 rkp 0 ;load subkey into s1
-var_insn_mem(31) := X"D282"; --xor  re re s1    ;xor subkey with char
-var_insn_mem(32) := X"8529"; --add  s2 rrn re   ;get the index of the table
-var_insn_mem(33) := X"5920"; --lb  re s2 0      ;retrieve value from rng table
-var_insn_mem(34) := X"9BB1"; --addi rkp rkp 1   ;increment subkey pointer
-var_insn_mem(35) := X"9111"; --addi ri ri 1     ;increment ri by 1
+var_insn_mem(30) := X"9111"; --addi ri ri 1     ;increment ri by 1
+var_insn_mem(31) := X"5B80"; --lb  s1 rkp 0 ;load subkey into s1
+var_insn_mem(32) := X"D282"; --xor  re re s1    ;xor subkey with char
+var_insn_mem(33) := X"8529"; --add  s2 rrn re   ;get the index of the table
+var_insn_mem(34) := X"5920"; --lb  re s2 0      ;retrieve value from rng table
+var_insn_mem(35) := X"9BB1"; --addi rkp rkp 1   ;increment subkey pointer
 var_insn_mem(36) := X"0000";
 var_insn_mem(37) := X"6011"; --beq ri $0 SAVE_ENCRYPT  ;once all 8 subkeys have been processed, save and do tag
 var_insn_mem(38) := X"201E"; --j ENCRYPT_lOOP
