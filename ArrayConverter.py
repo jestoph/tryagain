@@ -185,53 +185,53 @@ print "-- Initial Array"
 print
 pos=8*2
 current = 0
-print "var_dat_mem({}) := X\"{:04X}\"; -- Offset to key in bytes".format(current,pos)
+print "var_data_mem({}) := X\"{:04X}\"; -- Offset to key in bytes".format(current,pos)
 pos+=len(key) + 8
 current += 1
-print "var_dat_mem({}) := X\"{:04X}\"; -- Offset to random array in bytes".format(current,pos)
+print "var_data_mem({}) := X\"{:04X}\"; -- Offset to random array in bytes".format(current,pos)
 pos+=len(randomarray) + 8
 current += 1
-print "var_dat_mem({}) := X\"{:04X}\"; -- Offset to Input array in bytes".format(current,pos)
+print "var_data_mem({}) := X\"{:04X}\"; -- Offset to Input array in bytes".format(current,pos)
 pos+=len(inputarray)+ 4
 current += 1
-print "var_dat_mem({}) := X\"{:04X}\"; -- Length of the input string in bytes (including padding)".format(current,len(inputarray) + 8)
+print "var_data_mem({}) := X\"{:04X}\"; -- Length of the input string in bytes (including padding)".format(current,len(inputarray) + 8)
 current += 1
 
 for i in range(4):
-    print "var_dat_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
+    print "var_data_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
     current += 1
 
 print
 print "-- Key "
 print
 for i, a in enumerate(makepairs(key)):
-    print "var_dat_mem({}) := X\"{:02X}{:02X}\"; -- key[{}]".format(current,a[0],a[1],i)
+    print "var_data_mem({}) := X\"{:02X}{:02X}\"; -- key[{}]".format(current,a[0],a[1],i)
     current += 1
 
 for i in range(4):
-    print "var_dat_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
+    print "var_data_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
     current += 1
 
 print
 print "-- Random "
 print
 for i, a in enumerate(makepairs(randomarray)):
-    print "var_dat_mem({}) := X\"{:02X}{:02X}\"; -- randomarray[{}]".format(current,a[0],a[1],i)
+    print "var_data_mem({}) := X\"{:02X}{:02X}\"; -- randomarray[{}]".format(current,a[0],a[1],i)
     current += 1
 
 for i in range(4):
-    print "var_dat_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
+    print "var_data_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
     current += 1
 
 print
 print "-- Input " 
 print
 for i, a in enumerate(makepairs(inputarray)):
-    print "var_dat_mem({}) := X\"{:02X}{:02X}\"; -- inputarray[{}] : \'{}{}\'".format(current,a[0],a[1],i,chr(a[0]),chr(a[1]))
+    print "var_data_mem({}) := X\"{:02X}{:02X}\"; -- inputarray[{}] : \'{}{}\'".format(current,a[0],a[1],i,chr(a[0]),chr(a[1]))
     current += 1
 
 for i in range(4):
-    print "var_dat_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
+    print "var_data_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
     current += 1
 
 print
@@ -239,11 +239,11 @@ print "-- Output "
 print
 
 for i, a in enumerate(makepairs(outputarray)):
-    print "var_dat_mem({}) := X\"{:02X}{:02X}\"; -- outputarray[{}]".format(current,a[0],a[1],i)
+    print "var_data_mem({}) := X\"{:02X}{:02X}\"; -- outputarray[{}]".format(current,a[0],a[1],i)
     current += 1
 
 for i in range(4):
-    print "var_dat_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
+    print "var_data_mem({}) := X\"{:04X}\"; -- padding".format(current,0)
     current += 1
 
 
