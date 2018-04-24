@@ -71,7 +71,7 @@ reg_process: process(reset,
       data_out <= (others => '0'); 
    elsif (rising_edge(clk)) then
       if(flush = '1') then
-         data_out <= (others => '0'); 
+         data_out <= (others => '0') after 10ns; 
       else
          data_out <= data_in after 10ns; 
       end if;
