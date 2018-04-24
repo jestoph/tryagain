@@ -210,31 +210,33 @@ begin
 
 var_insn_mem(0) := X"0000"; --nop
 var_insn_mem(1) := X"0000"; --nop
-var_insn_mem(2) := X"0000"; --nop
-var_insn_mem(3) := X"0000"; --nop
-var_insn_mem(4) := X"0000"; --nop
-var_insn_mem(5) := X"0000"; --nop
 -- INIT--INIT:
-var_insn_mem(6) := X"10B0"; --lw rkp $0 0     ; Load Key address
-var_insn_mem(7) := X"1052"; --lw rrn $0 2     ; Load Random Table
-var_insn_mem(8) := X"1064"; --lw ris $0 4       ; Load Input address
-var_insn_mem(9) := X"1076"; --lw ros $0 6     ; Load output address
-var_insn_mem(10) := X"0000";
-var_insn_mem(11) := X"0000"; 
-var_insn_mem(12) := X"1BC0"; --lw rk1 rkp 0    ; key1 = *key + 0
-var_insn_mem(13) := X"1BD2"; --lw rk1 rkp 0    ; key2 = *key + 2
-var_insn_mem(14) := X"1BE4"; --lw rk1 rkp 0    ; key3 = *key + 4
-var_insn_mem(15) := X"1BF6"; --lw rk1 rkp 0    ; key4 = *key + 6
-var_insn_mem(16) := X"0000"; 
-var_insn_mem(17) := X"9031"; --addi rkc $0 1   ; load 0x0001
-var_insn_mem(18) := X"F331"; --srl  rkc rkc 1  ; make 0x8000
-var_insn_mem(19) := X"90AF"; --addi rm1 $0 0xf ; make 0x000f
-var_insn_mem(20) := X"EAA1"; --sll  rm1 rm1 1  ; make 0x00f0
-var_insn_mem(21) := X"9AAF"; --addi rm1 rm1 0xf ;make 0x00ff
+var_insn_mem(2) := X"10B0"; --lw rkp $0 0     ; Load Key address
+var_insn_mem(3) := X"1052"; --lw rrn $0 2     ; Load Random Table
+var_insn_mem(4) := X"1064"; --lw ris $0 4      ; Load Input address
+var_insn_mem(5) := X"1076"; --lw ros $0 6     ; string length
+var_insn_mem(6) := X"9774"; -- string length + padding
+var_insn_mem(7) := X"8677"; -- calculate output string addr
+
+var_insn_mem(8) := X"0000"; --nop
+var_insn_mem(9) := X"0000"; --nop
+var_insn_mem(10) := X"0000"; --nop
+
+var_insn_mem(11) := X"1BC0"; --lw rk1 rkp 0    ; key1 = *key + 0
+var_insn_mem(12) := X"1BD2"; --lw rk1 rkp 0    ; key2 = *key + 2
+var_insn_mem(13) := X"1BE4"; --lw rk1 rkp 0    ; key3 = *key + 4
+var_insn_mem(14) := X"1BF6"; --lw rk1 rkp 0    ; key4 = *key + 6
+var_insn_mem(15) := X"0000"; 
+var_insn_mem(16) := X"9031"; --addi rkc $0 1   ; load 0x0001
+var_insn_mem(17) := X"e33F"; --srl  rkc rkc 1  ; make 0x8000
+var_insn_mem(18) := X"90AF"; --addi rm1 $0 0xf ; make 0x000f
+var_insn_mem(19) := X"EAA1"; --sll  rm1 rm1 1  ; make 0x00f0
+var_insn_mem(20) := X"9AAF"; --addi rm1 rm1 0xf ;make 0x00ff
 -- MAIN--MAIN:          ; do {
-var_insn_mem(22) := X"5620"; --lb re ris 0      ; load byte of string into re ; tmp = string[j]
-var_insn_mem(23) := X"8661"; --add ris ris 1    ; j++ or *string++
-var_insn_mem(24) := X"4022"; --bne re $0 START  ; if(*string != EOF) continue
+var_insn_mem(21) := X"5620"; --lb re ris 0      ; load byte of string into re ; tmp = string[j]
+var_insn_mem(22) := X"8661"; --add ris ris 1    ; j++ or *string++
+var_insn_mem(23) := X"0000"; 
+var_insn_mem(24) := X"4021"; --bne re $0 START  ; if(*string != EOF) continue
 var_insn_mem(25) := X"2040"; --j END
 -- START--START:
 var_insn_mem(26) := X"5B80"; --lb s1 rkp 0       ;load first value of key into s1
