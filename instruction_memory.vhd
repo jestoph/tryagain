@@ -238,7 +238,7 @@ var_insn_mem(21) := X"9661"; --addi ris ris 1    ; j++ or *string++
 var_insn_mem(22) := X"0000"; 
 var_insn_mem(23) := X"0000"; --nop
 var_insn_mem(24) := X"4021"; --bne re $0 START  ; if(*string != EOF) continue
-var_insn_mem(25) := X"204D"; --j END
+var_insn_mem(25) := X"2043"; --j END
 -- START--START:
 --var_insn_mem(26) := X"5B80"; --lb s1 rkp 0       ;load first value of key into s1
 --var_insn_mem(27) := X"D282"; --xor re re s1 ;xor input char with first key byte
@@ -271,35 +271,36 @@ var_insn_mem(42) := X"9771"; --addi ros ros 1  ;increment output str pointer
 
 -- DOTAG--DOTAG:            ; shift encrypted character left by 1 if needed
 
-var_insn_mem(43) := X"AC31"; --slt  ri rk1 rkc  ; if rk1 < 1b80, Msb is 0 -> ri=1
+var_insn_mem(43) := X"AF31"; --slt  ri rk4 rkc  ; if rk1 < 1b80, Msb is 0 -> ri=1
 var_insn_mem(44) := X"0000";
 var_insn_mem(45) := X"0000";
 var_insn_mem(46) := X"0000";
 var_insn_mem(47) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1), don't shift
 var_insn_mem(48) := X"E221"; --sll  re re 1     ; shift encrypted char left by 1
-var_insn_mem(49) := X"D288"; --xor s1 re s1 ; XOR the tag with the shifted character ;only the ls 8 bits needed. ;Mask the output of the tag at END
-var_insn_mem(50) := X"AF31"; --slt  ri rk4 rkc  ; if rk4 < 0x80, Msb = 0 -> ri = 1 ; rotate key2 left
+var_insn_mem(49) := X"D244"; --xor rT re rT ; XOR the tag with the shifted character ;only the ls 8 bits needed. ;Mask the output of the tag at END
+var_insn_mem(50) := X"AF31"; --slt  ri rk4 rkc  ; if rk4 < 0x80, Msb = 0 -> ri = 1 ; rotate key4 left
 var_insn_mem(51) := X"EFF1"; --sll  rk4 rk4 1   ; shift rk4 left by 1
-var_insn_mem(52) := X"AE38"; --slt  s1 rk3 rkc  ; if rk3 < 0x80, Msb = 0 -> s1 = 1
-var_insn_mem(53) := X"EEE1"; --sll rk3 rk3 1    ; shift rk3 left by 1
+var_insn_mem(52) := X"AC38"; --slt  s1 rk1 rkc  ; if rk1 < 0x80, Msb = 0 -> s1 = 1
+var_insn_mem(53) := X"ECC1"; --sll rk1 rk1 1    ; shift rk1 left by 1
 var_insn_mem(54) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
-var_insn_mem(55) := X"9EE1"; --addi rk3 rk3 1   ; add carry
+var_insn_mem(55) := X"9CC1"; --addi rk1 rk1 1   ; add carry
 var_insn_mem(56) := X"AD31"; --slt  ri rk2 rkc  ; if rk2 < 0x80, Msb = 0 -> ri = 1
 var_insn_mem(57) := X"EDD1"; --sll rk2 rk2 1    ; shift rk2 left by 1
-var_insn_mem(68) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1) don't add carry
-var_insn_mem(69) := X"9EE1"; --addi rk3 rk3 1   ; add carry
-var_insn_mem(70) := X"AC38"; --slt  s1 rk1 rkc  ; if rk1 < 0x80, Msb = 0 -> s1 = 1
-var_insn_mem(71) := X"ECC1"; --sll rk1 rk1 1    ; shift rk1 left by 1
-var_insn_mem(72) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
-var_insn_mem(73) := X"9CC1"; --addi rk1 rk1 1   ; add carry
-var_insn_mem(74) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1)no Msb to rotate
-var_insn_mem(75) := X"9FF1"; --addi rk4 rk4 1   ; move Msb to lsb
+var_insn_mem(58) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1) don't add carry
+var_insn_mem(59) := X"9DD1"; --addi rk2 rk2 1   ; add carry
+var_insn_mem(60) := X"AE38"; --slt  s1 rk3 rkc  ; if rk3 < 0x80, Msb = 0 -> s1 = 1
+var_insn_mem(61) := X"EEE1"; --sll rk3 rk3 1    ; shift rk3 left by 1
+var_insn_mem(62) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
+var_insn_mem(63) := X"9EE1"; --addi rk3 rk3 1   ; add carry
+var_insn_mem(64) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1)no Msb to rotate
+var_insn_mem(65) := X"9FF1"; --addi rk4 rk4 1   ; move Msb to lsb
 -- DOTaG_ExIT--DOTaG_ExIT:     ; Modify Tag given output and key
-var_insn_mem(76) := X"2014"; --j MAIN
+var_insn_mem(66) := X"2014"; --j MAIN
 -- END--END:
-var_insn_mem(77) := X"C4A4"; --and rT rT rm1    ;mask the tag
-var_insn_mem(77) := X"7744"; --sb    ;store the tag
-var_insn_mem(78) := X"0000"; --nop              ; Finished.
+var_insn_mem(67) := X"C4A4"; --and rT rT rm1    ;mask the tag
+var_insn_mem(67) := X"7744"; --sb    ;store the tag
+var_insn_mem(68) := X"0000"; --nop              ; Finished.
+var_insn_mem(69) := X"2045"; -- infinite loop
 
 
 
