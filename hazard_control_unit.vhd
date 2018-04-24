@@ -65,6 +65,9 @@ signal   sig_src_a_if  : std_logic_vector(3 downto 0);
 signal   sig_src_b_if  : std_logic_vector(3 downto 0);
 signal   sig_dst_id    : std_logic_vector(3 downto 0);
 signal   sig_src_b_en  : std_logic;
+signal   sig_is_load   : std_logic;
+signal   sig_a_match   : std_logic;
+signal   sig_b_match   : std_logic;
 
 begin
 
@@ -93,9 +96,14 @@ begin
     do_not_jmp <= not sig_do_jmp after 1.5ns;
     do_pc_offset <= do_branch or sig_do_jmp after 1.5ns;
     
-    stall      <= '1' when (  (sig_op_id = OP_LOAD or sig_op_id = OP_LDB) 
-                              and (sig_src_a_if = sig_dst_id or (sig_src_b_en = '1' and
-                                    (sig_src_b_if = sig_dst_id)))) else '0' after 1.5ns;
+    sig_is_load     <= '1' when (  (sig_op_id = OP_LOAD or sig_op_id = OP_LDB) ) else '0';
+    
+    sig_a_match     <= '1' when (sig_src_a_if = sig_dst_id) else '0';
+    
+    sig_b_match     <= '1' when (sig_src_b_en = '1' and (sig_src_b_if = sig_dst_id)) else '0';
+                                    
+    stall           <= sig_is_load and (sig_b_match or sig_a_match) after 15ns;
+    
     b_or_jmp    <= sig_do_jmp after 1.5ns;
     pc_src      <= do_branch after 1.5ns;
     

@@ -809,7 +809,7 @@ begin
               data_out(11 downto 0)     => sig_pc_stage_wb);
 
    hazard_control_unit        : hzd_ctrl
-   port map ( opcode    => sig_insn_id(15 downto 12),
+   port map ( opcode    => sig_insn_id_storage(15 downto 12),
             do_jmp      => sig_do_jmp,
             do_not_jmp  => sig_do_not_jmp,
             b_type      => sig_b_type,
@@ -843,7 +843,7 @@ begin
               clk         => clk,
               flush       => '0',
               
-              data_in(15 downto 0)      => sig_insn_id,
+              data_in(15 downto 0)      => sig_insn_if,
 
               data_out(15 downto 0)     => sig_insn_id_storage);
               
