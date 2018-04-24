@@ -93,7 +93,12 @@ begin
 				end if;
 			else 				
 		    -- WORD Addressible
-				var_data_mem(var_addr) := write_data;
+                if(add_in(0) = '1') then
+                    var_data_mem(var_addr)(15 downto 8) := write_data(7 downto 0);
+                    var_data_mem(var_addr + 1)(7 downto 0) := write_data(15 downto 8);
+                else
+                    var_data_mem(var_addr) := write_data;
+                end if;
 			end if;
 		
 			
@@ -114,7 +119,12 @@ begin
                 end if;
             else 				
                 -- WORD Addressible
-                var_dm_out := var_data_mem(var_addr);
+                if(add_in(0) = '1') then
+                    var_dm_out(7 downto 0) := var_data_mem(var_addr)(15 downto 8);
+                    var_dm_out(15 downto 8) := var_data_mem(var_addr + 1)(7 downto 0);
+                else
+                    var_dm_out := var_data_mem(var_addr);
+                end if;
             end if;
         else
             var_dm_out := "0000000000000000";
