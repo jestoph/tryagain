@@ -24,7 +24,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
- 
+  
 entity program_counter is
     port ( reset    : in  std_logic;
            clk      : in  std_logic;

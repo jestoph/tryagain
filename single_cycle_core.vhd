@@ -503,7 +503,7 @@ begin
                data_b     => sig_insn_id(3 downto 0),
                data_out   => sig_write_register_id );
 
-    reg_file : register_file 
+    reg_file : register_file  
     port map ( reset           => reset, 
                clk             => clk,
                read_register_a => sig_reg_read_a_id,

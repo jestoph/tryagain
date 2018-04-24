@@ -91,7 +91,7 @@ begin
     
     b_type     <= '1' when (opcode = OP_BEQ) else
                   '0' after 1.5ns;
-    
+     
     do_jmp     <= sig_do_jmp after 1.5ns;
     do_not_jmp <= not sig_do_jmp after 1.5ns;
     do_pc_offset <= do_branch or sig_do_jmp after 1.5ns;
