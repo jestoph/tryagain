@@ -215,7 +215,7 @@ var_insn_mem(2) := X"10B0"; --lw rkp $0 0     ; Load Key address
 var_insn_mem(3) := X"1052"; --lw rrn $0 2     ; Load Random Table
 var_insn_mem(4) := X"1064"; --lw ris $0 4      ; Load Input address
 var_insn_mem(5) := X"1076"; --lw ros $0 6     ; string length
-var_insn_mem(6) := X"9772"; --(padding should be 4, not 2)--4"; -- string length + padding | add ros ros padding
+var_insn_mem(6) := X"9774"; --(padding should be 8, not 4)--4"; -- string length + padding | add ros ros padding
 var_insn_mem(7) := X"8677"; -- calculate output string addr | add ros ros ris
 
 var_insn_mem(8) := X"0000"; --nop
@@ -247,51 +247,61 @@ var_insn_mem(25) := X"2040"; --j END
 
 var_insn_mem(26) := X"0000";
 var_insn_mem(27) := X"0000";
+var_insn_mem(28) := X"0000";
 
-var_insn_mem(28) := X"9018"; --addi ri $0 8 ;for(ri = -8; ri < 0; ri--) ri = -8
-var_insn_mem(29) := X"b011"; --addi ri $0 8 ;for(ri = -8; ri < 0; ri--) ri = -8
+var_insn_mem(29) := X"9018"; --addi ri $0 8 ;for(ri = -8; ri < 0; ri--) ri = -8
+var_insn_mem(30) := X"b011"; --addi ri $0 8 ;for(ri = -8; ri < 0; ri--) ri = -8
 
 -- ENCRYPT_lOOP--ENCRYPT_lOOP:
-var_insn_mem(30) := X"9111"; --addi ri ri 1     ;increment ri by 1
-var_insn_mem(31) := X"5B80"; --lb  s1 rkp 0 ;load subkey into s1
-var_insn_mem(32) := X"D282"; --xor  re re s1    ;xor subkey with char
-var_insn_mem(33) := X"8529"; --add  s2 rrn re   ;get the index of the table
-var_insn_mem(34) := X"5920"; --lb  re s2 0      ;retrieve value from rng table
-var_insn_mem(35) := X"9BB1"; --addi rkp rkp 1   ;increment subkey pointer
-var_insn_mem(36) := X"0000";
+var_insn_mem(31) := X"9111"; --addi ri ri 1     ;increment ri by 1
+var_insn_mem(32) := X"5B80"; --lb  s1 rkp 0     ;load subkey into s1
+var_insn_mem(33) := X"D282"; --xor  re re s1    ;xor subkey with char
+var_insn_mem(34) := X"8529"; --add  s2 rrn re   ;get the index of the table
+var_insn_mem(35) := X"5920"; --lb  re s2 0      ;retrieve value from rng table
+var_insn_mem(36) := X"9BB1"; --addi rkp rkp 1   ;increment subkey pointer
+
 var_insn_mem(37) := X"6011"; --beq ri $0 SAVE_ENCRYPT  ;once all 8 subkeys have been processed, save and do tag
-var_insn_mem(38) := X"201E"; --j ENCRYPT_lOOP
+var_insn_mem(38) := X"201F"; --j ENCRYPT_lOOP
 -- SAVE_ENCRYPT
-var_insn_mem(39) := X"9017"; --addi ri, $0, 7
-var_insn_mem(40) := X"bBB1"; --sub rkp rkp ri   ;rkp - 7 -> returned to original value
+var_insn_mem(39) := X"9018"; --addi ri, $0, 8
+var_insn_mem(40) := X"bB1B"; --sub rkp rkp ri   ;rkp - 8 -> returned to original value
 var_insn_mem(41) := X"7720"; --sb re ros 0     ;store the output byte
 var_insn_mem(42) := X"9771"; --addi ros ros 1  ;increment output str pointer
+
 -- DOTAG--DOTAG:            ; shift encrypted character left by 1 if needed
+
 var_insn_mem(43) := X"AC31"; --slt  ri rk1 rkc  ; if rk1 < 1b80, Msb is 0 -> ri=1
-var_insn_mem(44) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1), don't shift
-var_insn_mem(45) := X"E221"; --sll  re re 1     ; shift encrypted char left by 1
-var_insn_mem(46) := X"D288"; --xor s1 re s1 ; XOR the tag with the shifted character ;only the ls 8 bits needed. ;Mask the output of the tag at END
-var_insn_mem(47) := X"AF31"; --slt  ri rk4 rkc  ; if rk4 < 0x80, Msb = 0 -> ri = 1 ; rotate key2 left
-var_insn_mem(48) := X"EFF1"; --sll  rk4 rk4 1   ; shift rk4 left by 1
-var_insn_mem(49) := X"AE38"; --slt  s1 rk3 rkc  ; if rk3 < 0x80, Msb = 0 -> s1 = 1
-var_insn_mem(50) := X"EEE1"; --sll rk3 rk3 1    ; shift rk3 left by 1
-var_insn_mem(51) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
-var_insn_mem(52) := X"9EE1"; --addi rk3 rk3 1   ; add carry
-var_insn_mem(53) := X"AD31"; --slt  ri rk2 rkc  ; if rk2 < 0x80, Msb = 0 -> ri = 1
-var_insn_mem(54) := X"EDD1"; --sll rk2 rk2 1    ; shift rk2 left by 1
-var_insn_mem(55) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1) don't add carry
-var_insn_mem(56) := X"9EE1"; --addi rk3 rk3 1   ; add carry
-var_insn_mem(57) := X"AC38"; --slt  s1 rk1 rkc  ; if rk1 < 0x80, Msb = 0 -> s1 = 1
-var_insn_mem(58) := X"ECC1"; --sll rk1 rk1 1    ; shift rk1 left by 1
-var_insn_mem(59) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
-var_insn_mem(60) := X"9CC1"; --addi rk1 rk1 1   ; add carry
-var_insn_mem(61) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1)no Msb to rotate
-var_insn_mem(62) := X"9FF1"; --addi rk4 rk4 1   ; move Msb to lsb
+var_insn_mem(44) := X"0000";
+var_insn_mem(45) := X"0000";
+var_insn_mem(46) := X"0000";
+var_insn_mem(47) := X"0000";
+var_insn_mem(48) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1), don't shift
+var_insn_mem(49) := X"E221"; --sll  re re 1     ; shift encrypted char left by 1
+var_insn_mem(50) := X"D288"; --xor s1 re s1 ; XOR the tag with the shifted character ;only the ls 8 bits needed. ;Mask the output of the tag at END
+var_insn_mem(51) := X"AF31"; --slt  ri rk4 rkc  ; if rk4 < 0x80, Msb = 0 -> ri = 1 ; rotate key2 left
+var_insn_mem(52) := X"EFF1"; --sll  rk4 rk4 1   ; shift rk4 left by 1
+var_insn_mem(53) := X"AE38"; --slt  s1 rk3 rkc  ; if rk3 < 0x80, Msb = 0 -> s1 = 1
+var_insn_mem(54) := X"EEE1"; --sll rk3 rk3 1    ; shift rk3 left by 1
+var_insn_mem(55) := X"0000";
+var_insn_mem(56) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
+var_insn_mem(57) := X"9EE1"; --addi rk3 rk3 1   ; add carry
+var_insn_mem(58) := X"AD31"; --slt  ri rk2 rkc  ; if rk2 < 0x80, Msb = 0 -> ri = 1
+var_insn_mem(59) := X"EDD1"; --sll rk2 rk2 1    ; shift rk2 left by 1
+var_insn_mem(60) := X"0000";
+var_insn_mem(61) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1) don't add carry
+var_insn_mem(62) := X"9EE1"; --addi rk3 rk3 1   ; add carry
+var_insn_mem(63) := X"AC38"; --slt  s1 rk1 rkc  ; if rk1 < 0x80, Msb = 0 -> s1 = 1
+var_insn_mem(64) := X"ECC1"; --sll rk1 rk1 1    ; shift rk1 left by 1
+var_insn_mem(65) := X"0000";
+var_insn_mem(66) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
+var_insn_mem(67) := X"9CC1"; --addi rk1 rk1 1   ; add carry
+var_insn_mem(68) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1)no Msb to rotate
+var_insn_mem(69) := X"9FF1"; --addi rk4 rk4 1   ; move Msb to lsb
 -- DOTaG_ExIT--DOTaG_ExIT:     ; Modify Tag given output and key
-var_insn_mem(63) := X"2016"; --j MAIN
+var_insn_mem(70) := X"2016"; --j MAIN
 -- END--END:
-var_insn_mem(64) := X"C4A4"; --and rT rT rm1    ;mask the tag
-var_insn_mem(65) := X"0000"; --nop              ; Finished.
+var_insn_mem(71) := X"C4A4"; --and rT rT rm1    ;mask the tag
+var_insn_mem(72) := X"0000"; --nop              ; Finished.
 
 
 
