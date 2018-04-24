@@ -36,7 +36,8 @@ end data_memory;
 
 architecture behavioral of data_memory is
 
-type mem_array is array(0 to 59) of std_logic_vector(15 downto 0);
+
+type mem_array is array(0 to 4096) of std_logic_vector(15 downto 0);
 signal sig_data_mem : mem_array;
 --signal sig_data_mem_tmp : mem_array;
 --signal sig_var_addr_b : std_logic_vector (11 downto 0);
@@ -69,6 +70,8 @@ begin
             var_data_mem(1) := X"0034"; -- random_tableKrandom_tableK
             var_data_mem(2) := X"0014"; -- InputStringInputString
             var_data_mem(3) := X"001e"; -- OutputStringOutputString
+
+            -- initial values of the data memory : reset to zero 
             var_data_mem(4) := X"0000"; -- END_OF_ARRAY 
             var_data_mem(5) := X"1234"; -- START_OF_ARRAY Key[]
             var_data_mem(6) := X"5678"; -- 
