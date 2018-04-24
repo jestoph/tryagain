@@ -215,8 +215,8 @@ var_insn_mem(2) := X"10B0"; --lw rkp $0 0     ; Load Key address
 var_insn_mem(3) := X"1052"; --lw rrn $0 2     ; Load Random Table
 var_insn_mem(4) := X"1064"; --lw ris $0 4      ; Load Input address
 var_insn_mem(5) := X"1076"; --lw ros $0 6     ; string length
-var_insn_mem(6) := X"9774"; -- string length + padding
-var_insn_mem(7) := X"8677"; -- calculate output string addr
+var_insn_mem(6) := X"9772"; --(padding should be 4, not 2)--4"; -- string length + padding | add ros ros padding
+var_insn_mem(7) := X"8677"; -- calculate output string addr | add ros ros ris
 
 var_insn_mem(8) := X"0000"; --nop
 var_insn_mem(9) := X"0000"; --nop
@@ -230,31 +230,40 @@ var_insn_mem(15) := X"0000";
 var_insn_mem(16) := X"9031"; --addi rkc $0 1   ; load 0x0001
 var_insn_mem(17) := X"e33F"; --srl  rkc rkc 1  ; make 0x8000
 var_insn_mem(18) := X"90AF"; --addi rm1 $0 0xf ; make 0x000f
-var_insn_mem(19) := X"EAA1"; --sll  rm1 rm1 1  ; make 0x00f0
+var_insn_mem(19) := X"EAA4"; --sll  rm1 rm1 4  ; make 0x00f0
 var_insn_mem(20) := X"9AAF"; --addi rm1 rm1 0xf ;make 0x00ff
 -- MAIN--MAIN:          ; do {
 var_insn_mem(21) := X"5620"; --lb re ris 0      ; load byte of string into re ; tmp = string[j]
-var_insn_mem(22) := X"8661"; --add ris ris 1    ; j++ or *string++
+var_insn_mem(22) := X"9661"; --addi ris ris 1    ; j++ or *string++
 var_insn_mem(23) := X"0000"; 
 var_insn_mem(24) := X"4021"; --bne re $0 START  ; if(*string != EOF) continue
 var_insn_mem(25) := X"2040"; --j END
 -- START--START:
-var_insn_mem(26) := X"5B80"; --lb s1 rkp 0       ;load first value of key into s1
-var_insn_mem(27) := X"D282"; --xor re re s1 ;xor input char with first key byte
-var_insn_mem(28) := X"8529"; --add s2 rrn re    ;get the index of the r table
-var_insn_mem(29) := X"5920"; --lb re s2 0       ;load the rng table's value
-var_insn_mem(30) := X"9BB1"; --addi rkp rkp 1   ;get next subkey
-var_insn_mem(31) := X"9017"; --addi ri $0 7 ;for(ri = 7; ri > 0; ri--) ri = 7
+--var_insn_mem(26) := X"5B80"; --lb s1 rkp 0       ;load first value of key into s1
+--var_insn_mem(27) := X"D282"; --xor re re s1 ;xor input char with first key byte
+--var_insn_mem(28) := X"8529"; --add s2 rrn re    ;get the index of the r table
+--var_insn_mem(29) := X"5920"; --lb re s2 0       ;load the rng table's value
+--var_insn_mem(30) := X"9BB1"; --addi rkp rkp 1   ;get next subkey
+
+var_insn_mem(26) := X"0000";
+var_insn_mem(27) := X"0000";
+
+var_insn_mem(28) := X"9017"; --addi ri $0 7 ;for(ri = 7; ri > 0; ri--) ri = 7
+var_insn_mem(29) := X"b011"; --addi ri $0 7 ;for(ri = 7; ri > 0; ri--) ri = 7
+
 -- ENCRYPT_lOOP--ENCRYPT_lOOP:
-var_insn_mem(32) := X"5B80"; --lb  s1 rkp 0 ;load subkey into s1
-var_insn_mem(33) := X"D282"; --xor  re re s1    ;xor subkey with char
-var_insn_mem(34) := X"8529"; --add  s2 rrn re   ;get the index of the table
-var_insn_mem(35) := X"5920"; --lb  re s2 0      ;retrieve value from rng table
-var_insn_mem(36) := X"9BB1"; --addi rkp rkp 1   ;increment subkey pointer
-var_insn_mem(37) := X"911F"; --addi ri ri 15    ;decrement ri by 1
-var_insn_mem(38) := X"6015"; --beq ri $0 DOTAG  ;once all 8 subkeys have been processed, do tag
-var_insn_mem(39) := X"2020"; --j ENCRYPT_lOOP
-var_insn_mem(40) := X"9BB9"; --addi rkp rkp 9   ;rkp - 7 -> returned to original value
+var_insn_mem(30) := X"5B80"; --lb  s1 rkp 0 ;load subkey into s1
+var_insn_mem(31) := X"D282"; --xor  re re s1    ;xor subkey with char
+var_insn_mem(32) := X"8529"; --add  s2 rrn re   ;get the index of the table
+var_insn_mem(33) := X"5920"; --lb  re s2 0      ;retrieve value from rng table
+var_insn_mem(34) := X"9BB1"; --addi rkp rkp 1   ;increment subkey pointer
+var_insn_mem(35) := X"9111"; --addi ri ri 1     ;increment ri by 1
+var_insn_mem(36) := X"0000";
+var_insn_mem(37) := X"6011"; --beq ri $0 SAVE_ENCRYPT  ;once all 8 subkeys have been processed, save and do tag
+var_insn_mem(38) := X"201E"; --j ENCRYPT_lOOP
+-- SAVE_ENCRYPT
+var_insn_mem(39) := X"9017"; --addi ri, $0, 7
+var_insn_mem(40) := X"bBB1"; --sub rkp rkp ri   ;rkp - 7 -> returned to original value
 var_insn_mem(41) := X"7720"; --sb re ros 0     ;store the output byte
 var_insn_mem(42) := X"9771"; --addi ros ros 1  ;increment output str pointer
 -- DOTAG--DOTAG:            ; shift encrypted character left by 1 if needed

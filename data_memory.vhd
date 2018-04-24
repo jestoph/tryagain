@@ -139,10 +139,10 @@ begin
 --            var_data_mem(58) := X"0000"; -- END_OF_ARRAY 
 --            var_data_mem(59) := X"0000";
 
-var_data_mem(0) := X"0005"; -- START_OF_ARRAY Initial_Pointers[]RPKRPK
-var_data_mem(1) := X"000a"; -- random_tableKrandom_tableK
-var_data_mem(2) := X"0013"; -- InputStringInputString
-var_data_mem(3) := X"0018"; -- OutputStringOutputString
+var_data_mem(0) := X"000A"; -- pointer to key
+var_data_mem(1) := X"0034"; -- pointer to random_tableKrandom_tableK
+var_data_mem(2) := X"0014"; -- pointer to InputString
+var_data_mem(3) := X"0004"; -- input string length
 var_data_mem(4) := X"0000"; -- END_OF_ARRAY 
 var_data_mem(5) := X"1234"; -- START_OF_ARRAY Key[]
 var_data_mem(6) := X"5678"; -- 
