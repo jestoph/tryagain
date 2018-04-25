@@ -104,7 +104,7 @@ begin
                                     
     stall           <= sig_is_load and (sig_b_match or sig_a_match) after 0.7 ns;
     
-    b_or_jmp    <= sig_do_jmp after 0.3 s;
+    b_or_jmp    <= sig_do_jmp after 0.3 ns;
     pc_src      <= do_branch ;
     
     

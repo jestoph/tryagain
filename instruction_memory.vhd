@@ -222,10 +222,10 @@ var_insn_mem(8) := X"0000"; --nop
 var_insn_mem(9) := X"0000"; --nop
 
 
-var_insn_mem(10) := X"1BC0"; --lw rk1 rkp 0    ; key1 = *key + 0
-var_insn_mem(11) := X"1BD2"; --lw rk1 rkp 0    ; key2 = *key + 2
-var_insn_mem(12) := X"1BE4"; --lw rk1 rkp 0    ; key3 = *key + 4
-var_insn_mem(13) := X"1BF6"; --lw rk1 rkp 0    ; key4 = *key + 6
+var_insn_mem(10) := X"17C0"; --lw rk1 rkp 6    ; key1 = *key + 0
+var_insn_mem(11) := X"17D2"; --lw rk2 rkp 4    ; key2 = *key + 2
+var_insn_mem(12) := X"17E4"; --lw rk3 rkp 2    ; key3 = *key + 4
+var_insn_mem(13) := X"17F6"; --lw rk4 rkp 0    ; key4 = *key + 6
 var_insn_mem(14) := X"0000";  
 var_insn_mem(15) := X"9031"; --addi rkc $0 1   ; load 0x0001
 var_insn_mem(16) := X"e33F"; --srl  rkc rkc 1  ; make 0x8000
