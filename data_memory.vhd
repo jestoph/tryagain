@@ -73,7 +73,7 @@ begin
 var_data_mem(0) := X"0010"; -- Offset to key in bytes
 var_data_mem(1) := X"0020"; -- Offset to random array in bytes
 var_data_mem(2) := X"0128"; -- Offset to Input array in bytes
-var_data_mem(3) := X"0012"; -- Length of the input string in bytes
+var_data_mem(3) := X"001A"; -- Length of the input string in bytes + padding
 var_data_mem(4) := X"0000"; -- padding
 var_data_mem(5) := X"0000"; -- padding
 var_data_mem(6) := X"0000"; -- padding
