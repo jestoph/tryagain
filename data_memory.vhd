@@ -344,11 +344,11 @@ var_data_mem(155) := X"0000";
             var_dm_out := "0000000000000000";
         end if;
 		
-		data_out <= var_dm_out after 2.3 ns;
+		data_out <= var_dm_out after 0.5 ns;-- after 2.3 ns;
 		
 		
         -- the following are probe signals (for simulation purpose) 
-        sig_data_mem <= var_data_mem after 2.3 ns;
+        sig_data_mem <= var_data_mem after 0.5 ns;-- after 2.3 ns;
 
     end process;
   
