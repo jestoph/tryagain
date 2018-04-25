@@ -312,14 +312,14 @@ var_insn_mem(69) := X"2045"; -- infinite loop
 --var_insn_mem(7) := X"1010";
 --var_insn_mem(8) := X"d563";
 
-var_insn_mem(1) := X"9011";
-var_insn_mem(2) := X"9022";
-var_insn_mem(3) := X"9033";
-var_insn_mem(4) := X"9044";
-var_insn_mem(5) := X"9051";
-var_insn_mem(6) := X"6151";
-var_insn_mem(7) := X"1010";
-var_insn_mem(8) := X"d563";
+--var_insn_mem(1) := X"9011";
+--var_insn_mem(2) := X"9022";
+--var_insn_mem(3) := X"9033";
+--var_insn_mem(4) := X"9044";
+--var_insn_mem(5) := X"9051";
+--var_insn_mem(6) := X"6151";
+--var_insn_mem(7) := X"1010";
+--var_insn_mem(8) := X"d563";
 
 
         elsif (falling_edge(clk) and stall = '0') then
