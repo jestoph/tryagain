@@ -78,7 +78,7 @@ var_insn_mem(0) := X"10B0"; --lw rkp $0 0     # Load Key address
 var_insn_mem(1) := X"1052"; --lw rrn $0 2     # Load Random Table
 var_insn_mem(2) := X"1064"; --lw ris $0 4       # Load Input address
 var_insn_mem(3) := X"1076"; --lw ros $0 6     # Load string length
-var_insn_mem(4) := X"0000"; --
+var_insn_mem(4) := X"10B0"; --
 var_insn_mem(5) := X"8767"; --add ros ros ris     # output string address
 --# copy the key
 --# This copies the key into registers.
