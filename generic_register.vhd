@@ -73,7 +73,7 @@ reg_process: process(reset,
       if(flush = '1') then
          data_out <= (others => '0') after 10ns; 
       else
-         data_out <= data_in after 10ns; 
+         data_out <= data_in after 0.5ns; 
       end if;
    end if;
    

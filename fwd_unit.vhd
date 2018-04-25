@@ -50,30 +50,30 @@ begin
         
         -- determine if we need to forward to src b
         if ( alu_src = '0' and ((reg_write_dm = '1' and src_reg_b = write_reg_dm ) or (reg_write_wb = '1' and src_reg_b = write_reg_wb)) ) then
-            alu_src_b_ctrl <= '1';
+            alu_src_b_ctrl <= '1' after 0.5 ns;
         else
-            alu_src_b_ctrl <= '0';
+            alu_src_b_ctrl <= '0' after 0.5 ns;
         end if;
         
         -- determine if we need to forward to src a
         if ( (reg_write_dm = '1' and src_reg_a = write_reg_dm ) or (reg_write_wb = '1' and src_reg_a = write_reg_wb) ) then
-            alu_src_a_ctrl <= '1';
+            alu_src_a_ctrl <= '1' after 0.4 ns;
         else
-            alu_src_a_ctrl <= '0';
+            alu_src_a_ctrl <= '0' after 0.4 ns;
         end if;
         
         -- choose between dm and write for a
         if ( reg_write_dm = '1' and write_reg_dm = src_reg_a ) then
-            alu_fwd_dm_or_w_a <= '0';
+            alu_fwd_dm_or_w_a <= '0' after 0.3 ns;
         else 
-            alu_fwd_dm_or_w_a <= '1';
+            alu_fwd_dm_or_w_a <= '1' after 0.3 ns;
         end if;
         
         -- choose between dm and write for b
         if ( reg_write_dm = '1' and write_reg_dm = src_reg_b ) then
-            alu_fwd_dm_or_w_b <= '0';
+            alu_fwd_dm_or_w_b <= '0' after 0.3 ns;
         else 
-            alu_fwd_dm_or_w_b <= '1';
+            alu_fwd_dm_or_w_b <= '1' after 0.3 ns;
         end if;
         
     end process;
