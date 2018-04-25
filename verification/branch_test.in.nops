@@ -1,0 +1,84 @@
+#
+# Simple test file for memory access
+#
+
+#
+# Start with nops 
+#
+    nop
+    nop
+    nop
+    nop
+    nop
+
+#
+# Attempt a loop with bne
+# Should loop 7 times
+# equivalent to for(int i = 7 ; i != 0 ; i--)
+#
+addi $7 $0 7
+    nop
+    nop
+    nop
+    nop
+addi $1 $0 1
+    nop
+    nop
+    nop
+    nop
+
+# Begin loop
+sub $7 $7 $1 
+    nop
+    nop
+    nop
+    nop
+bne $7 $0 -7
+    nop
+    nop
+    nop
+    nop
+
+
+#
+#   CANNOT DO THIS YET AS IMMEDIATE IS TOO SMALL TO BRANCHBACKWADDS
+# Attempt a loop with beq
+# Should loop 7 times
+# equivalent to for(int i = 7 ; i >= 1 ; i--)
+#
+addi $7 $0 7
+    nop
+    nop
+    nop
+    nop
+addi $1 $0 1
+    nop
+    nop
+    nop
+    nop
+
+# Begin loop
+sub $7 $7 $1 
+    nop
+    nop
+    nop
+    nop
+slt $2 $1 $7 # 2 <- $7 < 1? 1 : 0
+    nop
+    nop
+    nop
+    nop
+beq $2 $1 5
+    nop
+    nop
+    nop
+    nop
+addi $1 $0 15
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop

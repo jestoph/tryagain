@@ -1,0 +1,40 @@
+#
+# Simple test file for memory access
+#
+
+#
+# Start with nops 
+#
+    nop
+    nop
+    nop
+    nop
+    nop
+
+ALIAS i $7
+
+#
+# Attempt a loop with bne
+# Should loop 7 times
+# equivalent to for(int i = 7 ; i != 0 ; i--)
+#
+addi i $0 7 # i = 7
+addi $1 $0 1 
+    nop
+    nop
+    nop
+    nop
+
+# Begin loop
+begin_1:
+    nop
+
+sub i i $1 # i--
+bne i $0 begin_1
+    nop
+    nop
+    nop
+    nop
+    nop
+
+

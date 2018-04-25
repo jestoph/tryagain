@@ -1,0 +1,168 @@
+#
+# Simple test file for memory access
+#
+
+#
+# Start with nops 
+#
+    nop
+    nop
+    nop
+    nop
+    nop
+
+#
+#
+# Start with unconditional Forward jumps
+# At the end of this, all registers should be zero
+# We will skip over all addi functions
+# We use Sleds of instructions to catch early jumps
+#
+
+j A # Jump 8 instructions
+    nop
+    nop
+    nop
+    nop
+addi $1 $0 1
+A:
+    nop
+    nop
+    nop
+    nop
+    nop
+j B
+    nop
+    nop
+    nop
+    nop
+addi $2 $0 1
+addi $2 $0 1
+addi $2 $0 1
+addi $2 $0 1
+addi $2 $0 1
+addi $2 $0 1
+addi $2 $0 1
+addi $2 $0 1
+addi $2 $0 1
+addi $2 $0 1
+B:
+    nop
+    nop
+    nop
+    nop
+    nop
+j C
+    nop
+    nop
+    nop
+    nop
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+addi $3 $0 1
+C:
+    nop
+    nop
+    nop
+    nop
+    nop
+
+
+#
+# Now do backwards jumps
+# We jump forwards and backwards to avoid values here
+#
+j D
+    nop
+    nop
+    nop
+    nop
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+addi $5 $0 1
+
+E:
+    nop
+    nop
+    nop
+    nop
+    nop
+j F
+    nop
+    nop
+    nop
+    nop
+
+addi $6 $0 1
+addi $6 $0 1
+addi $6 $0 1
+addi $6 $0 1
+addi $6 $0 1
+addi $6 $0 1
+addi $6 $0 1
+
+D:
+    nop
+    nop
+    nop
+    nop
+    nop
+j E    # <- Backwards jump
+    nop
+    nop
+    nop
+    nop
+addi $4 $0 1
+addi $4 $0 1
+addi $4 $0 1
+addi $4 $0 1
+addi $4 $0 1
+addi $4 $0 1
+addi $4 $0 1
+addi $4 $0 1
+addi $4 $0 1
+addi $4 $0 1
+addi $4 $0 1
+
+F:
+    nop
+    nop
+    nop
+    nop
+

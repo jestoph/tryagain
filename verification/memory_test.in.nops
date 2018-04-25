@@ -1,0 +1,265 @@
+#
+# Simple test file for memory access
+#
+
+#
+# Start with nops 
+#
+    nop
+    nop
+    nop
+    nop
+    nop
+
+#
+# Set up some registers
+# At the end of this:
+#  $5 will contain 0x5555
+#  $10 will contain 0xAAAA
+#
+# These are useful numbers for checking memory
+#
+addi $5 $0 5 # $5 <- 0x0005
+    nop
+    nop
+    nop
+    nop
+sll $5 $5 4
+    nop
+    nop
+    nop
+    nop
+addi $5 $5 5 # $5 <- 0x0055
+    nop
+    nop
+    nop
+    nop
+sll $5 $5 4
+    nop
+    nop
+    nop
+    nop
+addi $5 $5 5 # $5 <- 0x0555
+    nop
+    nop
+    nop
+    nop
+sll $5 $5 4
+    nop
+    nop
+    nop
+    nop
+addi $5 $5 5 # $5 <- 0x5555
+    nop
+    nop
+    nop
+    nop
+
+
+addi $10 $0 10 # $10 <- 0x000A
+    nop
+    nop
+    nop
+    nop
+sll $10 $10 4
+    nop
+    nop
+    nop
+    nop
+addi $10 $10 10 # $10 <- 0x00AA
+    nop
+    nop
+    nop
+    nop
+sll $10 $10 4
+    nop
+    nop
+    nop
+    nop
+addi $10 $10 10 # $10 <- 0x0AAA
+    nop
+    nop
+    nop
+    nop
+sll $10 $10 4
+    nop
+    nop
+    nop
+    nop
+addi $10 $10 10 # $10 <- 0xAAAA
+    nop
+    nop
+    nop
+    nop
+
+
+#
+# Write to memory, indexing by IMMEDIATE
+# At the end of this
+#   MEM(1:0) <- 0x5555
+#   MEM(3:2) <- 0x0055
+#   MEM(5:4) <- 0x5500
+#
+sw $5 $0 0
+    nop
+    nop
+    nop
+    nop
+sb $5 $0 2
+    nop
+    nop
+    nop
+    nop
+sb $5 $0 5
+    nop
+    nop
+    nop
+    nop
+
+#
+# Write to memory, indexing by REGISTER
+# At the end of this
+#   MEM(7:6) <- 0xAAAA
+#   MEM(9:8) <- 0x00AA
+#   MEM(11:10) <- 0xAA00
+#
+addi $7 $0 0
+    nop
+    nop
+    nop
+    nop
+sw $10 $7 6 # sw MEM[6 + 0]
+    nop
+    nop
+    nop
+    nop
+addi $7 $7 2
+    nop
+    nop
+    nop
+    nop
+sb $10 $7 6 # sw MEM[6 + 3]
+    nop
+    nop
+    nop
+    nop
+addi $7 $7 3
+    nop
+    nop
+    nop
+    nop
+sb $10 $7 6 # sw MEM[6 + 4]
+    nop
+    nop
+    nop
+    nop
+
+
+#
+# Our memory map now looks like this:
+#   MEM(1:0) <- 0x5555
+#   MEM(3:2) <- 0x0055
+#   MEM(5:4) <- 0x5500
+#
+#   Now we read out these values in the the registers 
+#   corresponding to their index (except $0)
+#
+
+
+#   
+# To start we index by immediate
+# After this 
+#   $1 <- 0x5555
+#   $2 <- 0x0055
+#   $3,$4 <- 0x0000
+#   $5 <- 0x0055
+#
+lw $1 $0 0
+    nop
+    nop
+    nop
+    nop
+lb $2 $0 2
+    nop
+    nop
+    nop
+    nop
+lb $3 $0 3
+    nop
+    nop
+    nop
+    nop
+lb $4 $0 4
+    nop
+    nop
+    nop
+    nop
+lb $5 $0 5
+    nop
+    nop
+    nop
+    nop
+
+#
+# Our memory map now looks like this:
+#   MEM(7:6) <- 0xAAAA
+#   MEM(9:8) <- 0x00AA
+#   MEM(11:10) <- 0xAA00
+#
+# Now we index by register
+# After this 
+#   $10 <- 0xAAAA
+#   $11 <- 0x00AA
+#   $12,$13 <- 0x0000
+#   $14 <- 0x00AA
+#
+addi $7 $0 0
+    nop
+    nop
+    nop
+    nop
+lw $10 $7 6 # $10 <- MEM [ 0 + 6]
+    nop
+    nop
+    nop
+    nop
+addi $7 $7 2
+    nop
+    nop
+    nop
+    nop
+lb $11 $7 6 # $10 <- MEM [ 2 + 6]
+    nop
+    nop
+    nop
+    nop
+addi $7 $7 1
+    nop
+    nop
+    nop
+    nop
+lb $12 $7 6 # $10 <- MEM [ 3 + 6]
+    nop
+    nop
+    nop
+    nop
+addi $7 $7 1
+    nop
+    nop
+    nop
+    nop
+lb $13 $7 6 # $10 <- MEM [ 4 + 6]
+    nop
+    nop
+    nop
+    nop
+addi $7 $7 1
+    nop
+    nop
+    nop
+    nop
+lb $14 $7 6 # $10 <- MEM [ 0 + 6]
+    nop
+    nop
+    nop
+    nop

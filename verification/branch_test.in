@@ -1,0 +1,53 @@
+#
+# Simple test file for memory access
+#
+
+#
+# Start with nops 
+#
+    nop
+    nop
+    nop
+    nop
+    nop
+
+ALIAS i $7
+
+#
+# Attempt a loop with bne
+# Should loop 7 times
+# equivalent to for(int i = 7 ; i != 0 ; i--)
+#
+addi i $0 7 # i = 7
+addi $1 $0 1 
+
+# Begin loop
+begin_1:
+
+sub i i $1 # i--
+bne i $0 begin_1
+    nop
+    nop
+    nop
+    nop
+
+
+
+#
+# Attempt a loop with beq
+# Should loop 7 times
+# equivalent to for(int i = 7 ; i >= 1 ; i--)
+#
+addi i $0 7 # i = 7
+addi $1 $0 1
+
+# Begin loop
+begin_2:
+sub i i $1 # i--
+slt $2 $1 i # 2 <- i < 1? 1 : 0
+beq $2 $1 begin_2
+addi $1 $0 15
+    nop
+    nop
+    nop
+    nop

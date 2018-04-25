@@ -1,0 +1,316 @@
+#
+#     nop Test
+#     At the end of this all registers should be 0
+#
+    nop
+    nop
+    nop
+    nop
+    nop
+
+
+#
+# Test addi first because 
+# we use these to load values in to registers
+# Registers $0 to $4 will have their register names in value
+#
+addi $1 $0 1
+    nop
+    nop
+    nop
+    nop
+addi $2 $0 2
+    nop
+    nop
+    nop
+    nop
+addi $3 $0 3
+    nop
+    nop
+    nop
+    nop
+addi $4 $0 0 # Add a zero immediate
+    nop
+    nop
+    nop
+    nop
+addi $4 $3 1 # Add an immediate to a register
+    nop
+    nop
+    nop
+    nop
+
+
+#
+# Now Test that we can do some basic register addition
+# After this test, registers $0 to $8 will contain the number 
+# of their register name
+#
+add $5 $2 $3 
+    nop
+    nop
+    nop
+    nop
+add $6 $3 $3 # Rs and Rt are the same
+    nop
+    nop
+    nop
+    nop
+add $7 $3 $4
+    nop
+    nop
+    nop
+    nop
+add $7 $0 $7 # Add zero vector as rt
+    nop
+    nop
+    nop
+    nop
+addi $8 $0 4 # This is setup for the next instruction
+    nop
+    nop
+    nop
+    nop
+add $8 $8 $8 # Rs Rt and Rd are the same
+    nop
+    nop
+    nop
+    nop
+add $8 $8 $0 # Add Zero vector as rs
+    nop
+    nop
+    nop
+    nop
+
+#
+# Now Test that we can subtract some numbers, and immediates
+# After this test, registers $8 to $12 will contain the number 
+# of their register name mod 8
+#
+sub $9 $8 $7
+    nop
+    nop
+    nop
+    nop
+addi $10 $0 10 
+    nop
+    nop
+    nop
+    nop
+sub $10 $10 $8 # Rd and Rt are the same
+    nop
+    nop
+    nop
+    nop
+add $11 $0 $3
+    nop
+    nop
+    nop
+    nop
+sub $11 $3 $0 # Sub $0 to not do anything
+    nop
+    nop
+    nop
+    nop
+addi $12 $4 8
+    nop
+    nop
+    nop
+    nop
+sub $12 $12 $8 
+    nop
+    nop
+    nop
+    nop
+sub $8 $8 $8 # Rd Rs Rt all the same
+    nop
+    nop
+    nop
+    nop
+
+# 
+# Now We test some bit masks
+# After this:
+#  registers $1 to $3 will contain 1 to 3
+#  registers $4 and $5 will contain 0
+#  register $15 will contain 15
+addi $15 $0 15 # Load $15 with our mask
+    nop
+    nop
+    nop
+    nop
+and $1 $1 $15 # and with mask in rs
+    nop
+    nop
+    nop
+    nop
+and $2 $15 $2 # and with mask in rt
+    nop
+    nop
+    nop
+    nop
+and $3 $3 $3 # and with Rd Rt Rs the same
+    nop
+    nop
+    nop
+    nop
+and $4 $4 $0 # and with $0 in rs
+    nop
+    nop
+    nop
+    nop
+and $5 $0 $5 # and with $0 in rt
+    nop
+    nop
+    nop
+    nop
+
+# 
+# Now test Rotations
+# After this $15 will be 0xffff and $14 will be 0
+# and $1 to $4 will be a single shifted byte of 0xf
+#
+addi $15 $0 15 # Load $15 with our mask
+    nop
+    nop
+    nop
+    nop
+sll $1 $15 0 # $1 <- 0x000f
+    nop
+    nop
+    nop
+    nop
+sll $2 $15 4 # $2 <- 0x00f0
+    nop
+    nop
+    nop
+    nop
+sll $3 $15 8 # $3 <- 0x0f00
+    nop
+    nop
+    nop
+    nop
+sll $4 $15 12 # $4 <- 0xf000
+    nop
+    nop
+    nop
+    nop
+add $15 $1 $2
+    nop
+    nop
+    nop
+    nop
+add $15 $15 $3 
+    nop
+    nop
+    nop
+    nop
+add $15 $15 $4 # mask done $15 <- 0xffff
+    nop
+    nop
+    nop
+    nop
+add $14 $0 $15 # fill $14 up to get ready to shift right
+    nop
+    nop
+    nop
+    nop
+srl $14 $14 4 # $14 <- 0x0fff
+    nop
+    nop
+    nop
+    nop
+srl $14 $14 4 # $14 <- 0x00ff
+    nop
+    nop
+    nop
+    nop
+srl $14 $14 4 # $14 <- 0x000f
+    nop
+    nop
+    nop
+    nop
+srl $14 $14 4 # $14 <- 0x0000
+    nop
+    nop
+    nop
+    nop
+
+# 
+# Test: slt
+# Register $1 should toggle 1,0,1,0,1,0,1,0
+#
+slt $1 $2 $3 # $1 <- 1
+    nop
+    nop
+    nop
+    nop
+slt $1 $3 $2 # $1 <- 0
+    nop
+    nop
+    nop
+    nop
+slt $1 $1 $2 # $1 <- 1 Rd and Rt the same 
+    nop
+    nop
+    nop
+    nop
+slt $1 $2 $1 # $1 <- 0 Rd and Rs the same 
+    nop
+    nop
+    nop
+    nop
+slt $1 $1 $2 # $1 <- 1 Rd and Rt the same 
+    nop
+    nop
+    nop
+    nop
+slt $1 $1 $1 # $1 <- 0 Rs rd an Rt the same 
+    nop
+    nop
+    nop
+    nop
+slt $1 $1 $2 # $1 <- 1 Rd and Rt the same 
+    nop
+    nop
+    nop
+    nop
+slt $1 $1 $1 # $1 <- 0 Rs an Rt the same 
+    nop
+    nop
+    nop
+    nop
+
+
+
+# 
+# Now test XOR
+# At the end of this:
+# $1, $2 will be 0xffff
+# $3, $4 will be 0
+#
+xor $1 $15 $14 # test 0xffff ^ 0x0 = 0xffff
+    nop
+    nop
+    nop
+    nop
+xor $2 $14 $15 # test 0 ^ 0xffff = 0xffff
+    nop
+    nop
+    nop
+    nop
+xor $3 $15 $15 # test 0xffff ^ 0xffff = 0
+    nop
+    nop
+    nop
+    nop
+xor $4 $14 $14 # test 0x0 ^ 0x0 = 0
+    nop
+    nop
+    nop
+    nop
+
+# 
+# Test: slt
+# Register $1 should toggle 1,0,1,0
+#
