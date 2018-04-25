@@ -280,13 +280,13 @@ char random_table[]={
 
 char encrypt(char in, char * key, int key_size, char * random, char random_mask, int verbose){
 
-    char left = in;
-    char xored = 0;
-    char rnout = 0;
+    unsigned char left = in;
+    unsigned char xored = 0;
+    unsigned char rnout = 0;
    
     for(int i = 0 ; i < key_size ; i++){
         xored = left ^ key[i];
-        rnout = random[ xored & random_mask ];
+        rnout = random[ xored];
         if(verbose)
             printf("left: 0x%x key[%d]: 0x%x xored 0x%x rnout: 0x%x\n",
                     left&0xff, i, key[i]&0xff, xored&0xff, rnout&0xff);
