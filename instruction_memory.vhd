@@ -115,50 +115,51 @@ var_insn_mem(27) := X"9111"; --addi ri  ri  1    #increment ri by 1
 var_insn_mem(28) := X"5B80"; --lb  s1  rkp  0    #load subkey into s1
 var_insn_mem(29) := X"D282"; --xor  re  re  s1    #xor subkey with char
 var_insn_mem(30) := X"8529"; --add  s2  rrn  re    #get the index of the table
-var_insn_mem(31) := X"5920"; --lb  re  s2  0        #retrieve value from rng table
-var_insn_mem(32) := X"9BB1"; --addi rkp  rkp  1    #increment subkey pointer
-var_insn_mem(33) := X"0000"; --nop
-var_insn_mem(34) := X"6011"; --beq ri  $0  SAVE_ENCRYPT  #once all 8 subkeys have been processed  save and do tag
-var_insn_mem(35) := X"201B"; --j ENCRYPT_LOOP
+var_insn_mem(31) := X"C2a2"; -- and re, re, rm1
+var_insn_mem(32) := X"5920"; --lb  re  s2  0        #retrieve value from rng table
+var_insn_mem(33) := X"9BB1"; --addi rkp  rkp  1    #increment subkey pointer
+var_insn_mem(34) := X"0000"; --nop
+var_insn_mem(35) := X"6011"; --beq ri  $0  SAVE_ENCRYPT  #once all 8 subkeys have been processed  save and do tag
+var_insn_mem(36) := X"201B"; --j ENCRYPT_LOOP
 -- SAVE_ENCRYPT--SAVE_ENCRYPT:
-var_insn_mem(36) := X"9018"; --addi ri  $0  8
-var_insn_mem(37) := X"BB1B"; --sub rkp rkp ri   #rkp - 8 -> returned to original value
-var_insn_mem(38) := X"7720"; --sb   re  ros 0 #store the output byte
-var_insn_mem(39) := X"9771"; --addi ros  ros  1#increment output str pointer
+var_insn_mem(37) := X"9018"; --addi ri  $0  8
+var_insn_mem(38) := X"BB1B"; --sub rkp rkp ri   #rkp - 8 -> returned to original value
+var_insn_mem(39) := X"7720"; --sb   re  ros 0 #store the output byte
+var_insn_mem(40) := X"9771"; --addi ros  ros  1#increment output str pointer
 -- DOTAG--DOTAG:
 --# shift encrypted character left by 1 if needed
-var_insn_mem(40) := X"AF31"; --slt    ri  rk4  rkc    # if rk4 < 1b80  MSB is 0 -> ri=1
-var_insn_mem(41) := X"0000"; --nop
+var_insn_mem(41) := X"AF31"; --slt    ri  rk4  rkc    # if rk4 < 1b80  MSB is 0 -> ri=1
 var_insn_mem(42) := X"0000"; --nop
 var_insn_mem(43) := X"0000"; --nop
-var_insn_mem(44) := X"4011"; --bne    ri  $0  1        # if ri != 0 (ri == 1)  don't shift
-var_insn_mem(45) := X"E221"; --sll    re  re  1     # shift encrypted char left by 1
+var_insn_mem(44) := X"0000"; --nop
+var_insn_mem(45) := X"4011"; --bne    ri  $0  1        # if ri != 0 (ri == 1)  don't shift
+var_insn_mem(46) := X"E221"; --sll    re  re  1     # shift encrypted char left by 1
 --# XOR the tag with the shifted character
-var_insn_mem(46) := X"D244"; --xor     rT  re  rT    #only the LS 8 bits needed.
+var_insn_mem(47) := X"D244"; --xor     rT  re  rT    #only the LS 8 bits needed.
 --#Mask the output of the tag at END
 --# rotate key4 left
-var_insn_mem(47) := X"AF31"; --slt    ri  rk4  rkc    # if rk4 < 0x80  MSB = 0 -> ri = 1
-var_insn_mem(48) := X"EFF1"; --sll    rk4 rk4  1    # shift rk4 left by 1
-var_insn_mem(49) := X"AC38"; --slt    s1  rk1  rkc   # if rk1 < 0x80  MSB = 0 -> s1 = 1
-var_insn_mem(50) := X"ECC1"; --sll  rk1 rk1  1    # shift rk1 left by 1
-var_insn_mem(51) := X"4011"; --bne    ri  $0  1        # if ri != 0 (ri == 1) don't add carry
-var_insn_mem(52) := X"9CC1"; --addi    rk1 rk1 1        # add carry
-var_insn_mem(53) := X"AD31"; --slt    ri  rk2  rkc    # if rk2 < 0x80  MSB = 0 -> ri = 1
-var_insn_mem(54) := X"EDD1"; --sll  rk2 rk2  1    # shift rk2 left by 1
-var_insn_mem(55) := X"4081"; --bne    s1  $0  1        # if s1 != 0 (s1 == 1) don't add carry
-var_insn_mem(56) := X"9DD1"; --addi    rk2 rk2 1        # add carry
-var_insn_mem(57) := X"AE38"; --slt    s1  rk3  rkc    # if rk3 < 0x80  MSB = 0 -> s1 = 1
-var_insn_mem(58) := X"EEE1"; --sll  rk3 rk3  1    # shift rk3 left by 1
-var_insn_mem(59) := X"4011"; --bne    ri  $0  1        # if ri != 0 (ri == 1) don't add carry
-var_insn_mem(60) := X"9EE1"; --addi    rk3 rk3 1        # add carry
-var_insn_mem(61) := X"4081"; --bne    s1  $0  1        # if s1 != 0 (s1 == 1)no MSB to rotate
-var_insn_mem(62) := X"9FF1"; --addi    rk4 rk4 1        # move MSB to LSB
+var_insn_mem(48) := X"AF31"; --slt    ri  rk4  rkc    # if rk4 < 0x80  MSB = 0 -> ri = 1
+var_insn_mem(49) := X"EFF1"; --sll    rk4 rk4  1    # shift rk4 left by 1
+var_insn_mem(50) := X"AC38"; --slt    s1  rk1  rkc   # if rk1 < 0x80  MSB = 0 -> s1 = 1
+var_insn_mem(51) := X"ECC1"; --sll  rk1 rk1  1    # shift rk1 left by 1
+var_insn_mem(52) := X"4011"; --bne    ri  $0  1        # if ri != 0 (ri == 1) don't add carry
+var_insn_mem(53) := X"9CC1"; --addi    rk1 rk1 1        # add carry
+var_insn_mem(54) := X"AD31"; --slt    ri  rk2  rkc    # if rk2 < 0x80  MSB = 0 -> ri = 1
+var_insn_mem(55) := X"EDD1"; --sll  rk2 rk2  1    # shift rk2 left by 1
+var_insn_mem(56) := X"4081"; --bne    s1  $0  1        # if s1 != 0 (s1 == 1) don't add carry
+var_insn_mem(57) := X"9DD1"; --addi    rk2 rk2 1        # add carry
+var_insn_mem(58) := X"AE38"; --slt    s1  rk3  rkc    # if rk3 < 0x80  MSB = 0 -> s1 = 1
+var_insn_mem(59) := X"EEE1"; --sll  rk3 rk3  1    # shift rk3 left by 1
+var_insn_mem(60) := X"4011"; --bne    ri  $0  1        # if ri != 0 (ri == 1) don't add carry
+var_insn_mem(61) := X"9EE1"; --addi    rk3 rk3 1        # add carry
+var_insn_mem(62) := X"4081"; --bne    s1  $0  1        # if s1 != 0 (s1 == 1)no MSB to rotate
+var_insn_mem(63) := X"9FF1"; --addi    rk4 rk4 1        # move MSB to LSB
 -- DOTAG_EXIT--DOTAG_EXIT:
-var_insn_mem(63) := X"2013"; --j MAIN
+var_insn_mem(64) := X"2013"; --j MAIN
 -- END--END:
-var_insn_mem(64) := X"C4A4"; --and         rT  rT  rm1    #mask the tag
-var_insn_mem(65) := X"7474"; --sb        ros rT 4
-var_insn_mem(66) := X"0000"; --nop                    # Finished.
+var_insn_mem(65) := X"C4A4"; --and         rT  rT  rm1    #mask the tag
+var_insn_mem(66) := X"7474"; --sb        ros rT 4
+var_insn_mem(67) := X"0000"; --nop                    # Finished.
 
        
         elsif (falling_edge(clk) and stall = '0') then
