@@ -104,7 +104,7 @@ var_insn_mem(19) := X"5620"; --lb re ris  0        # Load byte of string into re
 var_insn_mem(20) := X"9661"; --addi ris ris 1        # j++ or *string++
 var_insn_mem(21) := X"0000"; --nop
 var_insn_mem(22) := X"0000"; --nop
-var_insn_mem(23) := X"4022"; --bne re $0 STArT    # if(*string != EOF) continue
+var_insn_mem(23) := X"4021"; --bne re $0 STArT    # if(*string != EOF) continue
 var_insn_mem(24) := X"2040"; --j END
 -- STArT--STArT:
 --#for(ri = -8
@@ -118,7 +118,7 @@ var_insn_mem(30) := X"8529"; --add  s2  rrn  re    #get the index of the table
 var_insn_mem(31) := X"5920"; --lb  re  s2  0        #retrieve value from rng table
 var_insn_mem(32) := X"9BB1"; --addi rkp  rkp  1    #increment subkey pointer
 var_insn_mem(33) := X"0000"; --nop
-var_insn_mem(34) := X"6012"; --beq ri  $0  SAVE_ENCRYPT  #once all 8 subkeys have been processed  save and do tag
+var_insn_mem(34) := X"6011"; --beq ri  $0  SAVE_ENCRYPT  #once all 8 subkeys have been processed  save and do tag
 var_insn_mem(35) := X"201B"; --j ENCRYPT_LOOP
 -- SAVE_ENCRYPT--SAVE_ENCRYPT:
 var_insn_mem(36) := X"9018"; --addi ri  $0  8
