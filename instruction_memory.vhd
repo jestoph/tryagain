@@ -302,10 +302,10 @@ begin
 --var_insn_mem(68) := X"0000"; --nop              ; Finished.
 --var_insn_mem(69) := X"2045"; -- infinite loop
 
-var_insn_mem(1) := X"9011";
+var_insn_mem(1) := X"1010";
 var_insn_mem(2) := X"9122";
 var_insn_mem(3) := X"9133";
-var_insn_mem(4) := X"8234";
+var_insn_mem(4) := X"0000";
 
 
 
