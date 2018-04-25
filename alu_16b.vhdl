@@ -105,7 +105,7 @@ begin
 			var_carry_out   := var_result(16);		
 		end if;
 
-        alu_out         <= var_sum;
-        carry_out       <= var_carry_out;
+        alu_out         <= var_sum after 2 ns;
+        carry_out       <= var_carry_out after 2 ns;
 	end process;
 end behavioural;

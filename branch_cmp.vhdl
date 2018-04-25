@@ -39,12 +39,12 @@ begin
 --    end process;
 
     sig_cmp_eq  <= '1' when (src_a = src_b) else
-                  '0';
+                  '0' after 0.3 ns;
                   
     
     do_branch   <= '1' when (b_insn = '1' and ((sig_cmp_eq = '1' and b_type = '1')
                                                 or (sig_cmp_eq = '0' and b_type = '0'))) else
-                  '0';
+                  '0' after 0.2 ns;
                   
 
 

@@ -87,14 +87,14 @@ begin
 
     b_insn     <= '1' when (opcode = OP_BEQ
                            or opcode = OP_BNE) else
-                  '0' after 1.5ns;
+                  '0' after 0.3 ns;
     
     b_type     <= '1' when (opcode = OP_BEQ) else
-                  '0' after 1.5ns;
+                  '0' after 0.2 ns;
      
-    do_jmp     <= sig_do_jmp after 1.5ns;
-    do_not_jmp <= not sig_do_jmp after 1.5ns;
-    do_pc_offset <= do_branch or sig_do_jmp after 1.5ns;
+    do_jmp     <= sig_do_jmp after 0.3 ns;
+    do_not_jmp <= not sig_do_jmp after 0.3 ns;
+    do_pc_offset <= do_branch or sig_do_jmp after 0.4 ns;
     
     sig_is_load     <= '1' when (  (sig_op_id = OP_LOAD or sig_op_id = OP_LDB) ) else '0';
     
@@ -102,10 +102,10 @@ begin
     
     sig_b_match     <= '1' when (sig_src_b_en = '1' and (sig_src_b_if = sig_dst_id)) else '0';
                                     
-    stall           <= sig_is_load and (sig_b_match or sig_a_match) after 15ns;
+    stall           <= sig_is_load and (sig_b_match or sig_a_match) after 0.7 ns;
     
-    b_or_jmp    <= sig_do_jmp after 1.5ns;
-    pc_src      <= do_branch after 1.5ns;
+    b_or_jmp    <= sig_do_jmp after 0.3 s;
+    pc_src      <= do_branch ;
     
     
 

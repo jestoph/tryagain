@@ -42,11 +42,11 @@ begin
                               clk ) is
     begin
        if (reset = '1') then
-           addr_out <= (others => '0'); 
+           addr_out <= (others => '0') after 0.5 ns; 
        --elsif (refresh = '1') then
        --    addr_out <= addr_in after 0.5ns; 
        elsif (rising_edge(clk) and stall = '0') then
-           addr_out <= addr_in after 0.5ns; 
+           addr_out <= addr_in after 0.5 ns; 
        end if;
     end process;
 end behavioral;

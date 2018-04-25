@@ -31,6 +31,6 @@ architecture behavioural of jmp_ctrl is
 constant OP_JMP   : std_logic_vector(3 downto 0) := "0010"; -- 2
 begin
 
-     jmp_flag <= '1' when opcode = OP_JMP else '0';
+     jmp_flag <= '1' when opcode = OP_JMP else '0' after 0.2 ns;
 
 end behavioural;

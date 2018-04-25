@@ -30,6 +30,6 @@ end or_gate;
 architecture behavioural of or_gate is
 begin
 
-    d_out <= src_a or src_b;
+    d_out <= src_a or src_b after 0.1 ns;
 
 end behavioural;

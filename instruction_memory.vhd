@@ -307,8 +307,8 @@ var_insn_mem(69) := X"2045"; -- infinite loop
         elsif (falling_edge(clk) and stall = '0') then
             -- read instructions on the rising clock edge
             var_addr := conv_integer(addr_in);
-            insn_out <= var_insn_mem(var_addr);
-            insn_out_raw <= var_insn_mem(var_addr);
+            insn_out <= var_insn_mem(var_addr) after 1.7 ns;
+            insn_out_raw <= var_insn_mem(var_addr) after 1.7 ns;
         end if;
 
         -- the following are probe signals (for simulation purpose)
