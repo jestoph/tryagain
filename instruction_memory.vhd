@@ -157,8 +157,13 @@ var_insn_mem(62) := X"9FF1"; --addi    rk4 rk4 1        # move MSB to LSB
 var_insn_mem(63) := X"2013"; --j MAIN
 -- END--END:
 var_insn_mem(64) := X"C4A4"; --and         rT  rT  rm1    #mask the tag
-var_insn_mem(65) := X"7474"; --sb        ros rT 4
+var_insn_mem(65) := X"7744"; --sb        ros rT 4
 var_insn_mem(66) := X"0000"; --nop                    # Finished.
+var_insn_mem(67) := X"0000"; --nop                    # Finished.
+var_insn_mem(68) := X"0000"; --nop                    # Finished.
+var_insn_mem(69) := X"0000"; --nop                    # Finished.
+var_insn_mem(70) := X"0000"; --nop                    # Finished.
+var_insn_mem(71) := X"0000"; --nop                    # Finished.
 
        
         elsif (falling_edge(clk) and stall = '0') then
