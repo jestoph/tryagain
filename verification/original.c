@@ -379,20 +379,20 @@ int main(){
     printf("--------------------------\n\n\n");
 
     char in;
-    char tag=0;
+    unsigned char tag=0;
     char next;
-    unsigned long long key_copy;
-    memcpy(&key_copy, key, 8);
+    unsigned long long key_copy = 0x123456789abcdef0;
     printf("Output: \n");
     int i = 0;
     while((in=getchar())!=EOF){
-        next = encrypt(in, key, KEY_SIZE, random_table, RANDOM_TABLE_MASK, 1) & 0x7f;
-        char shifted = doshift(next, &key_copy);
-        tag = tag ^ shifted;
-	    printf("out[%d] 0x%02x %c\n", i++, next , next );
+        next = encrypt(in, key, KEY_SIZE, random_table, RANDOM_TABLE_MASK, 0) & 0x7f;
+        unsigned char shifted = doshift(next, &key_copy);
+        unsigned char newtag = tag ^ shifted;
+	    printf("in[%02d]: %c -> out[%02d] 0x%02x %c tag: 0x%x\n", next, i++, i++, next , next, newtag );
+        tag = newtag;
     }
     printf("\n");
-    printf("Tag: %x\n", tag&&0xff);
+    printf("Tag: 0x%x\n", tag);
     printf("\n");
 
 
