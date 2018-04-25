@@ -82,10 +82,10 @@ var_insn_mem(4) := X"8778"; --add ros ros 8 # add 4 words of padding
 var_insn_mem(5) := X"8767"; --add ros ros ris     # output string address
 --# copy the key
 --# This copies the key into registers.
-var_insn_mem(6) := X"10B0"; --lw rkp $0 0     # Load Key address
-var_insn_mem(7) := X"1052"; --lw rrn $0 2     # Load Random Table
-var_insn_mem(8) := X"1064"; --lw ris $0 4       # Load Input address
-var_insn_mem(9) := X"1076"; --lw ros $0 6     # Load output address
+var_insn_mem(6) := X"0000"; --lw rkp $0 0     # Load Key address
+var_insn_mem(7) := X"0000"; --lw rrn $0 2     # Load Random Table
+var_insn_mem(8) := X"0000"; --lw ris $0 4       # Load Input address
+var_insn_mem(9) := X"0000"; --lw ros $0 6     # Load output address
 var_insn_mem(10) := X"17C6"; --lw rk1 ros 6    # key1 = *key + 0
 var_insn_mem(11) := X"17D4"; --lw rk2 ros 4    # key2 = *key + 2
 var_insn_mem(12) := X"17E2"; --lw rk3 ros 2    # key3 = *key + 4
