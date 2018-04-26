@@ -169,8 +169,8 @@ var_insn_mem(71) := X"0000"; --nop                    # Finished.
         elsif (falling_edge(clk) and stall = '0') then
             -- read instructions on the rising clock edge
             var_addr := conv_integer(addr_in);
-            insn_out <= var_insn_mem(var_addr);
-            insn_out_raw <= var_insn_mem(var_addr);
+            insn_out <= var_insn_mem(var_addr)  after 0.5ns;--after 1.7 ns;
+            insn_out_raw <= var_insn_mem(var_addr) after 0.5ns;--after 1.7 ns;
         end if;
 
         -- the following are probe signals (for simulation purpose)

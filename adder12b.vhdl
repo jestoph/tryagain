@@ -37,7 +37,7 @@ signal sig_result : std_logic_vector(12 downto 0);
 begin
 
     sig_result <= ('0' & src_a) + ('0' & src_b) + ("000000000000" & carry_in);
-    sum        <= sig_result(11 downto 0);
+    sum        <= sig_result(11 downto 0) after 0.8 ns;
     carry_out  <= sig_result(12);
     
 end behavioural;

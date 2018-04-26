@@ -75,11 +75,11 @@ begin
 
         -- continuous read of the registers at location read_register_a
         -- and read_register_b
-        read_data_a <= var_regfile(var_read_addr_a) after 0.8 ns; 
-        read_data_b <= var_regfile(var_read_addr_b) after 0.8 ns;
+        read_data_a <= var_regfile(var_read_addr_a) after 0.8 ns;--after 0.8 ns; 
+        read_data_b <= var_regfile(var_read_addr_b) after 0.8 ns;--after 0.8 ns;
 
         -- the following are probe signals (for simulation purpose)
-        sig_regfile <= var_regfile after 0.8 ns;
+        sig_regfile <= var_regfile after 0.8 ns;--after 0.8 ns;
 
     end process; 
 end behavioral;

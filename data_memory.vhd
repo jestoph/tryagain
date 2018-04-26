@@ -441,7 +441,7 @@ var_data_mem(173) := X"0000"; -- padding
             var_dm_out := "0000000000000000";
         end if;
         
-        data_out <= var_dm_out;
+        data_out <= var_dm_out after 2.9 ns;
         
         
         -- the following are probe signals (for simulation purpose) 

@@ -92,7 +92,7 @@ begin
 			  "011" when (opcode = OP_AND) else 
 			  "110" when (opcode = OP_LSL) else
 			  "111" when (opcode = OP_LSR) else
-			  "000";
+			  "000" after 2 ns;
 	
 	-- '1' when we are writing our output to Rd, '0' when writing to Rt 
     reg_dst    <= '1' when (opcode = OP_ADD
@@ -100,7 +100,7 @@ begin
 							or opcode = OP_XOR
 							or opcode = OP_SLT
 							or opcode = OP_SUB) else
-                  '0';
+                  '0' after 2 ns;
 
 	-- '1' When we're writing back to a register (as opposed to memory)
     reg_write  <= '1' when (opcode = OP_ADD 
@@ -113,7 +113,7 @@ begin
 							or opcode = OP_LSR
                             or opcode = OP_LOAD
 							or opcode = OP_LDB) else
-                  '0';
+                  '0' after 2 ns;
     
 	-- '1' when using Immediate, '0' when using a register
     alu_src    <= '1' when (opcode = OP_LOAD 
@@ -123,38 +123,38 @@ begin
 						   or opcode = OP_STB
 						   or opcode = OP_LSL
 						   or opcode = OP_LSR) else
-                  '0';
+                  '0' after 2 ns;
                  
     mem_write  <= '1' when (opcode = OP_STORE
 						   or opcode = OP_STB) else
-                  '0';
+                  '0' after 2 ns;
                  
     mem_to_reg <= '1' when (opcode = OP_LOAD
 						   or opcode = OP_LDB) else
-                  '0';
+                  '0' after 2 ns;
                   
     do_slt     <= '1' when (opcode = OP_SLT) else
-                  '0';
+                  '0' after 2 ns;
                   
     sig_do_jmp     <= '1' when (opcode = OP_JMP) else
-                  '0';
+                  '0' after 2 ns;
 
     byte_addr  <= '1' when (opcode = OP_LDB
                             or opcode = OP_STB) else
-                   '0';
+                   '0' after 2 ns;
                    
     mem_read   <= '1' when (opcode = OP_LOAD
 						   or opcode = OP_LDB) else
-                  '0';
+                  '0' after 2 ns;
                   
     b_insn     <= '1' when (opcode = OP_BEQ
                            or opcode = OP_BNE) else
-                  '0';
+                  '0' after 2 ns;
     
     b_type     <= '1' when (opcode = OP_BEQ) else
-                  '0';
+                  '0' after 2 ns;
     
-    do_jmp     <= sig_do_jmp;
-    do_not_jmp <= not sig_do_jmp;
-    do_pc_offset <= do_branch or sig_do_jmp;
+    do_jmp     <= sig_do_jmp after 2 ns;
+    do_not_jmp <= not sig_do_jmp after 2 ns;
+    do_pc_offset <= do_branch or sig_do_jmp after 2 ns;
 end behavioural;
