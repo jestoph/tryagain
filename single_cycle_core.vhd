@@ -50,7 +50,13 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity single_cycle_core is
     port ( reset  : in  std_logic;
            clk    : in  std_logic;
-           clk_pc  : in std_logic           );
+           w_req  : out std_logic;
+           r_req  : out std_logic;
+           w_en   : out std_logic;
+           r_en   : out std_logic;
+           w_b_addr : out std_logic;
+           r_b_addr : out std_logic;
+           core_num :in std_logic_vector(15 downto 0));
 end single_cycle_core;
 
 architecture structural of single_cycle_core is
