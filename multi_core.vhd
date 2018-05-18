@@ -93,6 +93,26 @@ signal sig_r_others_1   : std_logic;
 signal sig_r_others_2   : std_logic;
 signal sig_r_others_3   : std_logic;
 
+signal sig_r_tok_0to1   : std_logic;
+signal sig_r_tok_1to2   : std_logic;
+signal sig_r_tok_2to3   : std_logic;
+signal sig_r_tok_3to0   : std_logic; 
+
+signal sig_w_tok_0to1   : std_logic;
+signal sig_w_tok_1to2   : std_logic;
+signal sig_w_tok_2to3   : std_logic;
+signal sig_w_tok_3to0   : std_logic; 
+
+signal sig_r_tok_stat_0 : std_logic;
+signal sig_r_tok_stat_1 : std_logic;
+signal sig_r_tok_stat_2 : std_logic;
+signal sig_r_tok_stat_3 : std_logic;
+
+signal sig_w_tok_stat_0 : std_logic;
+signal sig_w_tok_stat_1 : std_logic;
+signal sig_w_tok_stat_2 : std_logic;
+signal sig_w_tok_stat_3 : std_logic;
+
 begin
 
     other_r_req_0 : or_3in_1b 
@@ -143,5 +163,93 @@ begin
                in_c      => sig_w_req_2,   
                or_out    => sig_w_others_3 );
 
+    arb_r_token_0 : r_token
+    port map ( clk         => clk,
+               reset       => reset,
+               init        => '1',
+               req         => sig_r_req_0,
+               others_req  => sig_r_others_0,
+               tok_in      => sig_r_tok_3to0,
+               tok_out     => sig_r_tok_0to1,
+               tok_stat    => sig_r_tok_stat_0
+               );
+
+    arb_r_token_1 : r_token
+    port map ( clk         => clk,
+               reset       => reset,
+               init        => '0',
+               req         => sig_r_req_1,
+               others_req  => sig_r_others_1,
+               tok_in      => sig_r_tok_0to1,
+               tok_out     => sig_r_tok_1to2,
+               tok_stat    => sig_r_tok_stat_1
+               );
+               
+    arb_r_token_2 : r_token
+    port map ( clk         => clk,
+               reset       => reset,
+               init        => '0',
+               req         => sig_r_req_2,
+               others_req  => sig_r_others_2,
+               tok_in      => sig_r_tok_1to2,
+               tok_out     => sig_r_tok_2to3,
+               tok_stat    => sig_r_tok_stat_2
+               );
+
+    arb_r_token_3 : r_token
+    port map ( clk         => clk,
+               reset       => reset,
+               init        => '0',
+               req         => sig_r_req_3,
+               others_req  => sig_r_others_3,
+               tok_in      => sig_r_tok_2to3,
+               tok_out     => sig_r_tok_3to0,
+               tok_stat    => sig_r_tok_stat_3
+               );
+
+    arb_w_token_0 : w_token
+    port map ( clk         => clk,
+               reset       => reset,
+               init        => '1',
+               req         => sig_w_req_0,
+               others_req  => sig_w_others_0,
+               tok_in      => sig_w_tok_3to0,
+               tok_out     => sig_w_tok_0to1,
+               tok_stat    => sig_w_tok_stat_0
+               );
+
+    arb_w_token_1 : w_token
+    port map ( clk         => clk,
+               reset       => reset,
+               init        => '0',
+               req         => sig_w_req_1,
+               others_req  => sig_w_others_1,
+               tok_in      => sig_w_tok_0to1,
+               tok_out     => sig_w_tok_1to2,
+               tok_stat    => sig_w_tok_stat_1
+               );
+               
+    arb_w_token_2 : w_token
+    port map ( clk         => clk,
+               reset       => reset,
+               init        => '0',
+               req         => sig_w_req_2,
+               others_req  => sig_w_others_2,
+               tok_in      => sig_w_tok_1to2,
+               tok_out     => sig_w_tok_2to3,
+               tok_stat    => sig_w_tok_stat_2
+               );
+
+    arb_w_token_3 : w_token
+    port map ( clk         => clk,
+               reset       => reset,
+               init        => '0',
+               req         => sig_w_req_3,
+               others_req  => sig_w_others_3,
+               tok_in      => sig_w_tok_2to3,
+               tok_out     => sig_w_tok_3to0,
+               tok_stat    => sig_w_tok_stat_3
+               );
 
 end structural;
+   

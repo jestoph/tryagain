@@ -284,6 +284,15 @@ component mux_4to1_16b is
            data_out   : out std_logic_vector(15 downto 0) );
 end component; 
 
+component stall_unit   is
+    port ( hzd_stall  : in  std_logic;
+           w_en       : in  std_logic;
+           r_en       : in  std_logic;
+           w_req      : in  std_logic;
+           r_req      : in  std_logic;
+           stall      : out std_logic );
+end component;
+
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
 signal sig_one_4b               : std_logic_vector(3 downto 0);
@@ -423,11 +432,21 @@ signal sig_insn_if_raw          : std_logic_vector(15 downto 0);
 signal sig_insn_id_fe           : std_logic_vector(15 downto 0);
 signal sig_insn_id_storage      : std_logic_vector(15 downto 0);
 
+signal   sig_w_req              : std_logic;
+signal   sig_r_req              : std_logic;
+signal   sig_w_en               : std_logic;
+signal   sig_r_en               : std_logic;
+signal   sig_hzd_stall          : std_logic;
+
 begin
 
     sig_one_4b              <= "0001";
 	 sig_one_12b             <= "000000000001";
     sig_z_12b               <= "000000000000";
+    w_en                    <= sig_w_en;
+    r_en                    <= sig_r_en;
+    w_req                   <= sig_w_req;
+    r_req                   <= sig_r_req;
 
     sig_alu_result          <= sig_alu_result;
 --    sig_read_data_b         <= sig_read_data_b;
@@ -835,7 +854,7 @@ begin
             pc_src      => sig_pc_src,
             insn_if     => sig_insn_id_storage,
             insn_id     => sig_insn_ex,
-            stall       => sig_stall            );
+            stall       => sig_hzd_stall            );
             
     refresh_select          : or_gate 
     port map (  src_a  => sig_pc_src,
@@ -874,4 +893,12 @@ begin
 --               data_b     => sig_pc_stage_if,
 --               data_out   => sig_curr_pc_if );
                
+    stall_detection     :  stall_unit
+    port map(  hzd_stall  =>sig_hzd_stall,
+               w_en       => sig_w_en,
+               r_en       => sig_r_en,
+               w_req      => sig_w_req,
+               r_req      => sig_r_req,
+               stall      => sig_stall );
+
 end structural;
