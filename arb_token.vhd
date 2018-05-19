@@ -17,7 +17,7 @@ end arb_token;
 architecture behavioural of r_token is
 
 signal    sig_tok_out   : std_logic;
-signal    sig_tok_d
+signal    sig_tok_d     : std_logic;
 signal    sig_tok_in    : std_logic;
 signal    sig_tok       : std_logic;
 
@@ -36,7 +36,7 @@ begin
        if (reset = '1') then
             var_token   := init; 
        elsif (rising_edge(clk)) then
-            var_token   := sig_tok_d
+            var_token   := sig_tok_d;
        end if;
     end process;
 
@@ -58,7 +58,7 @@ end arb_token;
 architecture behavioural of w_token is
 
 signal    sig_tok_out   : std_logic;
-signal    sig_tok_d
+signal    sig_tok_d     : std_logic; --current status of token
 signal    sig_tok_in    : std_logic;
 signal    sig_tok       : std_logic;
 
@@ -77,7 +77,7 @@ begin
        if (reset = '1') then
             var_token   := init; 
        elsif (falling_edge(clk)) then
-            var_token   := sig_tok_d
+            var_token   := sig_tok_d;
        end if;
     end process;
 

@@ -10,7 +10,7 @@ port ( hzd_stall  : in  std_logic;
            w_req      : in  std_logic;
            r_req      : in  std_logic;
            stall      : out std_logic );
-end stall_unit
+end stall_unit;
 
 architecture behavioural of stall_unit is
 
@@ -35,4 +35,4 @@ begin
                       
    stall          <= sig_stall or sig_hzd_stall;
 
-end behavioural
+end behavioural;
