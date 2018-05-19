@@ -53,7 +53,8 @@ begin
                            addr_in_r,
                            addr_in_w,
                            read_enable,
-						   byte_addr) is
+						   byte_addr_r,
+                           byte_addr_w) is
   
     variable var_data_mem : mem_array;
     variable var_addr_w   : integer;
@@ -248,7 +249,7 @@ var_data_mem(155) := X"0000";
 				end if;
 			else 				
 		    -- WORD Addressible
-                if(addr_in(0) = '1') then
+                if(addr_in_w(0) = '1') then
                     var_data_mem(var_addr_w)(15 downto 8) := write_data(7 downto 0);
                     var_data_mem(var_addr_w + 1)(7 downto 0) := write_data(15 downto 8);
                 else

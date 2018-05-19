@@ -128,7 +128,7 @@ signal sig_r_b_addr_bus : std_logic;
 signal sig_w_mem_bus    : std_logic_vector(15 downto 0);
 signal sig_r_mem_bus    : std_logic_vector(15 downto 0);
 signal sig_addr_r_bus   : std_logic_vector(11 downto 0);
-signal sig_addr_r_bus   : std_logic_vector(11 downto 0);
+signal sig_addr_w_bus   : std_logic_vector(11 downto 0);
 
 signal sig_write_enable : std_logic;
 signal sig_read_enable : std_logic;
@@ -298,7 +298,7 @@ begin
                 r_mem_bus   =>  sig_r_mem_bus,
                 addr_r_bus  =>  sig_addr_r_bus,
                 addr_w_bus  =>  sig_addr_w_bus,
-                core_num    =>  x"000000");
+                core_num    =>  x"0000");
                 
     core_1          :   single_cycle_core
     port map  ( reset       =>  reset,
@@ -313,7 +313,7 @@ begin
                 r_mem_bus   =>  sig_r_mem_bus,
                 addr_r_bus  =>  sig_addr_r_bus,
                 addr_w_bus  =>  sig_addr_w_bus,
-                core_num    =>  x"000001");
+                core_num    =>  x"0001");
                 
     core_2          :   single_cycle_core
     port map  ( reset       =>  reset,
@@ -328,7 +328,7 @@ begin
                 r_mem_bus   =>  sig_r_mem_bus,
                 addr_r_bus  =>  sig_addr_r_bus,
                 addr_w_bus  =>  sig_addr_w_bus,
-                core_num    =>  x"000002");
+                core_num    =>  x"0002");
                 
     core_3          :   single_cycle_core
     port map  ( reset       =>  reset,
@@ -343,9 +343,9 @@ begin
                 r_mem_bus   =>  sig_r_mem_bus,
                 addr_r_bus  =>  sig_addr_r_bus,
                 addr_w_bus  =>  sig_addr_w_bus,
-                core_num    =>  x"000003");
+                core_num    =>  x"0003");
                 
-    data_mem : data_memory 
+    data_mem : shared_memory
     port map ( reset        => reset,
                clk          => clk,
                write_enable => sig_read_enable,
