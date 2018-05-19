@@ -17,3 +17,4 @@ begin
     or_out <= in_a or in_b or in_c or in_d;
 
 end behavioural;
+ 
