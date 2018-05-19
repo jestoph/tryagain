@@ -20,6 +20,8 @@ port ( reset  : in  std_logic;
         r_en   : out std_logic;
         w_addr_b : out std_logic;
         r_addr_b : out std_logic;
+        w_mem_bus    : out std_logic_vector(15 downto 0);
+        r_mem_bus    : in  std_logic_vector(15 downto 0);
         core_num : in std_logic
         );
 end component;

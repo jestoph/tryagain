@@ -56,6 +56,8 @@ entity single_cycle_core is
            r_en   : out std_logic;
            w_b_addr : out std_logic;
            r_b_addr : out std_logic;
+           w_mem_bus    : out std_logic_vector(15 downto 0);
+           r_mem_bus    : in  std_logic_vector(15 downto 0);
            core_num :in std_logic_vector(15 downto 0));
 end single_cycle_core;
 
@@ -432,11 +434,21 @@ signal sig_insn_if_raw          : std_logic_vector(15 downto 0);
 signal sig_insn_id_fe           : std_logic_vector(15 downto 0);
 signal sig_insn_id_storage      : std_logic_vector(15 downto 0);
 
+-------------------------------------------
+-- signals for multicore
+-- 
+-------------------------------------------
+
 signal   sig_w_req              : std_logic;
 signal   sig_r_req              : std_logic;
 signal   sig_w_en               : std_logic;
 signal   sig_r_en               : std_logic;
 signal   sig_hzd_stall          : std_logic;
+signal   sig_core_num           : std_logic_vector(15 downto 0);
+signal   sig_w_bus              : std_logic_vector(15 downto 0);
+signal   sig_r_bus              : std_logic_vector(15 downto 0);
+signal   sig_addr_w_bus         : std_logic_vector(15 downto 0);
+signal   sig_addr_r_bus         : std_logic_vector(15 downto 0);
 
 begin
 
@@ -569,15 +581,15 @@ begin
                do_slt     => sig_do_slt_ex,
                carry_out  => sig_alu_carry_out );
 
-    data_mem : data_memory 
-    port map ( reset        => reset,
-               clk          => clk,
-               write_enable => sig_mem_write_dm,
-               read_enable  => sig_mem_read_dm,
-               write_data   => sig_read_data_b_dm,
-               byte_addr	=> sig_byte_addr_dm,
-               addr_in      => sig_alu_result_dm(11 downto 0),
-               data_out     => sig_data_mem_out_dm );
+--    data_mem : data_memory 
+--    port map ( reset        => reset,
+--               clk          => clk,
+--               write_enable => sig_mem_write_dm,
+--               read_enable  => sig_mem_read_dm,
+--               write_data   => sig_read_data_b_dm,
+--               byte_addr	=> sig_byte_addr_dm,
+--               addr_in      => sig_alu_result_dm(11 downto 0),
+--               data_out     => sig_data_mem_out_dm );
                
     mux_mem_to_reg : mux_2to1_16b 
     port map ( mux_select => sig_mem_to_reg_wb,
@@ -900,5 +912,20 @@ begin
                w_req      => sig_w_req,
                r_req      => sig_r_req,
                stall      => sig_stall );
+               
+    data_unit   : mem_connect
+    port map ( write_enable => sig_mem_write_dm,
+               read_enable  => sig_mem_read_dm,
+               write_token  => sig_w_tok,
+               read_token   => sig_r_tok,
+               write_data   => sig_read_data_b_dm,
+               byte_addr	=> sig_byte_addr_dm,
+               addr_in      => sig_alu_result_dm(11 downto 0),
+               data_out     => sig_data_mem_out_dm,
+               core_num     => sig_core_num,
+               mem_w_bus    => sig_w_bus,
+               mem_r_bus    => sig_r_bus,
+               addr_r_bus   => sig_addr_r_bus,
+               addr_w_bus   => sig_addr_w_bus );
 
 end structural;
