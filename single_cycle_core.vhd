@@ -58,6 +58,8 @@ entity single_cycle_core is
            r_b_addr : out std_logic; -- byte address mode
            w_mem_bus    : out std_logic_vector(15 downto 0);
            r_mem_bus    : in  std_logic_vector(15 downto 0);
+           addr_r_bus   : out std_logic_vector(11 downto 0);
+           addr_w_bus   : out std_logic_vector(11 downto 0);
            core_num :in std_logic_vector(15 downto 0));
 end single_cycle_core;
 
@@ -498,6 +500,9 @@ begin
     
     r_b_addr                <= sig_r_b_bus;
     w_b_addr                <= sig_w_b_bus;
+    
+    addr_r_bus              <= sig_addr_r_bus;
+    addr_w_bus              <= sig_addr_w_bus;
 
     sig_alu_result          <= sig_alu_result;
 --    sig_read_data_b         <= sig_read_data_b;

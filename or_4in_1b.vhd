@@ -9,7 +9,7 @@ entity or_4in_1b is
            in_c     : in  std_logic;
            in_d     : in  std_logic;
            or_out   : out std_logic );
-end mux_2to1_1b;
+end or_4in_1b;
 
 architecture behavioural of or_4in_1b is
 begin
