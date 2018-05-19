@@ -9,10 +9,10 @@ entity r_token is
            init         : in    std_logic;
            req          : in    std_logic;
            others_req   : in    std_logic;
-           tok_in       : out   std_logic;
+           tok_in       : in    std_logic;
            tok_out      : out   std_logic;
            tok_stat     : out   std_logic );
-end arb_token;
+end r_token;
 
 architecture behavioural of r_token is
 
@@ -22,11 +22,6 @@ signal    sig_tok_in    : std_logic;
 signal    sig_tok       : std_logic;
 
 begin
-    sig_tok          <= var_token;
-    sig_tok_in       <= tok_in;
-    sig_tok_d        <= ((not others_req and sig_tok) or (tok_in and req));
-    sig_tok_out      <= ((tok_in and not req) or sig_tok);
-
     token_process : process ( reset,
                               clk ) is
                               
@@ -38,11 +33,20 @@ begin
        elsif (rising_edge(clk)) then
             var_token   := sig_tok_d;
        end if;
+       
+    sig_tok          <= var_token;
+    sig_tok_in       <= tok_in;
+    sig_tok_d        <= ((not others_req and sig_tok) or (tok_in and req));
+    sig_tok_out      <= ((tok_in and not req) or sig_tok);
+    
+    
     end process;
-
 end behavioural;
 
-
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity w_token is
     port ( clk          : in    std_logic;
@@ -50,10 +54,10 @@ entity w_token is
            init         : in    std_logic;
            req          : in    std_logic;
            others_req   : in    std_logic;
-           tok_in       : out   std_logic;
+           tok_in       : in    std_logic;
            tok_out      : out   std_logic;
            tok_stat     : out   std_logic );
-end arb_token;
+end w_token;
 
 architecture behavioural of w_token is
 
@@ -63,11 +67,6 @@ signal    sig_tok_in    : std_logic;
 signal    sig_tok       : std_logic;
 
 begin
-    sig_tok          <= var_token;
-    sig_tok_in       <= tok_in;
-    sig_tok_d        <= ((not others_req and sig_tok) or (tok_in and req));
-    sig_tok_out      <= ((tok_in and not req) or sig_tok);
-
     token_process : process ( reset,
                               clk ) is
                               
@@ -79,6 +78,11 @@ begin
        elsif (falling_edge(clk)) then
             var_token   := sig_tok_d;
        end if;
+       
+    sig_tok          <= var_token;
+    sig_tok_in       <= tok_in;
+    sig_tok_d        <= ((not others_req and sig_tok) or (tok_in and req));
+    sig_tok_out      <= ((tok_in and not req) or sig_tok);
+    
     end process;
-
 end behavioural;

@@ -20,7 +20,6 @@ signal sig_r_en       : std_logic;
 signal sig_w_req      : std_logic;
 signal sig_r_req      : std_logic;
 signal sig_stall      : std_logic;
-signal sig_hzd_stall  : std_logic;
 
 begin
    sig_hzd_stall  <= hzd_stall;
@@ -30,8 +29,10 @@ begin
    sig_r_req      <= r_req;
    sig_hzd_stall  <= hzd_stall;
 
-   sig_stall      <= '1' when ((w_req = '1' and w_en = '1') or (r_req = '1' and r_en = '1') or (not r_req and not w_req))
-                      else '0';
+   sig_stall      <= '1' when ((w_req = '1' and w_en = '1') 
+                                or (r_req = '1' and r_en = '1') 
+                                or (r_req = '0' and w_req = '0'))
+                                else '0';
                       
    stall          <= sig_stall or sig_hzd_stall;
 

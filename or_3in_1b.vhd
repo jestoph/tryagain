@@ -8,7 +8,7 @@ entity or_3in_1b is
            in_b     : in  std_logic;
            in_c     : in  std_logic;
            or_out   : out std_logic );
-end mux_2to1_1b;
+end or_3in_1b;
 
 architecture behavioural of or_3in_1b is
 begin

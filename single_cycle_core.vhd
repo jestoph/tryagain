@@ -52,10 +52,10 @@ entity single_cycle_core is
            clk    : in  std_logic;
            w_req  : out std_logic;
            r_req  : out std_logic;
-           w_en   : out std_logic;
-           r_en   : out std_logic;
-           w_b_addr : out std_logic;
-           r_b_addr : out std_logic;
+           w_en   : out std_logic; -- token
+           r_en   : out std_logic; -- token
+           w_b_addr : out std_logic; -- byte address mode
+           r_b_addr : out std_logic; -- byte address mode
            w_mem_bus    : out std_logic_vector(15 downto 0);
            r_mem_bus    : in  std_logic_vector(15 downto 0);
            core_num :in std_logic_vector(15 downto 0));
@@ -286,14 +286,48 @@ component mux_4to1_16b is
            data_out   : out std_logic_vector(15 downto 0) );
 end component; 
 
-component stall_unit   is
-    port ( hzd_stall  : in  std_logic;
+
+------------------------------------
+-- multi core units
+--
+------------------------------------
+
+component mem_connect is
+    port ( write_enable :   in  std_logic;
+           read_enable  :   in  std_logic;
+           write_token  :   in  std_logic;
+           read_token   :   in  std_logic;
+           write_data   :   in  std_logic_vector(15 downto 0);
+           byte_addr	:   in  std_logic;
+           addr_in      :   in  std_logic_vector(11 downto 0);
+           data_out     :   out std_logic_vector(15 downto 0);
+           mem_r_bus    :   in  std_logic_vector(15 downto 0);
+           mem_w_bus    :   out std_logic_vector(15 downto 0);
+           core_num     :   in  std_logic_vector(15 downto 0);
+           addr_w_bus   :   out std_logic_vector(11 downto 0);
+           addr_r_bus   :   out std_logic_vector(11 downto 0);
+           byte_addr_r_bus  : out std_logic;
+           byte_addr_w_bus  : out std_logic);
+end component;
+ 
+
+component tok_req_ctrl is
+    port ( write_enable     : in  std_logic;
+           read_enable      : in  std_logic;
+           addr_in          : in  std_logic_vector(11 downto 0);
+           w_req            : out std_logic;
+           r_req            : out std_logic);
+end component;
+
+component stall_unit is
+port ( hzd_stall  : in  std_logic;
            w_en       : in  std_logic;
            r_en       : in  std_logic;
            w_req      : in  std_logic;
            r_req      : in  std_logic;
            stall      : out std_logic );
 end component;
+
 
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
@@ -447,8 +481,10 @@ signal   sig_hzd_stall          : std_logic;
 signal   sig_core_num           : std_logic_vector(15 downto 0);
 signal   sig_w_bus              : std_logic_vector(15 downto 0);
 signal   sig_r_bus              : std_logic_vector(15 downto 0);
-signal   sig_addr_w_bus         : std_logic_vector(15 downto 0);
-signal   sig_addr_r_bus         : std_logic_vector(15 downto 0);
+signal   sig_addr_w_bus         : std_logic_vector(11 downto 0);
+signal   sig_addr_r_bus         : std_logic_vector(11 downto 0);
+signal   sig_r_b_bus         : std_logic;
+signal   sig_w_b_bus         : std_logic;
 
 begin
 
@@ -459,6 +495,9 @@ begin
     r_en                    <= sig_r_en;
     w_req                   <= sig_w_req;
     r_req                   <= sig_r_req;
+    
+    r_b_addr                <= sig_r_b_bus;
+    w_b_addr                <= sig_w_b_bus;
 
     sig_alu_result          <= sig_alu_result;
 --    sig_read_data_b         <= sig_read_data_b;
@@ -916,8 +955,8 @@ begin
     data_unit   : mem_connect
     port map ( write_enable => sig_mem_write_dm,
                read_enable  => sig_mem_read_dm,
-               write_token  => sig_w_tok,
-               read_token   => sig_r_tok,
+               write_token  => sig_w_en,
+               read_token   => sig_r_en,
                write_data   => sig_read_data_b_dm,
                byte_addr	=> sig_byte_addr_dm,
                addr_in      => sig_alu_result_dm(11 downto 0),
@@ -926,6 +965,15 @@ begin
                mem_w_bus    => sig_w_bus,
                mem_r_bus    => sig_r_bus,
                addr_r_bus   => sig_addr_r_bus,
-               addr_w_bus   => sig_addr_w_bus );
+               addr_w_bus   => sig_addr_w_bus,
+               byte_addr_r_bus  => sig_r_b_bus,
+               byte_addr_w_bus  => sig_w_b_bus );
+    
+    tok_req     : tok_req_ctrl
+    port map ( write_enable     => sig_mem_write_ex,
+               read_enable      => sig_mem_read_ex,
+               addr_in          => sig_alu_result_ex(11 downto 0),
+               w_req            => sig_w_req,
+               r_req            => sig_r_req);
 
 end structural;
