@@ -295,7 +295,7 @@ var_data_mem(155) := X"0000";
                 var_r_type := x"1";
             end if;
         else
-            var_dm_out := x"000a";
+            --var_dm_out := x"0000";
             var_r_type := x"2";
         end if;
 		

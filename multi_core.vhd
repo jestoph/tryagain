@@ -348,8 +348,8 @@ begin
     data_mem : shared_memory
     port map ( reset        => reset,
                clk          => clk,
-               write_enable => sig_read_enable,
-               read_enable  => sig_write_enable,
+               write_enable => sig_write_enable,
+               read_enable  => sig_read_enable,
                write_data   => sig_w_mem_bus,
                byte_addr_r	=> sig_r_b_addr_bus,
                byte_addr_w	=> sig_w_b_addr_bus,
