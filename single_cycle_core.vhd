@@ -52,8 +52,8 @@ entity single_cycle_core is
            clk    : in  std_logic;
            w_req  : out std_logic;
            r_req  : out std_logic;
-           w_en   : out std_logic; -- token
-           r_en   : out std_logic; -- token
+           w_en   : in  std_logic; -- token
+           r_en   : in  std_logic; -- token
            w_b_addr : out std_logic; -- byte address mode
            r_b_addr : out std_logic; -- byte address mode
            w_mem_bus    : out std_logic_vector(15 downto 0);
@@ -330,6 +330,12 @@ port ( hzd_stall  : in  std_logic;
            stall      : out std_logic );
 end component;
 
+component and_2in_1b is
+    port ( in_a     : in  std_logic;
+           in_b     : in  std_logic;
+           and_out   : out std_logic );
+end component and_2in_1b;
+
 
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
@@ -454,6 +460,8 @@ signal sig_jmp_flag             : std_logic;
 signal sig_pc_p1_or_jmp         : std_logic_vector(11 downto 0);
 signal sig_refresh              : std_logic;
 signal sig_insn_ex              : std_logic_vector(15 downto 0);
+signal sig_insn_dm              : std_logic_vector(15 downto 0);
+signal sig_insn_wb              : std_logic_vector(15 downto 0);
 
 -------------------------------------------
 -- PC as it moves through the pipe
@@ -487,16 +495,19 @@ signal   sig_addr_w_bus         : std_logic_vector(11 downto 0);
 signal   sig_addr_r_bus         : std_logic_vector(11 downto 0);
 signal   sig_r_b_bus         : std_logic;
 signal   sig_w_b_bus         : std_logic;
+signal   sig_clk                : std_logic;
+signal   sig_mem_stall          : std_logic;
 
 begin
 
     sig_one_4b              <= "0001";
 	 sig_one_12b             <= "000000000001";
     sig_z_12b               <= "000000000000";
-    w_en                    <= sig_w_en;
-    r_en                    <= sig_r_en;
+    sig_w_en                <= w_en;
+    sig_r_en                <= r_en;
     w_req                   <= sig_w_req;
     r_req                   <= sig_r_req;
+    sig_clk                 <= clk;
     
     r_b_addr                <= sig_r_b_bus;
     w_b_addr                <= sig_w_b_bus;
@@ -515,10 +526,14 @@ begin
     sig_reg_read_a_id       <= sig_insn_id(11 downto 8);
     sig_reg_read_b_id       <= sig_insn_id(7 downto 4);
 
+    core_clk    : and_2in_1b
+    port map ( in_a     => sig_mem_stall,
+               in_b     => clk,
+               and_out  => sig_clk);
 
     pc : program_counter
     port map ( reset    => reset,
-               clk      => clk,
+               clk      => sig_clk,
                refresh  => '0',
                stall    => sig_stall,
                addr_in  => sig_next_pc,
@@ -559,7 +574,7 @@ begin
     
     insn_mem : instruction_memory 
     port map ( reset    => reset,
-               clk      => clk,
+               clk      => sig_clk,
                stall    => sig_stall,
                addr_in  => sig_curr_pc_if,
                insn_out => sig_insn_if,
@@ -595,7 +610,7 @@ begin
 
     reg_file : register_file  
     port map ( reset           => reset, 
-               clk             => clk,
+               clk             => sig_clk,
                read_register_a => sig_reg_read_a_id,
                read_register_b => sig_reg_read_b_id,
                write_enable    => sig_reg_write_wb,
@@ -627,7 +642,7 @@ begin
 
 --    data_mem : data_memory 
 --    port map ( reset        => reset,
---               clk          => clk,
+--               clk          => sig_clk,
 --               write_enable => sig_mem_write_dm,
 --               read_enable  => sig_mem_read_dm,
 --               write_data   => sig_read_data_b_dm,
@@ -649,7 +664,7 @@ begin
    register_if_id   : if_id_reg
    generic map( LEN => 16 )
    port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => sig_pc_src,
               stall       => sig_stall,
               
@@ -657,9 +672,9 @@ begin
               data_in     => sig_insn_if);
               
    register_ex_dm   : generic_register
-   generic map( LEN => 41 )
+   generic map( LEN => 57 )
    port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => '0',
               
               data_in(15 downto 0)      => sig_alu_result_ex,
@@ -670,6 +685,7 @@ begin
               data_in(35)               => sig_mem_read_ex, 
               data_in(36)               => sig_mem_to_reg_ex,
               data_in(40 downto 37)     => sig_write_register_ex,
+              data_in(56 downto 41)     => sig_insn_ex,
               
               data_out(15 downto 0)	    => sig_alu_result_dm,
               data_out(31 downto 16)    => sig_read_data_b_dm,
@@ -678,12 +694,13 @@ begin
               data_out(34)              => sig_mem_write_dm, 
               data_out(35)              => sig_mem_read_dm, 
               data_out(36)              => sig_mem_to_reg_dm,
-              data_out(40 downto 37)    => sig_write_register_dm);
+              data_out(40 downto 37)    => sig_write_register_dm,
+              data_out(56 downto 41)    => sig_insn_dm);
    
    register_dm_wb   : generic_register   
-   generic map( LEN => 38 )
+   generic map( LEN => 54 )
    port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => '0',
               
               data_in(15 downto 0)      => sig_alu_result_dm,
@@ -691,18 +708,19 @@ begin
               data_in(35 downto 32)	    => sig_write_register_dm,
               data_in(36)               => sig_mem_to_reg_dm,
               data_in(37)               => sig_reg_write_dm,
+              data_in(53 downto 38)    => sig_insn_dm,
               
               data_out(15 downto 0)     => sig_alu_result_wb,
               data_out(31 downto 16)    => sig_data_mem_out_wb,
               data_out(35 downto 32)    => sig_write_register_wb,
               data_out(36)              => sig_mem_to_reg_wb,
-              data_out(37)              => sig_reg_write_wb);
-
+              data_out(37)              => sig_reg_write_wb, 
+              data_out(53 downto 38)    => sig_insn_wb);
 
    register_id_ex   : generic_register
    generic map( LEN => 87 )						-- Guess 48 for the moment, probably going to be more like 53
    port map(  	    reset       => reset,
-					clk         => clk,
+					clk         => sig_clk,
                     flush       => '0',
 				  
 					-- This register stores:
@@ -802,7 +820,7 @@ begin
    register_pc_if_id   : generic_register
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => '0',
 
               data_in(11 downto 0) => sig_curr_pc_if,
@@ -838,7 +856,7 @@ begin
 --   register_pc_dummy_pc_track   : generic_register   
 --   generic map( LEN => 12 )
 --   port map(  reset       => reset,
---              clk         => clk,
+--              clk         => sig_clk,
 --              flush       => '0',
 --              
 --              data_in(11 downto 0)      => sig_curr_pc_if,
@@ -849,7 +867,7 @@ begin
    register_insn_dummy_pc_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => '0',
               
               data_in(11 downto 0)      => sig_curr_pc_if,
@@ -861,7 +879,7 @@ begin
    register_if_id_pc_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => '0',
               
               data_in(11 downto 0)      => sig_pc_stage_if,
@@ -871,7 +889,7 @@ begin
    register_id_ex_pc_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => '0',
               
               data_in(11 downto 0)      => sig_pc_stage_id,
@@ -881,7 +899,7 @@ begin
    register_if_ex_dm_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => '0',
               
               data_in(11 downto 0)      => sig_pc_stage_ex,
@@ -891,7 +909,7 @@ begin
    register_dm_wb_pc_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => '0',
               
               data_in(11 downto 0)      => sig_pc_stage_dm,
@@ -910,7 +928,7 @@ begin
             pc_src      => sig_pc_src,
             insn_if     => sig_insn_id_storage,
             insn_id     => sig_insn_ex,
-            stall       => sig_hzd_stall            );
+            stall       => sig_stall            );
             
     refresh_select          : or_gate 
     port map (  src_a  => sig_pc_src,
@@ -920,7 +938,7 @@ begin
 --    register_if_id_insn_fe   : generic_register_fe   
 --    generic map( LEN => 16 )
 --    port map(  reset       => reset,
---              clk         => clk,
+--              clk         => sig_clk,
 --              flush       => sig_pc_src,
 --              
 --              data_in(15 downto 0)      => sig_insn_if,
@@ -930,7 +948,7 @@ begin
     register_if_id_track   : generic_register   
     generic map( LEN => 16 )
     port map(  reset       => reset,
-              clk         => clk,
+              clk         => sig_clk,
               flush       => '0',
               
               data_in(15 downto 0)      => sig_insn_if,
@@ -950,12 +968,12 @@ begin
 --               data_out   => sig_curr_pc_if );
                
     stall_detection     :  stall_unit
-    port map(  hzd_stall  =>sig_hzd_stall,
+    port map(  hzd_stall  => '0',
                w_en       => sig_w_en,
                r_en       => sig_r_en,
                w_req      => sig_w_req,
                r_req      => sig_r_req,
-               stall      => sig_stall );
+               stall      => sig_mem_stall );
                
     data_unit   : mem_connect
     port map ( write_enable => sig_mem_write_dm,

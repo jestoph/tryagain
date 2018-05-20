@@ -34,6 +34,5 @@ begin
                                 or (r_req = '0' and w_req = '0'))
                                 else '0';
                       
-   stall          <= sig_stall or sig_hzd_stall;
-
+   stall          <= sig_stall;
 end behavioural;

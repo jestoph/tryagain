@@ -21,8 +21,8 @@ component single_cycle_core is
            clk    : in  std_logic;
            w_req  : out std_logic;
            r_req  : out std_logic;
-           w_en   : out std_logic; -- token
-           r_en   : out std_logic; -- token
+           w_en   : in  std_logic; -- token
+           r_en   : in  std_logic; -- token
            w_b_addr : out std_logic; -- byte address mode
            r_b_addr : out std_logic; -- byte address mode
            w_mem_bus    : out std_logic_vector(15 downto 0);
@@ -66,7 +66,7 @@ port (     clk          : in    std_logic;
            init         : in    std_logic;
            req          : in    std_logic;
            others_req   : in    std_logic;
-           tok_in       : out   std_logic;
+           tok_in       : in    std_logic;
            tok_out      : out   std_logic;
            tok_stat     : out   std_logic   );
 end component;
@@ -77,7 +77,7 @@ port (     clk          : in    std_logic;
            init         : in    std_logic;
            req          : in    std_logic;
            others_req   : in    std_logic;
-           tok_in       : out   std_logic;
+           tok_in       : in    std_logic;
            tok_out      : out   std_logic;
            tok_stat     : out   std_logic   );
 end component;

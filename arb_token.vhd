@@ -23,22 +23,27 @@ signal    sig_tok       : std_logic;
 
 begin
     token_process : process ( reset,
-                              clk ) is
+                              clk,
+                              req,
+                              others_req,
+                              tok_in ) is
                               
     variable   var_token    : std_logic;
     
     begin
+    
+    sig_tok          <= var_token;
+    sig_tok_in       <= tok_in;
+    sig_tok_d        <= ((not others_req and sig_tok) or (tok_in and req));
+    sig_tok_out      <= ((tok_in and not req) or sig_tok);
+    tok_stat         <= sig_tok;
+    tok_out          <= sig_tok_out after 5ns;
+    
        if (reset = '1') then
             var_token   := init; 
        elsif (rising_edge(clk)) then
             var_token   := sig_tok_d;
        end if;
-       
-    sig_tok          <= var_token;
-    sig_tok_in       <= tok_in;
-    sig_tok_d        <= ((not others_req and sig_tok) or (tok_in and req));
-    sig_tok_out      <= ((tok_in and not req) or sig_tok);
-    
     
     end process;
 end behavioural;
@@ -68,7 +73,10 @@ signal    sig_tok       : std_logic;
 
 begin
     token_process : process ( reset,
-                              clk ) is
+                              clk,
+                              req,
+                              others_req,
+                              tok_in) is
                               
     variable   var_token    : std_logic;
     
@@ -83,6 +91,8 @@ begin
     sig_tok_in       <= tok_in;
     sig_tok_d        <= ((not others_req and sig_tok) or (tok_in and req));
     sig_tok_out      <= ((tok_in and not req) or sig_tok);
+    tok_stat         <= sig_tok;
+    tok_out          <= sig_tok_out after 5ns;
     
     end process;
 end behavioural;
