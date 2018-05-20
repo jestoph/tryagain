@@ -154,10 +154,10 @@ begin
                or_out    => sig_r_others_2 );
 
     other_r_req_3 : or_3in_1b 
-    port map ( in_a      => sig_w_req_0, 
-               in_b      => sig_w_req_1,
-               in_c      => sig_w_req_2,   
-               or_out    => sig_w_others_3 );
+    port map ( in_a      => sig_r_req_0, 
+               in_b      => sig_r_req_1,
+               in_c      => sig_r_req_2,   
+               or_out    => sig_r_others_3 );
                
     other_w_req_0 : or_3in_1b 
     port map ( in_a      => sig_w_req_1, 

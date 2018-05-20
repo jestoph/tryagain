@@ -43,7 +43,8 @@ signal sig_data_mem : mem_array;
 --signal sig_data_mem_tmp : mem_array;
 --signal sig_var_addr_b : std_logic_vector (11 downto 0);
 
-signal sig_dm_chosen : std_logic_vector (15 downto 0);
+signal sig_addr_in_r : std_logic_vector (11 downto 0);
+signal sig_r_type : std_logic_vector(3 downto 0);
 --signal sig_addr : std_logic_vector(11 downto 0);
 
 begin
@@ -60,6 +61,7 @@ begin
     variable var_addr_w   : integer;
     variable var_addr_r   : integer;
     variable var_dm_out : std_logic_vector (15 downto 0);
+    variable var_r_type : std_logic_vector (3 downto 0);
     
 	begin
 		var_addr_w := conv_integer(addr_in_w);
@@ -67,6 +69,8 @@ begin
         
         var_addr_r := conv_integer(addr_in_r);
 		var_addr_r := var_addr_r / 2;
+        
+        sig_addr_in_r <= addr_in_r;
         
         if (reset = '1') then
         
@@ -81,17 +85,29 @@ begin
             -- 154+x    - 154+2x-1  : output string
             
 
-var_data_mem(0) := X"000A"; -- pointer to key
-var_data_mem(1) := X"0034"; -- pointer to random_tableKrandom_tableK
-var_data_mem(2) := X"0014"; -- pointer to InputString
-var_data_mem(3) := X"0008"; -- input string length
-var_data_mem(4) := X"0000"; -- END_OF_ARRAY 
-var_data_mem(5) := X"3412"; -- START_OF_ARRAY Key[] (array of 123456789abcdef0)
-var_data_mem(6) := X"7856"; -- 
-var_data_mem(7) := X"bc9a"; -- 
-var_data_mem(8) := X"f0de"; -- 
-var_data_mem(9) := X"0000"; -- END_OF_ARRAY 
-var_data_mem(10) := X"4849"; -- START_OF_ARRAY  InputArray[]
+--var_data_mem(0) := X"000A"; -- pointer to key
+--var_data_mem(1) := X"0034"; -- pointer to random_tableKrandom_tableK
+--var_data_mem(2) := X"0014"; -- pointer to InputString
+--var_data_mem(3) := X"0008"; -- input string length
+--var_data_mem(4) := X"0000"; -- END_OF_ARRAY 
+--var_data_mem(5) := X"3412"; -- START_OF_ARRAY Key[] (array of 123456789abcdef0)
+--var_data_mem(6) := X"7856"; -- 
+--var_data_mem(7) := X"bc9a"; -- 
+--var_data_mem(8) := X"f0de"; -- 
+--var_data_mem(9) := X"0000"; -- END_OF_ARRAY 
+--var_data_mem(10) := X"4849"; -- START_OF_ARRAY  InputArray[]
+var_data_mem(0) := X"0000"; -- 
+var_data_mem(1) := X"0001"; -- 
+var_data_mem(2) := X"0002"; -- 
+var_data_mem(3) := X"0003"; -- 
+var_data_mem(4) := X"0004"; -- 
+var_data_mem(5) := X"0005"; -- 
+var_data_mem(6) := X"0006"; -- 
+var_data_mem(7) := X"0007"; -- 
+var_data_mem(8) := X"0008"; -- 
+var_data_mem(9) := X"0009"; -- 
+var_data_mem(10) := X"000a"; -- 
+
 var_data_mem(11) := X"4652"; -- 
 var_data_mem(12) := X"4945"; -- 
 var_data_mem(13) := X"4e44"; -- 
@@ -258,7 +274,7 @@ var_data_mem(155) := X"0000";
 			end if;
 		
 		
-        elsif(falling_edge(clk) and read_enable = '1') then
+        elsif(rising_edge(clk) and read_enable = '1') then
             -- Byte Addressible Mode	
             if(byte_addr_r = '1') then
                 -- Take the relevant byte and zero extend
@@ -267,6 +283,7 @@ var_data_mem(155) := X"0000";
                 else
                     var_dm_out := X"00" & var_data_mem(var_addr_r)(7 downto 0);			
                 end if;
+                var_r_type := x"0";
             else 				
                 -- WORD Addressible
                 if(addr_in_r(0) = '1') then
@@ -275,13 +292,15 @@ var_data_mem(155) := X"0000";
                 else
                     var_dm_out := var_data_mem(var_addr_r);
                 end if;
+                var_r_type := x"1";
             end if;
         else
-            var_dm_out := "0000000000000000";
+            var_dm_out := x"000a";
+            var_r_type := x"2";
         end if;
 		
 		data_out <= var_dm_out;
-		
+		sig_r_type <= var_r_type;
 		
         -- the following are probe signals (for simulation purpose) 
         sig_data_mem <= var_data_mem;
