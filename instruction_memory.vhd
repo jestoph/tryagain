@@ -57,7 +57,7 @@ begin
             --  insn_5 : store $4, $0, 3   - store data $4 into 3($0)
             --  insn_6 - insn_15 : noop    - end of program
   
-            var_insn_mem(0)  := X"1010";
+            var_insn_mem(0)  := X"1011";
             var_insn_mem(1)  := X"1022";
             var_insn_mem(2)  := X"8013";
             var_insn_mem(3)  := X"8124";
