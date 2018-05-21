@@ -77,7 +77,7 @@ begin
 			var_carry_out  := '0';			
 		elsif (alu_op =  "110") then 
 			-- lsl
-			var_shift_amt   := conv_integer(src_b(3 downto 0));
+			var_shift_amt   := conv_integer(unsigned(src_b(3 downto 0)));
 			var_shift_buf   := src_a;
 			for I in 1 to var_shift_amt loop
 				var_shift_buf := var_shift_buf(14 downto 0) & '0';
@@ -87,7 +87,7 @@ begin
 			var_sum     := var_shift_buf;    
 		elsif (alu_op =  "111") then 
 			-- lsr
-			var_shift_amt   := conv_integer(src_b(3 downto 0));
+			var_shift_amt   := conv_integer(unsigned(src_b(3 downto 0)));
 			var_shift_buf   := src_a;
 			for I in 1 to var_shift_amt loop
 				var_shift_buf := '0' & var_shift_buf(15 downto 1);
