@@ -1,5 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
+
+int encryption_repetitions = 1;
+int shift_amount = 1;
+int number_of_cores = 4;
 
 char key[]={
     0x12,
@@ -278,33 +283,40 @@ char random_table[]={
 
 
 
-char encrypt(char in, char * key, int key_size, char * random, char random_mask, int verbose){
+char encrypt(char in, char * key, int key_size, char * random, char random_mask, int verbose, 
+    int repetitions){
 
     unsigned char left = in;
     unsigned char xored = 0;
     unsigned char rnout = 0;
    
-    for(int i = 0 ; i < key_size ; i++){
-        xored = left ^ key[i];
-        rnout = random[ xored];
+    for(int j = 0 ; j < repetitions ; j++){
         if(verbose)
-            printf("left: 0x%x key[%d]: 0x%x xored 0x%x rnout: 0x%x\n",
-                    left&0xff, i, key[i]&0xff, xored&0xff, rnout&0xff);
-        left = rnout;
+            printf("Repetition %d\n", j);
+        for(int i = 0 ; i < key_size ; i++){
+            xored = left ^ key[i];
+            rnout = random[ xored & random_mask];
+            if(verbose)
+                printf("left: 0x%x key[%d]: 0x%x xored 0x%x masked 0x%x rnout: 0x%x\n",
+                        left&0xff, i, key[i]&0xff, xored&0xff, xored&random_mask&0xff, rnout&0xff);
+            left = rnout;
+        }
     }
 
    return left;
 
 }
 
-char doshift(char next, unsigned long long * key){
+char doshift(char next, unsigned long long * key, int shifts){
     
     unsigned long long x = (*key >= 0x8000000000000000);
     //printf("key val is %x\n", *key);
     //printf("X val is %x\n", x);
     *key = (*key << 1)+x; 
     //printf("key val is now %x\n", *key);
-    return next << x;
+    for(int j = 0 ; j < shifts ; j++)
+        next = next << x;
+    return next;
 }
 
 
@@ -316,7 +328,7 @@ void tagtest(){
 
     printf("Input: \"%s\"\n",mystr);
     for(int i = 0 ; mystr[i] ; i ++){
-        char shifted = doshift(mystr[i], &val);
+        char shifted = doshift(mystr[i], &val, 1);
         mytag = mytag ^ shifted;
     	printf("mystr[%d]: 0x%x shifted: 0x%x currtag: 0x%x\n", 
                 i, mystr[i], shifted&0xff, mytag);
@@ -362,10 +374,69 @@ void encrypttest(){
 
     char input = 'C';
     printf("In: '%c'\n", input);
-    char out = encrypt(input, test_key, sizeof(test_key), rand, 0x0f, 1);
+    char out = encrypt(input, test_key, sizeof(test_key), rand, 0x0f, 1, 1);
     printf ("Out: 0x%x %s\n", out&0xff, out==0x52?"Correct":"Incorrect");
 
 }
+
+// Returns the tag
+unsigned char do_encrypt(char * input, char * output, int len, int offset, int stride){
+
+    unsigned char next;
+    unsigned char tag=0;
+    unsigned long long key_copy = 0x123456789abcdef0;
+
+    for(int i = offset ; i < len ; i += stride){
+
+        next = encrypt(input[i], key, KEY_SIZE, random_table, RANDOM_TABLE_MASK, 0, encryption_repetitions) & 0x7f;
+        unsigned char shifted = doshift(next, &key_copy, shift_amount);
+        unsigned char newtag = tag ^ shifted;
+        printf("in[%02d]: %c -> out[%02d] 0x%02x %c tag: 0x%x\n", i,next, i, input[i],  next , next, newtag );
+        output[i] = next;
+        output[i+1] = 0;
+        tag = newtag;
+    }
+
+    return tag;
+
+}
+
+struct data {
+    char * input;
+    char * output;
+    int len;
+    int numthreads;
+    int * finished;
+    unsigned char * tags;
+    unsigned char finalTag;
+} DATA;
+
+void* perform_work(void* argument) {
+    int threadId;
+
+    threadId = *((int*) argument);
+    unsigned char tag = do_encrypt(DATA.input, DATA.output, DATA.len, threadId, DATA.numthreads);
+    printf("Thread %d of %d, Tag = 0x%x\n", threadId, DATA.numthreads, tag);
+ 
+    DATA.tags[threadId] = tag;
+    DATA.finished[threadId] = 1;
+
+    for(int i = 0 ; i < DATA.numthreads ; i++){
+        if(!DATA.finished[i])
+            return NULL;
+    }
+
+    /* If we get here we are the last thread */
+    tag = 0;
+    for (int index = 0; index < number_of_cores; ++index) {
+        printf("Tag 0x%x ^ 0x%x -> 0x%x\n", tag, DATA.tags[index], tag ^ DATA.tags[index]);
+        tag = tag ^ DATA.tags[index];
+    }
+    DATA.finalTag = tag;
+
+    return NULL;
+}
+
 
 int main(){
 
@@ -378,21 +449,55 @@ int main(){
     printf("\n");
     printf("--------------------------\n\n\n");
 
-    char in;
-    unsigned char tag=0;
-    char next;
-    unsigned long long key_copy = 0x123456789abcdef0;
     printf("Output: \n");
-    int i = 0;
-    while((in=getchar())!=EOF){
-        next = encrypt(in, key, KEY_SIZE, random_table, RANDOM_TABLE_MASK, 0) & 0x7f;
-        unsigned char shifted = doshift(next, &key_copy);
-        unsigned char newtag = tag ^ shifted;
-	    printf("in[%02d]: %c -> out[%02d] 0x%02x %c tag: 0x%x\n", next, i++, i++, next , next, newtag );
-        tag = newtag;
+    char input[1000];
+    char output[1000];
+    while(fgets(input, sizeof(input), stdin)){
+        int len = strlen(input);
+
+        unsigned char tags[number_of_cores];
+        int finished[number_of_cores];
+        memset(finished, 0, sizeof(int) * number_of_cores);
+        DATA.input = input,
+        DATA.output = output,
+        DATA.len = len;
+        DATA.numthreads = number_of_cores;
+        DATA.tags = tags;
+        DATA.finished = finished;
+
+        pthread_t threads[number_of_cores];
+        int thread_args[number_of_cores];
+        int result_code[number_of_cores];
+
+        // Create N threads
+        for (int index = 0; index < number_of_cores; ++index) {
+            thread_args[ index ] = index;
+            printf("In main: creating thread %d\n", index);
+            pthread_create(&threads[index], NULL, perform_work, &thread_args[index]); 
+        }
+        for (int index = 0; index < number_of_cores; ++index) {
+            pthread_join(threads[index], NULL);
+            printf("In main: thread %d has completed and returned 0x%x\n", index, DATA.tags[index]&0xff);
+        }
+        /* This section is for serialising reads of the tags */
+        //unsigned char tag = 0;
+        //for (int index = 0; index < number_of_cores; ++index) {
+        //    printf("Tag 0x%x ^ 0x%x -> 0x%x\n", tag, DATA.tags[index], tag ^ DATA.tags[index]);
+        //    tag = tag ^ DATA.tags[index];
+        //}
+
+        //printf("In: %s\n", DATA.input);
+        //printf("Out: ");
+        //for(int i = 0 ; i < DATA.len ; i ++)
+        //    printf("0x%x ", DATA.output[i]&0xff);
+        //printf("(%s)", DATA.output);
+        //printf("\n");
+
+        //printf("Final Tag: 0x%x vs 0x%x\n", tag & 0xff, DATA.finalTag);
+        printf("Final Tag: 0x%x \n", DATA.finalTag);
+
+
     }
-    printf("\n");
-    printf("Tag: 0x%x\n", tag);
     printf("\n");
 
 
