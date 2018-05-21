@@ -63,7 +63,7 @@ begin
             var_insn_mem(3)  := X"8124";
             var_insn_mem(4)  := X"3031";
             var_insn_mem(5)  := X"3043";
-            var_insn_mem(6)  := X"e123";
+            var_insn_mem(6)  := X"3054";
             var_insn_mem(7)  := X"0000";
             var_insn_mem(8)  := X"0000";
             var_insn_mem(9)  := X"0000";

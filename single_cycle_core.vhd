@@ -501,13 +501,16 @@ signal   sig_mem_stall          : std_logic;
 begin
 
     sig_one_4b              <= "0001";
-	 sig_one_12b             <= "000000000001";
+	sig_one_12b             <= "000000000001";
     sig_z_12b               <= "000000000000";
     sig_w_en                <= w_en;
     sig_r_en                <= r_en;
     w_req                   <= sig_w_req;
     r_req                   <= sig_r_req;
     sig_clk                 <= clk;
+    
+    w_mem_bus               <= sig_w_bus;
+    sig_r_bus               <= r_mem_bus;
     
     r_b_addr                <= sig_r_b_bus;
     w_b_addr                <= sig_w_b_bus;
@@ -976,13 +979,13 @@ begin
                stall      => sig_mem_stall );
                
     data_unit   : mem_connect
-    port map ( write_enable => sig_mem_write_ex,
-               read_enable  => sig_mem_read_ex,
+    port map ( write_enable => sig_mem_write_dm,
+               read_enable  => sig_mem_read_dm,
                write_token  => sig_w_en,
                read_token   => sig_r_en,
-               write_data   => sig_read_data_b_ex,
-               byte_addr	=> sig_byte_addr_ex,
-               addr_in      => sig_alu_result_ex(11 downto 0),
+               write_data   => sig_read_data_b_dm,
+               byte_addr	=> sig_byte_addr_dm,
+               addr_in      => sig_alu_result_dm(11 downto 0),
                data_out     => sig_data_mem_out_dm,
                core_num     => sig_core_num,
                mem_w_bus    => sig_w_bus,
@@ -993,9 +996,9 @@ begin
                byte_addr_w_bus  => sig_w_b_bus );
     
     tok_req     : tok_req_ctrl
-    port map ( write_enable     => sig_mem_write_ex,
-               read_enable      => sig_mem_read_ex,
-               addr_in          => sig_alu_result_ex(11 downto 0),
+    port map ( write_enable     => sig_mem_write_dm,
+               read_enable      => sig_mem_read_dm,
+               addr_in          => sig_alu_result_dm(11 downto 0),
                w_req            => sig_w_req,
                r_req            => sig_r_req);
 

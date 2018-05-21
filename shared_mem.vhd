@@ -274,7 +274,7 @@ var_data_mem(155) := X"0000";
 			end if;
 		
 		
-        elsif(rising_edge(clk) and read_enable = '1') then
+        elsif(falling_edge(clk) and read_enable = '1') then
             -- Byte Addressible Mode	
             if(byte_addr_r = '1') then
                 -- Take the relevant byte and zero extend

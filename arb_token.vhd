@@ -29,6 +29,7 @@ begin
                               tok_in ) is
                               
     variable   var_token    : std_logic;
+    variable   var_tok_out  : std_logic;
     
     begin
     
@@ -36,17 +37,18 @@ begin
     sig_tok_in       <= tok_in;
     sig_tok_d        <= ((not others_req and sig_tok) or (tok_in and req));
     
-    
        if (reset = '1') then
             var_token   := init; 
        elsif (rising_edge(clk)) then
             var_token   := sig_tok_d;
        end if;
-    
+       if(rising_edge(tok_in) or rising_edge(req) or rising_edge(others_req)) then
+       end if;
     sig_tok          <= var_token;
+    var_tok_out      := ((tok_in and not req) or var_token);
     tok_stat         <= var_token;
-    sig_tok_out      <= ((tok_in and not req) or var_token);
-    tok_out          <= sig_tok_out;-- after 5ns;
+    tok_out          <= var_tok_out;-- after 5ns;
+    sig_tok_out      <= var_tok_out;
     
     end process;
 end behavioural;
@@ -82,6 +84,7 @@ begin
                               tok_in) is
                               
     variable   var_token    : std_logic;
+    variable   var_tok_out  : std_logic;
     
     begin
     
@@ -91,14 +94,16 @@ begin
     
        if (reset = '1') then
             var_token   := init; 
-       elsif (falling_edge(clk)) then
+       elsif (rising_edge(clk)) then
             var_token   := sig_tok_d;
        end if;
-       
+       if(rising_edge(tok_in) or rising_edge(req) or rising_edge(others_req)) then
+       end if;
     sig_tok          <= var_token;
-    sig_tok_out      <= ((tok_in and not req) or var_token);
+    var_tok_out      := ((tok_in and not req) or var_token);
     tok_stat         <= var_token;
-    tok_out          <= sig_tok_out;-- after 5ns;
+    tok_out          <= var_tok_out;-- after 5ns;
+    sig_tok_out      <= var_tok_out;
     
     end process;
 end behavioural;
