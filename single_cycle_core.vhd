@@ -508,6 +508,7 @@ begin
     w_req                   <= sig_w_req;
     r_req                   <= sig_r_req;
     sig_clk                 <= clk;
+    sig_core_num            <= core_num;
     
     w_mem_bus               <= sig_w_bus;
     sig_r_bus               <= r_mem_bus;

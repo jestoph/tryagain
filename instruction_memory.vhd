@@ -73,6 +73,23 @@ begin
             var_insn_mem(13) := X"0000";
             var_insn_mem(14) := X"0000";
             var_insn_mem(15) := X"0000";
+            
+            var_insn_mem(0)  := X"5010"; -- load core number to $1
+            var_insn_mem(1)  := X"e121"; -- $2 = 2 x $1
+            var_insn_mem(2)  := X"0000";--922f"; -- $2 = $2 - 1
+            var_insn_mem(3)  := X"5231"; -- $3 = mem($2 + 1)
+            var_insn_mem(4)  := X"5240"; -- $4 = mem($2)
+            var_insn_mem(5)  := X"8435"; -- $5 = $4 + $3
+            var_insn_mem(6)  := X"7221";
+            var_insn_mem(7)  := X"7246";
+            var_insn_mem(8)  := X"725b";
+            var_insn_mem(9)  := X"0000";
+            var_insn_mem(10) := X"0000";
+            var_insn_mem(11) := X"0000";
+            var_insn_mem(12) := X"0000";
+            var_insn_mem(13) := X"0000";
+            var_insn_mem(14) := X"0000";
+            var_insn_mem(15) := X"0000";
 
 --var_insn_mem(0) := X"0000"; --nop
 --var_insn_mem(1) := X"0000"; --nop
