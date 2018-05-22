@@ -92,22 +92,23 @@ end behavioral;
 
 
 instructions = {
-    'add'   : 0x8, 
-    'xor'   : 0xd, 
     'nop'   : 0x0, 
-    'sub'   : 0xb, 
-    'slt'   : 0xa, 
-    'and'   : 0xc, 
+    'lw'    : 0x1, 
+    'j'     : 0x2, 
+    'sw'    : 0x3, 
+    'bne'   : 0x4, 
+    'lb'    : 0x5, 
+    'beq'   : 0x6, 
+    'sb'    : 0x7, 
+    'add'   : 0x8, 
     'addi'  : 0x9, 
+    'slt'   : 0xa, 
+    'sub'   : 0xb, 
+    'and'   : 0xc, 
+    'xor'   : 0xd, 
     'sll'   : 0xe, 
     'srl'   : 0xf, 
-    'bne'   : 0x4, 
-    'beq'   : 0x6, 
-    'j'     : 0x2, 
-    'lw'    : 0x1, 
-    'sw'    : 0x3, 
-    'lb'    : 0x5, 
-    'sb'    : 0x7, 
+    'or'    : 0xf,
 }
 
 # This holds any register aliases
@@ -143,7 +144,9 @@ def getint(a):
 def parsefile(file):
     lines = []
     index = 0
+    lineno = 0
     for line in file:
+        lineno = lineno + 1
 
         if "ALIAS" in line:
             vals = line.split()
@@ -193,7 +196,8 @@ def parsefile(file):
 
         # If we get here then we have a four-field instruction
         if len(parts) < 4:
-            raise Exception("Unknown instruction ", parts)
+            print ("Unknown instruction ", parts, "lineno", lineno)
+            raise Exception("Unknown instruction ", parts, "lineno", lineno)
 
         # Substitute any aliases
         for i in range(1,4):
@@ -215,7 +219,7 @@ def parsefile(file):
             data['inst'] += "{:X}".format(registers[parts[1]])
             data['tobranch'] = parts[3]
         else:
-            raise Exception("I don't know how to handle", parts[3], "in", parts)
+            raise Exception("I don't know how to handle", parts[3], "in", parts, "lineno", lineno)
 
         index += 1
                 
