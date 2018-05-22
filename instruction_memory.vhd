@@ -82,7 +82,7 @@ begin
             var_insn_mem(5)  := X"8435"; -- $5 = $4 + $3
             var_insn_mem(6)  := X"7221";
             var_insn_mem(7)  := X"7246";
-            var_insn_mem(8)  := X"725b";
+            var_insn_mem(8)  := X"7257";
             var_insn_mem(9)  := X"0000";
             var_insn_mem(10) := X"0000";
             var_insn_mem(11) := X"0000";
