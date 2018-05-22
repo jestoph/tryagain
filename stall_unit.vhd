@@ -7,6 +7,8 @@ entity stall_unit is
 port ( hzd_stall  : in  std_logic;
            w_en       : in  std_logic;
            r_en       : in  std_logic;
+           w_en_2     : in  std_logic;
+           r_en_2     : in  std_logic;
            w_req      : in  std_logic;
            r_req      : in  std_logic;
            stall      : out std_logic );
@@ -29,8 +31,8 @@ begin
    sig_r_req      <= r_req;
    sig_hzd_stall  <= hzd_stall;
 
-   sig_stall      <= '0' when ((w_req = '1' and w_en = '1') 
-                                or (r_req = '1' and r_en = '1') 
+   sig_stall      <= '0' when ((w_req = '1' and (w_en = '1' or w_en_2 = '1')) 
+                                or (r_req = '1' and (r_en = '1' or r_en_2 = '1')) 
                                 or (r_req = '0' and w_req = '0'))
                                 else '1';
                       

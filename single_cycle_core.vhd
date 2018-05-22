@@ -330,6 +330,8 @@ component stall_unit is
 port ( hzd_stall  : in  std_logic;
            w_en       : in  std_logic;
            r_en       : in  std_logic;
+           w_en_2       : in  std_logic;
+           r_en_2       : in  std_logic;
            w_req      : in  std_logic;
            r_req      : in  std_logic;
            stall      : out std_logic );
@@ -340,6 +342,14 @@ component and_2in_1b is
            in_b     : in  std_logic;
            and_out   : out std_logic );
 end component and_2in_1b;
+
+component dff is
+    port ( reset    : in  std_logic;
+           clk      : in  std_logic;
+           d_in     : in  std_logic;
+           d_out    : out std_logic
+           );
+end component dff;
 
 
 signal sig_next_pc              : std_logic_vector(11 downto 0);
@@ -494,6 +504,8 @@ signal   sig_w_req_dm           : std_logic;
 signal   sig_r_req_dm           : std_logic;
 signal   sig_w_en               : std_logic;
 signal   sig_r_en               : std_logic;
+signal   sig_w_en_2               : std_logic;
+signal   sig_r_en_2               : std_logic;
 signal   sig_hzd_stall          : std_logic;
 signal   sig_core_num           : std_logic_vector(15 downto 0);
 signal   sig_w_bus              : std_logic_vector(15 downto 0);
@@ -996,6 +1008,8 @@ begin
     port map(  hzd_stall  => '0',
                w_en       => sig_w_en,
                r_en       => sig_r_en,
+               w_en_2       => sig_w_en_2,
+               r_en_2       => sig_r_en_2,
                w_req      => sig_w_req,
                r_req      => sig_r_req,
                stall      => sig_mem_stall );
@@ -1030,5 +1044,19 @@ begin
                addr_in          => sig_alu_result_dm(11 downto 0),
                w_req            => sig_w_req_dm,
                r_req            => sig_r_req_dm);
+    
+    r_en_storage : dff
+    port map ( reset    => reset,
+               clk      => clk,
+               d_in     => sig_r_en,
+               d_out    => sig_r_en_2
+               );
+               
+    w_en_storage : dff
+    port map ( reset    => reset,
+               clk      => clk,
+               d_in     => sig_w_en,
+               d_out    => sig_w_en_2
+               );
 
 end structural;
