@@ -54,7 +54,7 @@ end instruction_memory;
 
 architecture behavioral of instruction_memory is
 
-type mem_array is array(0 to 128) of std_logic_vector(15 downto 0);
+type mem_array is array(0 to 256) of std_logic_vector(15 downto 0);
 signal sig_insn_mem : mem_array;
 
 begin
