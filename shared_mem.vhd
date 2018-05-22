@@ -315,8 +315,8 @@ var_data_mem(196) := X"BC9A"; -- key[2]
 var_data_mem(197) := X"F0DE"; -- key[3]
 var_data_mem(198) := X"1234"; -- key[0]
 var_data_mem(199) := X"5678"; -- key[1]
-var_data_mem(170) := X"9abc"; -- key[2]
-var_data_mem(171) := X"def0"; -- key[3]
+var_data_mem(200) := X"9abc"; -- key[2]
+var_data_mem(201) := X"def0"; -- key[3]
 
         elsif (falling_edge(clk) and write_enable = '1') then
             -- memory writes on the falling clock edge 

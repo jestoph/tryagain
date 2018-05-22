@@ -10,8 +10,12 @@ entity and_2in_1b is
 end and_2in_1b;
 
 architecture behavioural of and_2in_1b is
-begin
 
-    and_out <= in_a and in_b;
+signal sig_and : std_logic;
+
+begin
+    
+    sig_and <= in_a and in_b;
+    and_out <= sig_and;
 
 end behavioural;

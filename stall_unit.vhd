@@ -29,10 +29,10 @@ begin
    sig_r_req      <= r_req;
    sig_hzd_stall  <= hzd_stall;
 
-   sig_stall      <= '1' when ((w_req = '1' and w_en = '1') 
+   sig_stall      <= '0' when ((w_req = '1' and w_en = '1') 
                                 or (r_req = '1' and r_en = '1') 
                                 or (r_req = '0' and w_req = '0'))
-                                else '0';
+                                else '1';
                       
    stall          <= sig_stall;
 end behavioural;

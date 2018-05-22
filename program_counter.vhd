@@ -31,7 +31,8 @@ entity program_counter is
            refresh  : in  std_logic;
            stall    : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
-           addr_out : out std_logic_vector(11 downto 0) );
+           addr_out : out std_logic_vector(11 downto 0);
+           stop     : in  std_logic);
 end program_counter;
 
 architecture behavioral of program_counter is
@@ -45,6 +46,8 @@ begin
            addr_out <= (others => '0'); 
        --elsif (refresh = '1') then
        --    addr_out <= addr_in after 0.5ns; 
+       elsif(stop = '1') then
+       
        elsif (rising_edge(clk) and stall = '0') then
            addr_out <= addr_in after 0.5ns; 
        end if;

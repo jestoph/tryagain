@@ -31,6 +31,7 @@ begin
                               
     variable   var_token    : std_logic;
     variable   var_tok_out  : std_logic;
+    variable   var_tok_valid : std_logic;
     
     begin
     
@@ -42,6 +43,8 @@ begin
             var_token   := init; 
        elsif (falling_edge(clk)) then
             var_token   := sig_tok_d;
+       elsif (rising_edge(clk)) then
+            var_tok_valid   := var_token;
        end if;
        if(rising_edge(tok_in) or rising_edge(req) or rising_edge(others_req)) then
        end if;
@@ -87,6 +90,7 @@ begin
                               
     variable   var_token    : std_logic;
     variable   var_tok_out  : std_logic;
+    variable   var_tok_valid : std_logic;
     
     begin
     
@@ -98,6 +102,8 @@ begin
             var_token   := init; 
        elsif (falling_edge(clk)) then
             var_token   := sig_tok_d;
+       elsif (rising_edge(clk)) then
+            var_tok_valid   := var_token;
        end if;
        if(rising_edge(tok_in) or rising_edge(req) or rising_edge(others_req)) then
        end if;

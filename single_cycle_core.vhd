@@ -73,7 +73,8 @@ component program_counter is
            refresh  : in  std_logic;
            stall    : in  std_logic;
            addr_in  : in  std_logic_vector(11 downto 0);
-           addr_out : out std_logic_vector(11 downto 0) );
+           addr_out : out std_logic_vector(11 downto 0);
+           stop     : in  std_logic);
 end component;
 
 component instruction_memory is
@@ -201,7 +202,8 @@ component generic_register is
            flush        : in  std_logic;
            clk          : in  std_logic;
            data_out		: out std_logic_vector(LEN-1 downto 0);
-           data_in     	: in  std_logic_vector(LEN-1 downto 0));
+           data_in     	: in  std_logic_vector(LEN-1 downto 0);
+           stop         : in  std_logic);
 end component;
 
 component generic_register_fe is
@@ -220,7 +222,8 @@ component if_id_reg is
            stall        : in  std_logic;
            clk          : in  std_logic;
            data_out		: out std_logic_vector(LEN-1 downto 0);
-           data_in     	: in  std_logic_vector(LEN-1 downto 0));
+           data_in     	: in  std_logic_vector(LEN-1 downto 0);
+           stop         : in  std_logic);
 end component;
 
 --------------------------------------------------------------
@@ -543,10 +546,11 @@ begin
 
     pc : program_counter
     port map ( reset    => reset,
-               clk      => sig_clk,
+               clk      => clk,
                refresh  => '0',
                stall    => sig_stall,
                addr_in  => sig_next_pc,
+               stop    =>  sig_mem_stall,
                addr_out => sig_curr_pc_if ); 
 
     -- We need to sign extend because a branch encodes the address in an immediate
@@ -584,7 +588,7 @@ begin
     
     insn_mem : instruction_memory 
     port map ( reset    => reset,
-               clk      => sig_clk,
+               clk      => clk,
                stall    => sig_stall,
                addr_in  => sig_curr_pc_if,
                insn_out => sig_insn_if,
@@ -620,7 +624,7 @@ begin
 
     reg_file : register_file  
     port map ( reset           => reset, 
-               clk             => sig_clk,
+               clk             => clk,
                read_register_a => sig_reg_read_a_id,
                read_register_b => sig_reg_read_b_id,
                write_enable    => sig_reg_write_wb,
@@ -652,7 +656,7 @@ begin
 
 --    data_mem : data_memory 
 --    port map ( reset        => reset,
---               clk          => sig_clk,
+--               clk          => clk,
 --               write_enable => sig_mem_write_dm,
 --               read_enable  => sig_mem_read_dm,
 --               write_data   => sig_read_data_b_dm,
@@ -674,9 +678,10 @@ begin
    register_if_id   : if_id_reg
    generic map( LEN => 16 )
    port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => sig_pc_src,
               stall       => sig_stall,
+              stop    =>  sig_mem_stall,
               
               data_out	  => sig_insn_id,
               data_in     => sig_insn_if);
@@ -684,8 +689,9 @@ begin
    register_ex_dm   : generic_register
    generic map( LEN => 57 )
    port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => '0',
+              stop    =>  sig_mem_stall,
               
               data_in(15 downto 0)      => sig_alu_result_ex,
               data_in(31 downto 16)     => sig_read_data_b_ex,
@@ -710,8 +716,9 @@ begin
    register_dm_wb   : generic_register   
    generic map( LEN => 54 )
    port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => '0',
+              stop    =>  sig_mem_stall,
               
               data_in(15 downto 0)      => sig_alu_result_dm,
               data_in(31 downto 16)     => sig_data_mem_out_dm,
@@ -730,8 +737,9 @@ begin
    register_id_ex   : generic_register
    generic map( LEN => 87 )						-- Guess 48 for the moment, probably going to be more like 53
    port map(  	    reset       => reset,
-					clk         => sig_clk,
+					clk         => clk,
                     flush       => '0',
+                    stop    =>  sig_mem_stall,
 				  
 					-- This register stores:
 					--   Reg A and Reg B from the register file
@@ -830,8 +838,9 @@ begin
    register_pc_if_id   : generic_register
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => '0',
+              stop    =>  sig_mem_stall,
 
               data_in(11 downto 0) => sig_curr_pc_if,
               
@@ -866,7 +875,7 @@ begin
 --   register_pc_dummy_pc_track   : generic_register   
 --   generic map( LEN => 12 )
 --   port map(  reset       => reset,
---              clk         => sig_clk,
+--              clk         => clk,
 --              flush       => '0',
 --              
 --              data_in(11 downto 0)      => sig_curr_pc_if,
@@ -877,8 +886,9 @@ begin
    register_insn_dummy_pc_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => '0',
+              stop    =>  sig_mem_stall,
               
               data_in(11 downto 0)      => sig_curr_pc_if,
 
@@ -889,8 +899,9 @@ begin
    register_if_id_pc_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => '0',
+              stop    =>  sig_mem_stall,
               
               data_in(11 downto 0)      => sig_pc_stage_if,
 
@@ -899,8 +910,9 @@ begin
    register_id_ex_pc_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => '0',
+              stop    =>  sig_mem_stall,
               
               data_in(11 downto 0)      => sig_pc_stage_id,
 
@@ -909,8 +921,9 @@ begin
    register_if_ex_dm_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => '0',
+              stop    =>  sig_mem_stall,
               
               data_in(11 downto 0)      => sig_pc_stage_ex,
 
@@ -919,8 +932,9 @@ begin
    register_dm_wb_pc_track   : generic_register   
    generic map( LEN => 12 )
    port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => '0',
+              stop    =>  sig_mem_stall,
               
               data_in(11 downto 0)      => sig_pc_stage_dm,
 
@@ -948,7 +962,7 @@ begin
 --    register_if_id_insn_fe   : generic_register_fe   
 --    generic map( LEN => 16 )
 --    port map(  reset       => reset,
---              clk         => sig_clk,
+--              clk         => clk,
 --              flush       => sig_pc_src,
 --              
 --              data_in(15 downto 0)      => sig_insn_if,
@@ -958,8 +972,9 @@ begin
     register_if_id_track   : generic_register   
     generic map( LEN => 16 )
     port map(  reset       => reset,
-              clk         => sig_clk,
+              clk         => clk,
               flush       => '0',
+              stop    =>  sig_mem_stall,
               
               data_in(15 downto 0)      => sig_insn_if,
 

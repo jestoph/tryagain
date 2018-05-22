@@ -30,7 +30,8 @@ entity generic_register is
            flush        : in  std_logic;
            clk          : in  std_logic;
            data_out		: out  std_logic_vector(LEN-1 downto 0);
-           data_in     	: in std_logic_vector(LEN-1 downto 0) );
+           data_in     	: in std_logic_vector(LEN-1 downto 0);
+           stop         : in std_logic);
 	end generic_register;
 
 architecture behavioral of generic_register is
@@ -50,25 +51,12 @@ reg_process: process(reset,
    begin
    
    sig_val_in <= data_in;
-   
---   if(reset = '1') then
---      var_val_in   := (others => '0');
---      var_val      := (others => '0');
---      var_val_out  := (others => '0');
---      sig_val_out  <= (others => '0');
---   else if (rising_edge(clk)) then
---      --var_val_in  := sig_val_in;
---      --var_val_in  := sig_val_in;
---      --var_val_out := var_val;
---         
---      var_val_in  := sig_val_in;         
---      var_val_out := var_val_in;
---      sig_val_out <= var_val_out;
---      
---   end if;
+
    
    if (reset = '1') then
       data_out <= (others => '0'); 
+   elsif(stop = '1') then
+   
    elsif (rising_edge(clk)) then
       if(flush = '1') then
          data_out <= (others => '0') after 10ns; 
