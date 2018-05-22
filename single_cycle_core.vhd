@@ -51,7 +51,9 @@ entity single_cycle_core is
     port ( reset  : in  std_logic;
            clk    : in  std_logic;
            w_req  : out std_logic;
-           r_req  : out std_logic;
+           r_req  : out std_logic;           
+           w_req_dm  : out std_logic;
+           r_req_dm  : out std_logic;
            w_en   : in  std_logic; -- token
            r_en   : in  std_logic; -- token
            w_b_addr : out std_logic; -- byte address mode
@@ -485,6 +487,8 @@ signal sig_insn_id_storage      : std_logic_vector(15 downto 0);
 
 signal   sig_w_req              : std_logic;
 signal   sig_r_req              : std_logic;
+signal   sig_w_req_dm           : std_logic;
+signal   sig_r_req_dm           : std_logic;
 signal   sig_w_en               : std_logic;
 signal   sig_r_en               : std_logic;
 signal   sig_hzd_stall          : std_logic;
@@ -506,7 +510,9 @@ begin
     sig_w_en                <= w_en;
     sig_r_en                <= r_en;
     w_req                   <= sig_w_req;
-    r_req                   <= sig_r_req;
+    r_req                   <= sig_r_req;    
+    w_req_dm                   <= sig_w_req_dm;
+    r_req_dm                   <= sig_r_req_dm;
     sig_clk                 <= clk;
     sig_core_num            <= core_num;
     
@@ -997,10 +1003,17 @@ begin
                byte_addr_w_bus  => sig_w_b_bus );
     
     tok_req     : tok_req_ctrl
+    port map ( write_enable     => sig_mem_write_ex,
+               read_enable      => sig_mem_read_ex,
+               addr_in          => sig_alu_result_ex(11 downto 0),
+               w_req            => sig_w_req,
+               r_req            => sig_r_req);
+               
+    tok_req_dm     : tok_req_ctrl
     port map ( write_enable     => sig_mem_write_dm,
                read_enable      => sig_mem_read_dm,
                addr_in          => sig_alu_result_dm(11 downto 0),
-               w_req            => sig_w_req,
-               r_req            => sig_r_req);
+               w_req            => sig_w_req_dm,
+               r_req            => sig_r_req_dm);
 
 end structural;

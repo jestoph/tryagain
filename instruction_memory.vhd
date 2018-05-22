@@ -35,7 +35,7 @@ end instruction_memory;
 
 architecture behavioral of instruction_memory is
 
-type mem_array is array(0 to 128) of std_logic_vector(15 downto 0);
+type mem_array is array(0 to 256) of std_logic_vector(15 downto 0);
 signal sig_insn_mem : mem_array;
 
 begin
@@ -57,133 +57,258 @@ begin
             --  insn_5 : store $4, $0, 3   - store data $4 into 3($0)
             --  insn_6 - insn_15 : noop    - end of program
   
-            var_insn_mem(0)  := X"1055";
-            var_insn_mem(1)  := X"1022";
-            var_insn_mem(2)  := X"8013";
-            var_insn_mem(3)  := X"8124";
-            var_insn_mem(4)  := X"3031";
-            var_insn_mem(5)  := X"3043";
-            var_insn_mem(6)  := X"3054";
-            var_insn_mem(7)  := X"0000";
-            var_insn_mem(8)  := X"0000";
-            var_insn_mem(9)  := X"0000";
-            var_insn_mem(10) := X"0000";
-            var_insn_mem(11) := X"0000";
-            var_insn_mem(12) := X"0000";
-            var_insn_mem(13) := X"0000";
-            var_insn_mem(14) := X"0000";
-            var_insn_mem(15) := X"0000";
-            
-            var_insn_mem(0)  := X"5010"; -- load core number to $1
-            var_insn_mem(1)  := X"e121"; -- $2 = 2 x $1
-            var_insn_mem(2)  := X"0000";--922f"; -- $2 = $2 - 1
-            var_insn_mem(3)  := X"5231"; -- $3 = mem($2 + 1)
-            var_insn_mem(4)  := X"5240"; -- $4 = mem($2)
-            var_insn_mem(5)  := X"8435"; -- $5 = $4 + $3
-            var_insn_mem(6)  := X"7221";
-            var_insn_mem(7)  := X"7246";
-            var_insn_mem(8)  := X"7257";
-            var_insn_mem(9)  := X"0000";
-            var_insn_mem(10) := X"0000";
-            var_insn_mem(11) := X"0000";
-            var_insn_mem(12) := X"0000";
-            var_insn_mem(13) := X"0000";
-            var_insn_mem(14) := X"0000";
-            var_insn_mem(15) := X"0000";
+--            var_insn_mem(0)  := X"1055";
+--            var_insn_mem(1)  := X"1022";
+--            var_insn_mem(2)  := X"8013";
+--            var_insn_mem(3)  := X"8124";
+--            var_insn_mem(4)  := X"3031";
+--            var_insn_mem(5)  := X"3043";
+--            var_insn_mem(6)  := X"3054";
+--            var_insn_mem(7)  := X"0000";
+--            var_insn_mem(8)  := X"0000";
+--            var_insn_mem(9)  := X"0000";
+--            var_insn_mem(10) := X"0000";
+--            var_insn_mem(11) := X"0000";
+--            var_insn_mem(12) := X"0000";
+--            var_insn_mem(13) := X"0000";
+--            var_insn_mem(14) := X"0000";
+--            var_insn_mem(15) := X"0000";
+--            
+--            var_insn_mem(0)  := X"5010"; -- load core number to $1
+--            var_insn_mem(1)  := X"e121"; -- $2 = 2 x $1
+--            var_insn_mem(2)  := X"0000";--922f"; -- $2 = $2 - 1
+--            var_insn_mem(3)  := X"5231"; -- $3 = mem($2 + 1)
+--            var_insn_mem(4)  := X"5240"; -- $4 = mem($2)
+--            var_insn_mem(5)  := X"8435"; -- $5 = $4 + $3
+--            var_insn_mem(6)  := X"7221";
+--            var_insn_mem(7)  := X"7246";
+--            var_insn_mem(8)  := X"7257";
+--            var_insn_mem(9)  := X"0000";
+--            var_insn_mem(10) := X"0000";
+--            var_insn_mem(11) := X"0000";
+--            var_insn_mem(12) := X"0000";
+--            var_insn_mem(13) := X"0000";
+--            var_insn_mem(14) := X"0000";
+--            var_insn_mem(15) := X"0000";
 
---var_insn_mem(0) := X"0000"; --nop
---var_insn_mem(1) := X"0000"; --nop
----- INIT--INIT:
---var_insn_mem(2) := X"10B0"; --lw rkp $0 0     ; Load Key address
---var_insn_mem(3) := X"1052"; --lw rrn $0 2     ; Load Random Table
---var_insn_mem(4) := X"1064"; --lw ris $0 4      ; Load Input address
---var_insn_mem(5) := X"1076"; --lw ros $0 6     ; string length
---var_insn_mem(6) := X"9774"; --(padding should be 8, not 4)--4"; -- string length + padding | add ros ros padding
---var_insn_mem(7) := X"8677"; -- calculate output string addr | add ros ros ris
---
---var_insn_mem(8) := X"0000"; --nop
---var_insn_mem(9) := X"0000"; --nop
---
---
---var_insn_mem(10) := X"1BC0"; --lw rk1 rkp 0    ; key1 = *key + 0
---var_insn_mem(11) := X"1BD2"; --lw rk1 rkp 0    ; key2 = *key + 2
---var_insn_mem(12) := X"1BE4"; --lw rk1 rkp 0    ; key3 = *key + 4
---var_insn_mem(13) := X"1BF6"; --lw rk1 rkp 0    ; key4 = *key + 6
---var_insn_mem(14) := X"0000";  
---var_insn_mem(15) := X"9031"; --addi rkc $0 1   ; load 0x0001
---var_insn_mem(16) := X"e33F"; --srl  rkc rkc 1  ; make 0x8000
---var_insn_mem(17) := X"90AF"; --addi rm1 $0 0xf ; make 0x000f
---var_insn_mem(18) := X"EAA4"; --sll  rm1 rm1 4  ; make 0x00f0
---var_insn_mem(19) := X"9AAF"; --addi rm1 rm1 0xf ;make 0x00ff
----- MAIN--MAIN:          ; do {
---var_insn_mem(20) := X"5620"; --lb re ris 0      ; load byte of string into re ; tmp = string[j]
---var_insn_mem(21) := X"9661"; --addi ris ris 1    ; j++ or *string++
---var_insn_mem(22) := X"0000"; 
---var_insn_mem(23) := X"0000"; --nop
---var_insn_mem(24) := X"4021"; --bne re $0 START  ; if(*string != EOF) continue
---var_insn_mem(25) := X"2043"; --j END
----- START--START:
-----var_insn_mem(26) := X"5B80"; --lb s1 rkp 0       ;load first value of key into s1
-----var_insn_mem(27) := X"D282"; --xor re re s1 ;xor input char with first key byte
-----var_insn_mem(28) := X"8529"; --add s2 rrn re    ;get the index of the r table
-----var_insn_mem(29) := X"5920"; --lb re s2 0       ;load the rng table's value
-----var_insn_mem(30) := X"9BB1"; --addi rkp rkp 1   ;get next subkey
---
---var_insn_mem(26) := X"0000";
---var_insn_mem(27) := X"0000";
---var_insn_mem(28) := X"0000";
---
---var_insn_mem(29) := X"9018"; --addi ri $0 8 ;for(ri = -8; ri < 0; ri--) ri = -8
---var_insn_mem(30) := X"b011"; --addi ri $0 8 ;for(ri = -8; ri < 0; ri--) ri = -8
---
----- ENCRYPT_lOOP--ENCRYPT_lOOP:
---var_insn_mem(31) := X"9111"; --addi ri ri 1     ;increment ri by 1
---var_insn_mem(32) := X"5B80"; --lb  s1 rkp 0     ;load subkey into s1
---var_insn_mem(33) := X"D282"; --xor  re re s1    ;xor subkey with char
---var_insn_mem(34) := X"8529"; --add  s2 rrn re   ;get the index of the table
---var_insn_mem(35) := X"5920"; --lb  re s2 0      ;retrieve value from rng table
---var_insn_mem(36) := X"9BB1"; --addi rkp rkp 1   ;increment subkey pointer
---
---var_insn_mem(37) := X"6011"; --beq ri $0 SAVE_ENCRYPT  ;once all 8 subkeys have been processed, save and do tag
---var_insn_mem(38) := X"201F"; --j ENCRYPT_lOOP
----- SAVE_ENCRYPT
---var_insn_mem(39) := X"9018"; --addi ri, $0, 8
---var_insn_mem(40) := X"bB1B"; --sub rkp rkp ri   ;rkp - 8 -> returned to original value
---var_insn_mem(41) := X"7720"; --sb re ros 0     ;store the output byte
---var_insn_mem(42) := X"9771"; --addi ros ros 1  ;increment output str pointer
---
----- DOTAG--DOTAG:            ; shift encrypted character left by 1 if needed
---
---var_insn_mem(43) := X"AF31"; --slt  ri rk4 rkc  ; if rk1 < 1b80, Msb is 0 -> ri=1
---var_insn_mem(44) := X"0000";
---var_insn_mem(45) := X"0000";
---var_insn_mem(46) := X"0000";
---var_insn_mem(47) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1), don't shift
---var_insn_mem(48) := X"E221"; --sll  re re 1     ; shift encrypted char left by 1
---var_insn_mem(49) := X"D244"; --xor rT re rT ; XOR the tag with the shifted character ;only the ls 8 bits needed. ;Mask the output of the tag at END
---var_insn_mem(50) := X"AF31"; --slt  ri rk4 rkc  ; if rk4 < 0x80, Msb = 0 -> ri = 1 ; rotate key4 left
---var_insn_mem(51) := X"EFF1"; --sll  rk4 rk4 1   ; shift rk4 left by 1
---var_insn_mem(52) := X"AC38"; --slt  s1 rk1 rkc  ; if rk1 < 0x80, Msb = 0 -> s1 = 1
---var_insn_mem(53) := X"ECC1"; --sll rk1 rk1 1    ; shift rk1 left by 1
---var_insn_mem(54) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
---var_insn_mem(55) := X"9CC1"; --addi rk1 rk1 1   ; add carry
---var_insn_mem(56) := X"AD31"; --slt  ri rk2 rkc  ; if rk2 < 0x80, Msb = 0 -> ri = 1
---var_insn_mem(57) := X"EDD1"; --sll rk2 rk2 1    ; shift rk2 left by 1
---var_insn_mem(58) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1) don't add carry
---var_insn_mem(59) := X"9DD1"; --addi rk2 rk2 1   ; add carry
---var_insn_mem(60) := X"AE38"; --slt  s1 rk3 rkc  ; if rk3 < 0x80, Msb = 0 -> s1 = 1
---var_insn_mem(61) := X"EEE1"; --sll rk3 rk3 1    ; shift rk3 left by 1
---var_insn_mem(62) := X"4011"; --bne  ri $0 1     ; if ri != 0 (ri == 1) don't add carry
---var_insn_mem(63) := X"9EE1"; --addi rk3 rk3 1   ; add carry
---var_insn_mem(64) := X"4081"; --bne  s1 $0 1     ; if s1 != 0 (s1 == 1)no Msb to rotate
---var_insn_mem(65) := X"9FF1"; --addi rk4 rk4 1   ; move Msb to lsb
----- DOTaG_ExIT--DOTaG_ExIT:     ; Modify Tag given output and key
---var_insn_mem(66) := X"2014"; --j MAIN
----- END--END:
---var_insn_mem(67) := X"C4A4"; --and rT rT rm1    ;mask the tag
---var_insn_mem(67) := X"7744"; --sb    ;store the tag
---var_insn_mem(68) := X"0000"; --nop              ; Finished.
---var_insn_mem(69) := X"2045"; -- infinite loop
+--#//////////////////////////////////////////////////
+--#//
+--#// Define registers
+--#// $0    r0    zero
+--#// $1    rc    core number
+--#// $2    rm    value of m (encrypt iterations)
+--#// $3    rn    value of n (tag iterations)
+--#// $4    rsz    size of string
+--#// $5    s1    scratch 1
+--#// $6    s2 re    scratch 2
+--#// $7    s3 rkc    scratch 3
+--#// $8    ris    Pointer to input string
+--#// $9    ros    Pointer to output string
+--#// $10    rrn    Pointer to RNG table
+--#// $11    rkp  Initially pointer to key
+--#// $12    rk1     63 : 48 key copy (initially pointer to key)
+--#// $13    rk2     47 : 32 key copy
+--#// $14    rk3     31 : 16 key copy
+--#// $15    rk4     15 : 0  key copy
+--#//
+--#////////////////////////////////////////////////
+var_insn_mem(0) := X"0000"; --nop
+var_insn_mem(1) := X"0000"; --nop
+var_insn_mem(2) := X"0000"; --nop
+var_insn_mem(3) := X"0000"; --nop
+var_insn_mem(4) := X"0000"; --nop
+var_insn_mem(5) := X"0000"; --nop
+var_insn_mem(6) := X"0000"; --nop
+var_insn_mem(7) := X"0000"; --nop
+--# INITIALISATION
+var_insn_mem(8) := X"10B2"; --lw  rkp  r0  0x2      #  Load  Key     address
+var_insn_mem(9) := X"10A4"; --lw  rrn  r0  0x4      #  Load  Random  Table
+var_insn_mem(10) := X"1086"; --lw  ris  r0  0x6      #  Load  Input   address
+var_insn_mem(11) := X"1098"; --lw  ros  r0  0x8      #  Load  output  address
+var_insn_mem(12) := X"5010"; --lb  rc   r0  0x0     #  load  core    number
+var_insn_mem(13) := X"102A"; --lw  rm   r0  0xa     #  load  value   of       m
+var_insn_mem(14) := X"103C"; --lw  rn   r0  0xc     #  load  value   of       n
+var_insn_mem(15) := X"8818"; --add  ris  ris  rc   #//set    offset
+var_insn_mem(16) := X"8919"; --add  ros  ros  rc   #//set    offset
+var_insn_mem(17) := X"8005"; --add  s1   r0   r0   #//clear  scratch  registers
+var_insn_mem(18) := X"8006"; --add  s2   r0   r0   #//clear  scratch  registers
+var_insn_mem(19) := X"8007"; --add  s3   r0   r0   #//clear  scratch  registers
+var_insn_mem(20) := X"90C7"; --addi  rk1  r0   0x7  #//make      a         mask  for  the  loop  counter
+var_insn_mem(21) := X"90FF"; --addi  rk4  r0   0xF  #//00000000  00111111
+var_insn_mem(22) := X"EFF2"; --sll   rk4  rk4  0x2  #//00000000  11111100
+var_insn_mem(23) := X"9FFF"; --addi  rk4  rk4  0xF  #//00000000  11111111
+var_insn_mem(24) := X"0000"; --nop
+var_insn_mem(25) := X"0000"; --nop
+var_insn_mem(26) := X"0000"; --nop
+--#//begin encryption
+--#//s1 keeps track of number of characters processed
+--#//s2 keeps track of encrypted character
+--#//s3 keeps track of the iteration number of the encrypt loop
+-- ENCRYPT_STRING--ENCRYPT_STRING:
+--#//if chars_processed > num_chars finish
+var_insn_mem(27) := X"6072"; --beq s3 r0 ENCRYPT_CHAR    #//encrypt if s3 == 0
+var_insn_mem(28) := X"2031"; --j   END_ENCRYPT_STRING
+-- ENCRYPT_CHAR--ENCRYPT_CHAR:
+var_insn_mem(29) := X"5860"; --lb   re  ris 0x0   #//load character to encrypt
+var_insn_mem(30) := X"9884"; --addi ris ris 0x4   #//increase in string pointer
+var_insn_mem(31) := X"8BD0"; --add  rk2 rkp 0x0   #//place key pointer in rk2
+var_insn_mem(32) := X"8007"; --add  s3  r0  r0    #//reset the loop counter
+-- ENCRYPT_LOOP--ENCRYPT_LOOP:
+var_insn_mem(33) := X"9771"; --addi  s3  s3  0x1           #//increment loop counter
+var_insn_mem(34) := X"C7FE"; --and   rk3 s3  rk4           #//get the next subkey index (<8)
+var_insn_mem(35) := X"A72E"; --slt   rk3 s3  rm            #//check if loop counter < m
+var_insn_mem(36) := X"5DD0"; --lb    rk2 rk2 0x0           #//load subkey
+var_insn_mem(37) := X"D6D6"; --xor   re  re  rk2           #//xor char with subkey
+var_insn_mem(38) := X"86AD"; --add   rk2 re  rrn           #//get a new table pointer
+var_insn_mem(39) := X"CDFD"; --and   rk2 rk2 rk4           #//mask the table pointer
+var_insn_mem(40) := X"5D60"; --lb    re  rk2 0x0           #//load table value
+var_insn_mem(41) := X"8EBD"; --add   rk2 rk3 rkp           #//update key pointer
+var_insn_mem(42) := X"60E2"; --beq   rk3 r0 ENCRYPT_SAVE   #//if counter !< m save character
+var_insn_mem(43) := X"2021"; --j     ENCRYPT_LOOP
+-- ENCRYPT_SAVE--ENCRYPT_SAVE:
+var_insn_mem(44) := X"9554"; --addi  s1  s1  0x4           #//inc num of chars processed by 4
+var_insn_mem(45) := X"A457"; --slt   s3  rsz s1            #//if rsz<s1 s3=1
+var_insn_mem(46) := X"7960"; --sb    re  ros 0x0           #//store encrypted character
+var_insn_mem(47) := X"9994"; --addi  ros ros 0x4           #//increment out string pointer
+var_insn_mem(48) := X"201B"; --j     ENCRYPT_STRING
+-- END_ENCRYPT_STRING--END_ENCRYPT_STRING:
+-- DOTAG--DOTAG:
+var_insn_mem(49) := X"1BFe"; --lw    rk4 rkp 0xe
+var_insn_mem(50) := X"1BEc"; --lw    rk3 rkp 0xc
+var_insn_mem(51) := X"1BDa"; --lw    rk2 rkp 0xa
+var_insn_mem(52) := X"1BC8"; --lw    rk1 rkp 0x8
+--#//strategy:
+--#//each processor will xor their own tags. Store tags at mem(tag + 2 + core id)
+--#// when each processor finishes its tag generation it will set mem(tag + 2 + core id + 4) to ff
+--#// processor 3 will (theoretically) finish last.
+--#//Core 3 will poll mem(tag + 2 + 6 + (012)) to see if other processors are done
+--#//once it's done core 3 will xor everyones results and place it in mem(tag)
+--#//available registers:
+--#//re s1 s3 rkp rrn rm
+--#// rkp: rkc 0x800
+--#// re: re…
+--#// rrn: s1
+--#// rm: ri
+--#// ris: tag / tag pointer
+--#//s1 keeps track of number of characters processed
+--#//s3 keeps track of the iteration number of the tag loop
+--# load constants
+--#rkc    key comparison = 0x8000 for doshift
+var_insn_mem(53) := X"90B1"; --addi    rkp $0  0x1         # load 0x0001
+var_insn_mem(54) := X"EBBf"; --sll     rkp rkp 0x15        # make 0x8000
+var_insn_mem(55) := X"109C"; --lw   ros $0 0xc             # Load output string pointer
+var_insn_mem(56) := X"8919"; --add  ros ros rc             #//get out string offset
+var_insn_mem(57) := X"0000"; --nop
+var_insn_mem(58) := X"0000"; --nop
+var_insn_mem(59) := X"0000"; --nop
+var_insn_mem(60) := X"8005"; --add   s1  r0  r0            #//initialize s1
+var_insn_mem(61) := X"8008"; --add   ris r0  r0            #//initialize tag
+var_insn_mem(62) := X"8007"; --add   s3  r0  r0            #//initialize s3
+-- DOTAG_STRING--DOTAG_STRING:
+--#//if chars_processed > num_chars finish
+var_insn_mem(63) := X"A457"; --slt   s3 rsz s1             #//if rsz<s1 s3=1
+var_insn_mem(64) := X"0000"; --nop
+var_insn_mem(65) := X"0000"; --nop
+var_insn_mem(66) := X"0000"; --nop
+var_insn_mem(67) := X"6071"; --beq   s3 r0 DOTAG_CHAR      #//make tag if s3 == 0
+var_insn_mem(68) := X"2063"; --j     END_DOTAG_STRING
+-- DOTAG_CHAR--DOTAG_CHAR:
+var_insn_mem(69) := X"5960"; --lb    re  ros  0x0           #//load character to tag
+var_insn_mem(70) := X"9994"; --addi  ros ros  0x4           #//increase out string pointer
+var_insn_mem(71) := X"8007"; --add   s3  r0   r0            #//reset the  loop counter
+var_insn_mem(72) := X"AFB2"; --slt   rm  rk4  rkp          # if rk4 < 1b80 MSB is 0 -> ri=1
+var_insn_mem(73) := X"0000"; --nop
+var_insn_mem(74) := X"0000"; --nop
+var_insn_mem(75) := X"0000"; --nop
+var_insn_mem(76) := X"4021"; --bne   rm $0 DONT_SHIFT      # if ri != 0 (ri == 1) don'tshift
+-- DOTAG_LOOP--DOTAG_LOOP: #//shift re n times
+var_insn_mem(77) := X"9771"; --addi  s3  s3  0x1        #//increment counter
+var_insn_mem(78) := X"A73A"; --slt   rrn s3  rn    # //rrn = 1 if s3 < rn
+var_insn_mem(79) := X"E661"; --sll   re  re  0x1     # shift encrypted char left by 1
+var_insn_mem(80) := X"40A1"; --bne   rrn r0  DONT_SHIFT
+var_insn_mem(81) := X"204D"; --j     DOTAG_LOOP
+-- DONT_SHIFT--DONT_SHIFT:
+--# XOR the tag with the shifted character
+var_insn_mem(82) := X"D688"; --xor   ris re  ris    #only the LS 8 bits needed.
+--#Mask the output of the tag at END
+--# rotate key4 left
+var_insn_mem(83) := X"AFB2"; --slt   rm  rk4 rkp    # if rk4 < 0x80 MSB = 0 -> ri = 1
+var_insn_mem(84) := X"EFF1"; --sll   rk4 rk4 0x1    # shift rk4 left by 1
+var_insn_mem(85) := X"ACBA"; --slt   rrn rk1 rkp   # if rk1 < 0x80 MSB = 0 -> s1 = 1
+var_insn_mem(86) := X"ECC1"; --sll   rk1 rk1 0x1    # shift rk1 left by 1
+var_insn_mem(87) := X"4021"; --bne   rm  $0  0x1        # if ri != 0 (ri == 1) don't add carry
+var_insn_mem(88) := X"9CC1"; --addi  rk1 rk1 0x1        # add carry
+var_insn_mem(89) := X"ADB2"; --slt   rm  rk2 rkp    # if rk2 < 0x80 MSB = 0 -> ri = 1
+var_insn_mem(90) := X"EDD1"; --sll   rk2 rk2 0x1    # shift rk2 left by 1
+var_insn_mem(91) := X"40A1"; --bne   rrn $0  0x1        # if s1 != 0 (s1 == 1) don't add carry
+var_insn_mem(92) := X"9DD1"; --addi  rk2 rk2 0x1        # add carry
+var_insn_mem(93) := X"AEBA"; --slt   rrn rk3 rkp    # if rk3 < 0x80 MSB = 0 -> s1 = 1
+var_insn_mem(94) := X"EEE1"; --sll   rk3 rk3 0x1    # shift rk3 left by 1
+var_insn_mem(95) := X"4021"; --bne   rm  $0  0x1        # if ri != 0 (ri == 1) don't add carry
+var_insn_mem(96) := X"9EE1"; --addi  rk3 rk3 0x1        # add carry
+var_insn_mem(97) := X"40A1"; --bne   rrn $0  0x1        # if s1 != 0 (s1 == 1)no MSB to rotate
+var_insn_mem(98) := X"9FF1"; --addi  rk4 rk4 0x1        # move MSB to LSB
+-- END_DOTAG_STRING--END_DOTAG_STRING:
+var_insn_mem(99) := X"90A3"; --addi  rrn  r0  0x3      #load core number 3 into rrn
+var_insn_mem(100) := X"106E"; --lw    re   r0  0xe      # Load tag pointer
+var_insn_mem(101) := X"8616"; --add   re   re  rc       #//get tag offset
+var_insn_mem(102) := X"7682"; --sb    ris  re  0x2
+var_insn_mem(103) := X"90Cf"; --addi  rk1  r0  0x15
+var_insn_mem(104) := X"ECC4"; --sll   rk1  rk1 0x4
+var_insn_mem(105) := X"9CCf"; --addi  rk1  rk1 0x15     # //generate 0xff code
+var_insn_mem(106) := X"76C6"; --sb    rk1  re  0x6      # //store operation complete code
+var_insn_mem(107) := X"61A1"; --beq   rrn  rc COMPILE_TAG   #    // make tag if this is core 3
+var_insn_mem(108) := X"208E"; --j    EXIT
+-- COMPILE_TAG--COMPILE_TAG:
+var_insn_mem(109) := X"106E"; --lw    re r0 0xe         #//load tag pointer
+--#//wait for other cores to finish
+-- WAIT_0--WAIT_0:
+var_insn_mem(110) := X"56A6"; --lb    rrn re 0x6
+var_insn_mem(111) := X"0000"; --nop
+var_insn_mem(112) := X"0000"; --nop
+var_insn_mem(113) := X"0000"; --nop
+var_insn_mem(114) := X"6AC1"; --beq  rk1 rrn WAIT_1
+var_insn_mem(115) := X"206E"; --j WAIT_0
+-- WAIT_1--WAIT_1:
+var_insn_mem(116) := X"56A7"; --lb    rrn re 0x7
+var_insn_mem(117) := X"0000"; --nop
+var_insn_mem(118) := X"0000"; --nop
+var_insn_mem(119) := X"0000"; --nop
+var_insn_mem(120) := X"6AC1"; --beq  rk1 rrn WAIT_2
+var_insn_mem(121) := X"2074"; --j WAIT_1
+-- WAIT_2--WAIT_2:
+var_insn_mem(122) := X"56A8"; --lb    rrn re 0x8
+var_insn_mem(123) := X"0000"; --nop
+var_insn_mem(124) := X"0000"; --nop
+var_insn_mem(125) := X"0000"; --nop
+var_insn_mem(126) := X"6AC1"; --beq  rk1 rrn XOR_TAGS
+var_insn_mem(127) := X"207A"; --j WAIT_2
+-- XOR_TAGS--XOR_TAGS:
+var_insn_mem(128) := X"56D2"; --lb    rk2 re 0x2
+var_insn_mem(129) := X"56E3"; --lb    rk3 re 0x3
+var_insn_mem(130) := X"56F4"; --lb    rk4 re 0x4
+var_insn_mem(131) := X"56A5"; --lb    rrn re 0x5 #//load the tags
+var_insn_mem(132) := X"DDAA"; --xor   rrn rk2 rrn
+var_insn_mem(133) := X"DEAA"; --xor   rrn rk3 rrn
+var_insn_mem(134) := X"DFAA"; --xor   rrn rk4 rrn #//xor the tags
+var_insn_mem(135) := X"36A0"; --sw    rrn  re 0x0
+var_insn_mem(136) := X"36AA"; --sw    rrn  re 0xa
+var_insn_mem(137) := X"36AB"; --sw    rrn  re 0xb
+var_insn_mem(138) := X"36AC"; --sw    rrn  re 0xc
+var_insn_mem(139) := X"36AD"; --sw    rrn  re 0xd
+var_insn_mem(140) := X"36AE"; --sw    rrn  re 0xe
+var_insn_mem(141) := X"36AF"; --sw    rrn  re 0xf
+-- EXIT--EXIT:
+var_insn_mem(142) := X"0000"; --nop
+var_insn_mem(143) := X"0000"; --nop
+var_insn_mem(144) := X"0000"; --nop
+var_insn_mem(145) := X"0000"; --nop
+var_insn_mem(146) := X"0000"; --nop
+var_insn_mem(147) := X"0000"; --nop
+var_insn_mem(148) := X"0000"; --nop
+var_insn_mem(149) := X"0000"; --nop
+var_insn_mem(150) := X"0000"; --nop
+var_insn_mem(151) := X"208E"; --nop
 
 
 

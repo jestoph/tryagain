@@ -11,7 +11,8 @@ entity r_token is
            others_req   : in    std_logic;
            tok_in       : in    std_logic;
            tok_out      : out   std_logic;
-           tok_stat     : out   std_logic );
+           tok_stat     : out   std_logic;
+           tok_d        : out   std_logic);
 end r_token;
 
 architecture behavioural of r_token is
@@ -39,7 +40,7 @@ begin
     
        if (reset = '1') then
             var_token   := init; 
-       elsif (rising_edge(clk)) then
+       elsif (falling_edge(clk)) then
             var_token   := sig_tok_d;
        end if;
        if(rising_edge(tok_in) or rising_edge(req) or rising_edge(others_req)) then
@@ -49,7 +50,7 @@ begin
     tok_stat         <= var_token;
     tok_out          <= var_tok_out;-- after 5ns;
     sig_tok_out      <= var_tok_out;
-    
+    tok_d   <= sig_tok_d;
     end process;
 end behavioural;
 
@@ -66,7 +67,8 @@ entity w_token is
            others_req   : in    std_logic;
            tok_in       : in    std_logic;
            tok_out      : out   std_logic;
-           tok_stat     : out   std_logic );
+           tok_stat     : out   std_logic;
+           tok_d        : out   std_logic);
 end w_token;
 
 architecture behavioural of w_token is
@@ -94,7 +96,7 @@ begin
     
        if (reset = '1') then
             var_token   := init; 
-       elsif (rising_edge(clk)) then
+       elsif (falling_edge(clk)) then
             var_token   := sig_tok_d;
        end if;
        if(rising_edge(tok_in) or rising_edge(req) or rising_edge(others_req)) then
@@ -104,6 +106,6 @@ begin
     tok_stat         <= var_token;
     tok_out          <= var_tok_out;-- after 5ns;
     sig_tok_out      <= var_tok_out;
-    
+    tok_d   <= sig_tok_d;
     end process;
 end behavioural;

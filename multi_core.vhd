@@ -21,6 +21,8 @@ component single_cycle_core is
            clk    : in  std_logic;
            w_req  : out std_logic;
            r_req  : out std_logic;
+           w_req_dm     : out std_logic;
+           r_req_dm     : out std_logic;
            w_en   : in  std_logic; -- token
            r_en   : in  std_logic; -- token
            w_b_addr : out std_logic; -- byte address mode
@@ -68,7 +70,8 @@ port (     clk          : in    std_logic;
            others_req   : in    std_logic;
            tok_in       : in    std_logic;
            tok_out      : out   std_logic;
-           tok_stat     : out   std_logic   );
+           tok_stat     : out   std_logic;
+           tok_d     : out   std_logic);
 end component;
 
 component w_token is
@@ -79,7 +82,8 @@ port (     clk          : in    std_logic;
            others_req   : in    std_logic;
            tok_in       : in    std_logic;
            tok_out      : out   std_logic;
-           tok_stat     : out   std_logic   );
+           tok_stat     : out   std_logic;
+tok_d     : out   std_logic           );
 end component;
 
 
@@ -92,6 +96,16 @@ signal sig_w_req_0      : std_logic;
 signal sig_w_req_1      : std_logic;
 signal sig_w_req_2      : std_logic;
 signal sig_w_req_3      : std_logic;
+
+signal sig_r_req_dm_0      : std_logic;
+signal sig_r_req_dm_1      : std_logic;
+signal sig_r_req_dm_2      : std_logic;
+signal sig_r_req_dm_3      : std_logic;
+
+signal sig_w_req_dm_0      : std_logic;
+signal sig_w_req_dm_1      : std_logic;
+signal sig_w_req_dm_2      : std_logic;
+signal sig_w_req_dm_3      : std_logic;
 
 signal sig_w_others_0   : std_logic;
 signal sig_w_others_1   : std_logic;
@@ -132,6 +146,15 @@ signal sig_addr_w_bus   : std_logic_vector(11 downto 0);
 
 signal sig_write_enable : std_logic;
 signal sig_read_enable : std_logic;
+
+signal sig_r_tok_d_0    : std_logic;
+signal sig_r_tok_d_1    : std_logic;
+signal sig_r_tok_d_2    : std_logic;
+signal sig_r_tok_d_3    : std_logic;
+signal sig_w_tok_d_0    : std_logic;
+signal sig_w_tok_d_1    : std_logic;
+signal sig_w_tok_d_2    : std_logic;
+signal sig_w_tok_d_3    : std_logic;
 
 begin
 
@@ -184,17 +207,17 @@ begin
                or_out    => sig_w_others_3 );
    
     write_enable_or : or_4in_1b   
-    port map ( in_a      => sig_w_req_0,
-               in_b      => sig_w_req_1,
-               in_c      => sig_w_req_2,
-               in_d      => sig_w_req_3,
+    port map ( in_a      => sig_w_req_dm_0,
+               in_b      => sig_w_req_dm_1,
+               in_c      => sig_w_req_dm_2,
+               in_d      => sig_w_req_dm_3,
                or_out    => sig_write_enable);
 
     read_enable_or : or_4in_1b   
-    port map ( in_a      => sig_r_req_0,
-               in_b      => sig_r_req_1,
-               in_c      => sig_r_req_2,
-               in_d      => sig_r_req_3,
+    port map ( in_a      => sig_r_req_dm_0,
+               in_b      => sig_r_req_dm_1,
+               in_c      => sig_r_req_dm_2,
+               in_d      => sig_r_req_dm_3,
                or_out    => sig_read_enable);
 
     arb_r_token_0 : r_token
@@ -205,7 +228,8 @@ begin
                others_req  => sig_r_others_0,
                tok_in      => sig_r_tok_3to0,
                tok_out     => sig_r_tok_0to1,
-               tok_stat    => sig_r_tok_stat_0
+               tok_stat    => sig_r_tok_stat_0,
+               tok_d       => sig_r_tok_d_0
                );
 
     arb_r_token_1 : r_token
@@ -216,7 +240,8 @@ begin
                others_req  => sig_r_others_1,
                tok_in      => sig_r_tok_0to1,
                tok_out     => sig_r_tok_1to2,
-               tok_stat    => sig_r_tok_stat_1
+               tok_stat    => sig_r_tok_stat_1,
+               tok_d       => sig_r_tok_d_1
                );
                
     arb_r_token_2 : r_token
@@ -227,7 +252,8 @@ begin
                others_req  => sig_r_others_2,
                tok_in      => sig_r_tok_1to2,
                tok_out     => sig_r_tok_2to3,
-               tok_stat    => sig_r_tok_stat_2
+               tok_stat    => sig_r_tok_stat_2,
+               tok_d       => sig_r_tok_d_2
                );
 
     arb_r_token_3 : r_token
@@ -238,7 +264,8 @@ begin
                others_req  => sig_r_others_3,
                tok_in      => sig_r_tok_2to3,
                tok_out     => sig_r_tok_3to0,
-               tok_stat    => sig_r_tok_stat_3
+               tok_stat    => sig_r_tok_stat_3,
+               tok_d       => sig_r_tok_d_3
                );
 
     arb_w_token_0 : w_token
@@ -249,7 +276,8 @@ begin
                others_req  => sig_w_others_0,
                tok_in      => sig_w_tok_3to0,
                tok_out     => sig_w_tok_0to1,
-               tok_stat    => sig_w_tok_stat_0
+               tok_stat    => sig_w_tok_stat_0,
+               tok_d       => sig_w_tok_d_0
                );
 
     arb_w_token_1 : w_token
@@ -260,7 +288,8 @@ begin
                others_req  => sig_w_others_1,
                tok_in      => sig_w_tok_0to1,
                tok_out     => sig_w_tok_1to2,
-               tok_stat    => sig_w_tok_stat_1
+               tok_stat    => sig_w_tok_stat_1,
+               tok_d       => sig_w_tok_d_1
                );
                
     arb_w_token_2 : w_token
@@ -271,7 +300,8 @@ begin
                others_req  => sig_w_others_2,
                tok_in      => sig_w_tok_1to2,
                tok_out     => sig_w_tok_2to3,
-               tok_stat    => sig_w_tok_stat_2
+               tok_stat    => sig_w_tok_stat_2,
+               tok_d       => sig_w_tok_d_2
                );
 
     arb_w_token_3 : w_token
@@ -282,14 +312,17 @@ begin
                others_req  => sig_w_others_3,
                tok_in      => sig_w_tok_2to3,
                tok_out     => sig_w_tok_3to0,
-               tok_stat    => sig_w_tok_stat_3
+               tok_stat    => sig_w_tok_stat_3,
+               tok_d       => sig_w_tok_d_3 
                );
 
     core_0          :   single_cycle_core
     port map  ( reset       =>  reset,
                 clk         =>  clk,
                 w_req       =>  sig_w_req_0,
-                r_req       =>  sig_r_req_0,
+                r_req       =>  sig_r_req_0,                
+                w_req_dm       =>  sig_w_req_dm_0,
+                r_req_dm       =>  sig_r_req_dm_0,
                 w_en        =>  sig_w_tok_stat_0,
                 r_en        =>  sig_r_tok_stat_0,
                 w_b_addr    =>  sig_w_b_addr_bus,
@@ -305,6 +338,8 @@ begin
                 clk         =>  clk,
                 w_req       =>  sig_w_req_1,
                 r_req       =>  sig_r_req_1,
+                w_req_dm       =>  sig_w_req_dm_1,
+                r_req_dm       =>  sig_r_req_dm_1,
                 w_en        =>  sig_w_tok_stat_1,
                 r_en        =>  sig_r_tok_stat_1,
                 w_b_addr    =>  sig_w_b_addr_bus,
@@ -320,6 +355,8 @@ begin
                 clk         =>  clk,
                 w_req       =>  sig_w_req_2,
                 r_req       =>  sig_r_req_2,
+                w_req_dm       =>  sig_w_req_dm_2,
+                r_req_dm       =>  sig_r_req_dm_2,
                 w_en        =>  sig_w_tok_stat_2,
                 r_en        =>  sig_r_tok_stat_2,
                 w_b_addr    =>  sig_w_b_addr_bus,
@@ -335,6 +372,8 @@ begin
                 clk         =>  clk,
                 w_req       =>  sig_w_req_3,
                 r_req       =>  sig_r_req_3,
+                w_req_dm       =>  sig_w_req_dm_3,
+                r_req_dm       =>  sig_r_req_dm_3,
                 w_en        =>  sig_w_tok_stat_3,
                 r_en        =>  sig_r_tok_stat_3,
                 w_b_addr    =>  sig_w_b_addr_bus,
