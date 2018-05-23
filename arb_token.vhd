@@ -21,6 +21,7 @@ signal    sig_tok_out   : std_logic;
 signal    sig_tok_d     : std_logic;
 signal    sig_tok_in    : std_logic;
 signal    sig_tok       : std_logic;
+signal    sig_tok_d_async   : std_logic;
 
 begin
     token_process : process ( reset,
@@ -53,8 +54,12 @@ begin
     tok_stat         <= var_token;
     tok_out          <= var_tok_out;-- after 5ns;
     sig_tok_out      <= var_tok_out;
-    tok_d   <= sig_tok_d;
+    --tok_d   <= sig_tok_d;
     end process;
+    
+    sig_tok_d_async <= ((not others_req and sig_tok) or (tok_in and req));
+    tok_d           <= sig_tok_d_async;
+    
 end behavioural;
 
 library IEEE;
@@ -80,8 +85,11 @@ signal    sig_tok_out   : std_logic;
 signal    sig_tok_d     : std_logic; --current status of token
 signal    sig_tok_in    : std_logic;
 signal    sig_tok       : std_logic;
+signal    sig_tok_d_async: std_logic;
 
 begin
+
+
     token_process : process ( reset,
                               clk,
                               req,
@@ -112,6 +120,9 @@ begin
     tok_stat         <= var_token;
     tok_out          <= var_tok_out;-- after 5ns;
     sig_tok_out      <= var_tok_out;
-    tok_d   <= sig_tok_d;
+    --tok_d   <= sig_tok_d;
     end process;
+    sig_tok_d_async <= ((not others_req and sig_tok) or (tok_in and req));
+    tok_d           <= sig_tok_d_async;
+
 end behavioural;

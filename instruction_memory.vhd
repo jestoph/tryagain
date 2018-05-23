@@ -118,8 +118,8 @@ var_insn_mem(2) := X"0000"; --nop
 var_insn_mem(3) := X"0000"; --nop
 var_insn_mem(4) := X"0000"; --nop
 var_insn_mem(5) := X"0000"; --nop
-var_insn_mem(6) := X"0000"; --nop
-var_insn_mem(7) := X"0000"; --nop
+var_insn_mem(6) := X"904e"; --addi rsz, r0, 0xe
+var_insn_mem(7) := X"1442"; --lw rsz, rsz, 0x2 #load size of string
 --# INITIALISATION
 var_insn_mem(8) := X"10B2"; --lw  rkp  r0  0x2      #  Load  Key     address
 var_insn_mem(9) := X"10A4"; --lw  rrn  r0  0x4      #  Load  Random  Table
@@ -135,9 +135,9 @@ var_insn_mem(18) := X"8006"; --add  s2   r0   r0   #//clear  scratch  registers
 var_insn_mem(19) := X"8007"; --add  s3   r0   r0   #//clear  scratch  registers
 var_insn_mem(20) := X"90C7"; --addi  rk1  r0   0x7  #//make      a         mask  for  the  loop  counter
 var_insn_mem(21) := X"90FF"; --addi  rk4  r0   0xF  #//00000000  00111111
-var_insn_mem(22) := X"EFF2"; --sll   rk4  rk4  0x2  #//00000000  11111100
+var_insn_mem(22) := X"EFF4"; --sll   rk4  rk4  0x4  #//00000000  11111100
 var_insn_mem(23) := X"9FFF"; --addi  rk4  rk4  0xF  #//00000000  11111111
-var_insn_mem(24) := X"0000"; --nop
+var_insn_mem(24) := X"9071"; --addi s3, r0, 1 initialize
 var_insn_mem(25) := X"0000"; --nop
 var_insn_mem(26) := X"0000"; --nop
 --#//begin encryption
@@ -146,7 +146,7 @@ var_insn_mem(26) := X"0000"; --nop
 --#//s3 keeps track of the iteration number of the encrypt loop
 -- ENCRYPT_STRING--ENCRYPT_STRING:
 --#//if chars_processed > num_chars finish
-var_insn_mem(27) := X"6071"; --beq s3 r0 ENCRYPT_CHAR    #//encrypt if s3 == 0
+var_insn_mem(27) := X"4071"; --bne s3 r0 ENCRYPT_CHAR    #//encrypt if s3 == 1
 var_insn_mem(28) := X"2031"; --j   END_ENCRYPT_STRING
 -- ENCRYPT_CHAR--ENCRYPT_CHAR:
 var_insn_mem(29) := X"5860"; --lb   re  ris 0x0   #//load character to encrypt
@@ -156,21 +156,22 @@ var_insn_mem(32) := X"8007"; --add  s3  r0  r0    #//reset the loop counter
 -- ENCRYPT_LOOP--ENCRYPT_LOOP:
 var_insn_mem(33) := X"9771"; --addi  s3  s3  0x1           #//increment loop counter
 var_insn_mem(34) := X"C7FE"; --and   rk3 s3  rk4           #//get the next subkey index (<8)
-var_insn_mem(35) := X"A72E"; --slt   rk3 s3  rm            #//check if loop counter < m
+var_insn_mem(35) := X"0000"; --nop   //slt   rk3 s3  rm            #//check if loop counter < m
 var_insn_mem(36) := X"5DD0"; --lb    rk2 rk2 0x0           #//load subkey
 var_insn_mem(37) := X"D6D6"; --xor   re  re  rk2           #//xor char with subkey
 var_insn_mem(38) := X"86AD"; --add   rk2 re  rrn           #//get a new table pointer
-var_insn_mem(39) := X"CDFD"; --and   rk2 rk2 rk4           #//mask the table pointer
+var_insn_mem(39) := X"0000"; --nop don't maskand   rk2 rk2 rk4           #//mask the table pointer
 var_insn_mem(40) := X"5D60"; --lb    re  rk2 0x0           #//load table value
 var_insn_mem(41) := X"8EBD"; --add   rk2 rk3 rkp           #//update key pointer
-var_insn_mem(42) := X"6071"; --beq   s3 r0 ENCRYPT_SAVE   #//if counter !< m save character
+var_insn_mem(42) := X"6271"; --beq   s3 rm ENCRYPT_SAVE   #//if counter !< m save character
 var_insn_mem(43) := X"2021"; --j     ENCRYPT_LOOP
 -- ENCRYPT_SAVE--ENCRYPT_SAVE:
 var_insn_mem(44) := X"9554"; --addi  s1  s1  0x4           #//inc num of chars processed by 4
-var_insn_mem(45) := X"A457"; --slt   s3  rsz s1            #//if rsz<s1 s3=1
+var_insn_mem(45) := X"A547"; --slt   s3  s1  rsz            #//if rsz>s1 s3=1
 var_insn_mem(46) := X"7960"; --sb    re  ros 0x0           #//store encrypted character
 var_insn_mem(47) := X"9994"; --addi  ros ros 0x4           #//increment out string pointer
 var_insn_mem(48) := X"201B"; --j     ENCRYPT_STRING
+
 var_insn_mem(49) := X"0000";
 var_insn_mem(50) := X"0000";
 var_insn_mem(51) := X"0000";

@@ -104,14 +104,14 @@ begin
 -- Initial Array
 
 var_data_mem(0) := X"0000"; -- Intentionally Left Blank
-var_data_mem(1) := X"0150"; -- Pointer to Key
+var_data_mem(1) := X"0184"; -- Pointer to Key
 var_data_mem(2) := X"0020"; -- Pointer to Random Table
 var_data_mem(3) := X"0130"; -- Pointer to input string
-var_data_mem(4) := X"014A"; -- Pointer to output string
-var_data_mem(5) := X"0003"; -- m our repetition parameter
+var_data_mem(4) := X"0152"; -- Pointer to output string
+var_data_mem(5) := X"0008"; -- m our repetition parameter
 var_data_mem(6) := X"0003"; -- n out shift parmeter
-var_data_mem(7) := X"0164"; -- Pointer to our tag
-var_data_mem(8) := X"0000"; -- Padding 0 of 8
+var_data_mem(7) := X"0174"; -- Pointer to our tag
+var_data_mem(8) := X"0008"; -- string length --Padding 0 of 8
 var_data_mem(9) := X"0000"; -- Padding 1 of 8
 var_data_mem(10) := X"0000"; -- Padding 2 of 8
 var_data_mem(11) := X"0000"; -- Padding 3 of 8
@@ -274,7 +274,7 @@ var_data_mem(161) := X"0000"; -- Padding 0 of 8
 var_data_mem(162) := X"0000"; -- Padding 1 of 8
 var_data_mem(163) := X"0000"; -- Padding 2 of 8
 var_data_mem(164) := X"0000"; -- Padding 3 of 8
-var_data_mem(165) := X"0000"; -- Padding 4 of 8
+var_data_mem(165) := X"0000"; -- Padding 4 of 8 <-- out string
 var_data_mem(166) := X"0000"; -- Padding 5 of 8
 var_data_mem(167) := X"0000"; -- Padding 6 of 8
 var_data_mem(168) := X"0000"; -- Padding 7 of 8
@@ -290,7 +290,7 @@ var_data_mem(174) := X"0000"; -- outputarray[5]
 var_data_mem(175) := X"0000"; -- outputarray[6]
 var_data_mem(176) := X"0000"; -- outputarray[7]
 var_data_mem(177) := X"0000"; -- outputarray[8]
-var_data_mem(178) := X"0000"; -- Padding 0 of 8
+var_data_mem(178) := X"0000"; -- Padding 0 of 8 <-- tag
 var_data_mem(179) := X"0000"; -- Padding 1 of 8
 var_data_mem(180) := X"0000"; -- Padding 2 of 8
 var_data_mem(181) := X"0000"; -- Padding 3 of 8
