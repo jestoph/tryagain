@@ -225,7 +225,7 @@ begin
     arb_r_token_0 : r_token
     port map ( clk         => clk,
                reset       => reset,
-               init        => '1',
+               init        => '0',
                req         => sig_r_req_0,
                others_req  => sig_r_others_0,
                tok_in      => sig_r_tok_3to0,
@@ -261,7 +261,7 @@ begin
     arb_r_token_3 : r_token
     port map ( clk         => clk,
                reset       => reset,
-               init        => '0',
+               init        => '1',
                req         => sig_r_req_3,
                others_req  => sig_r_others_3,
                tok_in      => sig_r_tok_2to3,
@@ -273,7 +273,7 @@ begin
     arb_w_token_0 : w_token
     port map ( clk         => clk,
                reset       => reset,
-               init        => '1',
+               init        => '0',
                req         => sig_w_req_0,
                others_req  => sig_w_others_0,
                tok_in      => sig_w_tok_3to0,
@@ -309,7 +309,7 @@ begin
     arb_w_token_3 : w_token
     port map ( clk         => clk,
                reset       => reset,
-               init        => '0',
+               init        => '1',
                req         => sig_w_req_3,
                others_req  => sig_w_others_3,
                tok_in      => sig_w_tok_2to3,
