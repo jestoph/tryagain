@@ -62,7 +62,9 @@ entity single_cycle_core is
            r_mem_bus    : in  std_logic_vector(15 downto 0);
            addr_r_bus   : out std_logic_vector(11 downto 0);
            addr_w_bus   : out std_logic_vector(11 downto 0);
-           core_num :in std_logic_vector(15 downto 0));
+           core_num :in std_logic_vector(15 downto 0);
+           w_tok_d     : in std_logic;
+           r_tok_d     : in std_logic);
 end single_cycle_core;
 
 architecture structural of single_cycle_core is
@@ -351,6 +353,13 @@ component dff is
            );
 end component dff;
 
+component dff_fall is
+    port ( reset    : in  std_logic;
+           clk      : in  std_logic;
+           d_in     : in  std_logic;
+           d_out    : out std_logic
+           );
+end component dff_fall;
 
 signal sig_next_pc              : std_logic_vector(11 downto 0);
 signal sig_curr_pc              : std_logic_vector(11 downto 0);
@@ -500,6 +509,8 @@ signal sig_insn_id_storage      : std_logic_vector(15 downto 0);
 
 signal   sig_w_req              : std_logic;
 signal   sig_r_req              : std_logic;
+signal   sig_w_req_2              : std_logic;
+signal   sig_r_req_2              : std_logic;
 signal   sig_w_req_dm           : std_logic;
 signal   sig_r_req_dm           : std_logic;
 signal   sig_w_en               : std_logic;
@@ -516,16 +527,19 @@ signal   sig_r_b_bus         : std_logic;
 signal   sig_w_b_bus         : std_logic;
 signal   sig_clk                : std_logic;
 signal   sig_mem_stall          : std_logic;
+signal   sig_w_tok_d            : std_logic;
+signal   sig_r_tok_d            : std_logic;
 
 begin
-
+    sig_r_tok_d             <= r_tok_d;
+    sig_w_tok_d             <= w_tok_d;
     sig_one_4b              <= "0001";
 	sig_one_12b             <= "000000000001";
     sig_z_12b               <= "000000000000";
     sig_w_en                <= w_en;
     sig_r_en                <= r_en;
-    w_req                   <= sig_w_req;
-    r_req                   <= sig_r_req;    
+    w_req                   <= sig_w_req_dm;
+    r_req                   <= sig_r_req_dm;    
     w_req_dm                   <= sig_w_req_dm;
     r_req_dm                   <= sig_r_req_dm;
     sig_clk                 <= clk;
@@ -1010,15 +1024,15 @@ begin
                r_en       => sig_r_en,
                w_en_2       => sig_w_en_2,
                r_en_2       => sig_r_en_2,
-               w_req      => sig_w_req,
-               r_req      => sig_r_req,
+               w_req      => sig_w_req_dm,
+               r_req      => sig_r_req_dm,
                stall      => sig_mem_stall );
                
     data_unit   : mem_connect
     port map ( write_enable => sig_mem_write_dm,
                read_enable  => sig_mem_read_dm,
-               write_token  => sig_w_en,
-               read_token   => sig_r_en,
+               write_token  => sig_w_tok_d,
+               read_token   => sig_r_tok_d,
                write_data   => sig_read_data_b_dm,
                byte_addr	=> sig_byte_addr_dm,
                addr_in      => sig_alu_result_dm(11 downto 0),
@@ -1044,6 +1058,7 @@ begin
                addr_in          => sig_alu_result_dm(11 downto 0),
                w_req            => sig_w_req_dm,
                r_req            => sig_r_req_dm);
+
     
     r_en_storage : dff
     port map ( reset    => reset,
@@ -1057,6 +1072,19 @@ begin
                clk      => clk,
                d_in     => sig_w_en,
                d_out    => sig_w_en_2
+               );
+               
+    r_req_storage : dff_fall
+    port map ( reset    => reset,
+               clk      => clk,
+               d_in     => sig_r_req,
+               d_out    => sig_r_req_2
+               );
+    w_req_storage : dff_fall
+    port map ( reset    => reset,
+               clk      => clk,
+               d_in     => sig_w_req,
+               d_out    => sig_w_req_2
                );
 
 end structural;

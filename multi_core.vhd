@@ -31,7 +31,9 @@ component single_cycle_core is
            r_mem_bus    : in  std_logic_vector(15 downto 0);
            addr_r_bus   : out std_logic_vector(11 downto 0);
            addr_w_bus   : out std_logic_vector(11 downto 0);
-           core_num :in std_logic_vector(15 downto 0));
+           core_num :in std_logic_vector(15 downto 0);
+           w_tok_d     : in std_logic;
+           r_tok_d     : in std_logic);
 end component;
 
 component shared_memory is
@@ -323,6 +325,8 @@ begin
                 r_req       =>  sig_r_req_0,                
                 w_req_dm       =>  sig_w_req_dm_0,
                 r_req_dm       =>  sig_r_req_dm_0,
+                w_tok_d     =>  sig_w_tok_d_0,
+                r_tok_d     =>  sig_r_tok_d_0,
                 w_en        =>  sig_w_tok_stat_0,
                 r_en        =>  sig_r_tok_stat_0,
                 w_b_addr    =>  sig_w_b_addr_bus,
@@ -340,6 +344,8 @@ begin
                 r_req       =>  sig_r_req_1,
                 w_req_dm       =>  sig_w_req_dm_1,
                 r_req_dm       =>  sig_r_req_dm_1,
+                w_tok_d     =>  sig_w_tok_d_1,
+                r_tok_d     =>  sig_r_tok_d_1,
                 w_en        =>  sig_w_tok_stat_1,
                 r_en        =>  sig_r_tok_stat_1,
                 w_b_addr    =>  sig_w_b_addr_bus,
@@ -357,6 +363,8 @@ begin
                 r_req       =>  sig_r_req_2,
                 w_req_dm       =>  sig_w_req_dm_2,
                 r_req_dm       =>  sig_r_req_dm_2,
+                w_tok_d     =>  sig_w_tok_d_2,
+                r_tok_d     =>  sig_r_tok_d_2,
                 w_en        =>  sig_w_tok_stat_2,
                 r_en        =>  sig_r_tok_stat_2,
                 w_b_addr    =>  sig_w_b_addr_bus,
@@ -374,6 +382,8 @@ begin
                 r_req       =>  sig_r_req_3,
                 w_req_dm       =>  sig_w_req_dm_3,
                 r_req_dm       =>  sig_r_req_dm_3,
+                w_tok_d     =>  sig_w_tok_d_3,
+                r_tok_d     =>  sig_r_tok_d_3,
                 w_en        =>  sig_w_tok_stat_3,
                 r_en        =>  sig_r_tok_stat_3,
                 w_b_addr    =>  sig_w_b_addr_bus,

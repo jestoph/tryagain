@@ -72,7 +72,7 @@ ARCHITECTURE testbench_arch OF multi_core_testbench IS
                 WAIT FOR 285 ns;
                 reset <= '0';
                 -- -------------------------------------
-                WAIT FOR 100000ns;--28500 ns;
+                WAIT FOR 50000ns;--28500 ns;
 
                 IF (TX_ERROR = 0) THEN
                     STD.TEXTIO.write(TX_OUT, string'("No errors or warnings"));
