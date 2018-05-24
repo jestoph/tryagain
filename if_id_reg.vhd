@@ -67,7 +67,7 @@ reg_process: process(reset,
       --elsif(stall = '1') then
       --   data_out <= (others => '0');
       else
-         data_out <= data_in after 10ns; 
+         data_out <= data_in after 0ns; 
       end if;
    end if;
    
