@@ -4,7 +4,7 @@
 
 int encryption_repetitions = 1;
 int shift_amount = 1;
-int number_of_cores = 4;
+int number_of_cores = 2;
 
 char key[]={
     0x12,
@@ -321,22 +321,71 @@ char doshift(char next, unsigned long long * key, int shifts){
 
 
 
+char tagtest_str[] = "CompArch";
 void tagtest(){
-    char mystr[] = "CompArch";
     unsigned long long val = 0xAAAAAAAAAAAAAAAA;
     unsigned char mytag = 0;
 
-    printf("Input: \"%s\"\n",mystr);
-    for(int i = 0 ; mystr[i] ; i ++){
-        char shifted = doshift(mystr[i], &val, 1);
+    printf("Input: \"%s\"\n",tagtest_str);
+    for(int i = 0 ; tagtest_str[i] ; i ++){
+        char shifted = doshift(tagtest_str[i], &val, 1);
         mytag = mytag ^ shifted;
-    	printf("mystr[%d]: 0x%x shifted: 0x%x currtag: 0x%x\n", 
-                i, mystr[i], shifted&0xff, mytag);
+    	printf("tagtest_str[%d]: 0x%x shifted: 0x%x currtag: 0x%x\n", 
+                i, tagtest_str[i], shifted&0xff, mytag);
     }
 
     printf("Final Tag: 0x%x %s\n", mytag, mytag==0x1d?"Correct":"Incorrect" );
 
 }
+
+void * do_tagtest_work(void * argument){
+
+    unsigned long long val = 0xAAAAAAAAAAAAAAAA;
+    unsigned char mytag = 0;
+    int threadId = *((int*) argument);
+
+    // Rotate the key to match thread id
+    for(int i = 0 ; i < threadId ; i++)
+        doshift('a', &val, 0);
+
+    printf("Input: \"%s\"\n",tagtest_str);
+    for(int i = threadId ; i<strlen(tagtest_str) ; i += number_of_cores){
+        char shifted = doshift(tagtest_str[i], &val, 1);
+        mytag = mytag ^ shifted;
+    	printf("tagtest_str[%d]: 0x%x shifted: 0x%x currtag: 0x%x\n", 
+                i, tagtest_str[i], shifted&0xff, mytag);
+        // Rotate the key N-1 times to get to next repetitions
+        for(int i = 0 ; i < (number_of_cores -1) ; i++)
+            doshift('a', &val, 0);
+        }
+    return (void*) mytag;
+}
+
+
+void tagtest_thread(){
+    pthread_t threads[number_of_cores];
+    int thread_args[number_of_cores];
+    int thread_rets[number_of_cores];
+    for (int index = 0; index < number_of_cores; ++index) {
+        thread_args[ index ] = index;
+        printf("In main: creating thread %d\n", index);
+        pthread_create(&threads[index], NULL, do_tagtest_work, &thread_args[index]); 
+    }
+    for (int index = 0; index < number_of_cores; ++index) {
+        pthread_join(threads[index], &thread_rets[index]);
+        printf("In main: thread %d has completed and returned 0x%x\n", index, thread_rets[index]&0xff);
+    }
+    char result=0;
+    for (int index = 0; index < number_of_cores; ++index) {
+        printf("0x%x ^ 0x%x -> 0x%x\n",
+            result&0xff, thread_rets[index]&0xff, (result ^ thread_rets[index])&0xff);
+        result = (result ^ thread_rets[index])&0xff;
+    }
+
+    printf("Final Tag: 0x%x vs 0x%x %s\n", result, 0x1d, result==0x1d?"Correct":"Incorrect" );
+}
+    
+
 
 void encrypttest(){
 
@@ -379,12 +428,17 @@ void encrypttest(){
 
 }
 
+
 // Returns the tag
 unsigned char do_encrypt(char * input, char * output, int len, int offset, int stride){
 
     unsigned char next;
     unsigned char tag=0;
     unsigned long long key_copy = 0x123456789abcdef0;
+
+    /* Rotate key by offset */
+    for(int i = 0 ; i < offset; i++)
+        doshift('a', &key_copy, 0);
 
     for(int i = offset ; i < len ; i += stride){
 
@@ -395,6 +449,10 @@ unsigned char do_encrypt(char * input, char * output, int len, int offset, int s
         output[i] = next;
         output[i+1] = 0;
         tag = newtag;
+
+        /* Rotate key for next go */
+        for(int i = 0 ; i < stride - 1; i++)
+            doshift('a', &key_copy, 0);
     }
 
     return tag;
@@ -412,9 +470,8 @@ struct data {
 } DATA;
 
 void* perform_work(void* argument) {
-    int threadId;
 
-    threadId = *((int*) argument);
+    int threadId = *((int*) argument);
     unsigned char tag = do_encrypt(DATA.input, DATA.output, DATA.len, threadId, DATA.numthreads);
     printf("Thread %d of %d, Tag = 0x%x\n", threadId, DATA.numthreads, tag);
  
@@ -444,6 +501,9 @@ int main(){
     printf("Tagtest:\n");
     tagtest();
     printf("\n");
+    printf("Tagtest_threads:\n");
+    tagtest_thread();
+    printf("\n");
     printf("EncryptTest:\n");
     encrypttest();
     printf("\n");
@@ -467,7 +527,6 @@ int main(){
 
         pthread_t threads[number_of_cores];
         int thread_args[number_of_cores];
-        int result_code[number_of_cores];
 
         // Create N threads
         for (int index = 0; index < number_of_cores; ++index) {
@@ -479,21 +538,6 @@ int main(){
             pthread_join(threads[index], NULL);
             printf("In main: thread %d has completed and returned 0x%x\n", index, DATA.tags[index]&0xff);
         }
-        /* This section is for serialising reads of the tags */
-        //unsigned char tag = 0;
-        //for (int index = 0; index < number_of_cores; ++index) {
-        //    printf("Tag 0x%x ^ 0x%x -> 0x%x\n", tag, DATA.tags[index], tag ^ DATA.tags[index]);
-        //    tag = tag ^ DATA.tags[index];
-        //}
-
-        //printf("In: %s\n", DATA.input);
-        //printf("Out: ");
-        //for(int i = 0 ; i < DATA.len ; i ++)
-        //    printf("0x%x ", DATA.output[i]&0xff);
-        //printf("(%s)", DATA.output);
-        //printf("\n");
-
-        //printf("Final Tag: 0x%x vs 0x%x\n", tag & 0xff, DATA.finalTag);
         printf("Final Tag: 0x%x \n", DATA.finalTag);
 
 
