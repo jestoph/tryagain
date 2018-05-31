@@ -102,7 +102,7 @@ begin
     
     sig_b_match     <= '1' when (sig_src_b_en = '1' and (sig_src_b_if = sig_dst_id)) else '0';
                                     
-    stall           <= sig_is_load and (sig_b_match or sig_a_match) after 15ns;
+    stall           <= sig_is_load and (sig_b_match or sig_a_match) after 1.5ns;
     
     b_or_jmp    <= sig_do_jmp after 1.5ns;
     pc_src      <= do_branch after 1.5ns;
